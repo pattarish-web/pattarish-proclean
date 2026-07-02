@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="article-body">
                                 <h3>${article.title}</h3>
                                 <p>${article.description}</p>
-                                <a href="posts.json" target="_blank" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
+                                <a href="blog.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
                             </div>
                         </article>
                     `).join('');
