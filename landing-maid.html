@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บริการจัดหาแม่บ้านประจำ สำนักงาน คอนโด อาคาร | Pattarish Pro Clean</title>
+    <meta name="description" content="บริการจัดหาแม่บ้านประจำมืออาชีพ สำหรับสำนักงาน คอนโด อาคาร ประสบการณ์กว่า 30 ปี มีคนสำรองทดแทน ดูแลเรื่องเงินเดือน ประกันสังคมให้ครบ">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Noto Sans Thai', 'Inter', sans-serif;
+            color: #1e293b;
+            background: #f8fafc;
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        img { max-width: 100%; height: auto; display: block; }
+        a { text-decoration: none; color: inherit; }
+
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --primary-light: #14b8a6;
+            --primary-glow: rgba(13, 148, 136, 0.25);
+            --accent-warm: #f59e0b;
+            --accent-warm-light: #fbbf24;
+            --accent-rose: #f43f5e;
+            --bg-dark: #0f172a;
+            --bg-dark-2: #1e293b;
+            --bg-light: #f0fdfa;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --glass-bg: rgba(255,255,255,0.12);
+            --glass-border: rgba(255,255,255,0.18);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+            --shadow-xl: 0 20px 60px rgba(0,0,0,0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-full: 9999px;
+        }
+
+        /* ===== UTILITY ===== */
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(13,148,136,0.1), rgba(13,148,136,0.05));
+            color: var(--primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: var(--radius-full);
+            letter-spacing: 0.03em;
+            border: 1px solid rgba(13,148,136,0.15);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+        .section-title {
+            font-size: clamp(1.6rem, 4vw, 2.3rem);
+            font-weight: 800;
+            line-height: 1.3;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+        .section-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Noto Sans Thai', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 16px 36px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .btn:hover::after { opacity: 1; }
+
+        .btn-line {
+            background: linear-gradient(135deg, #06c755, #00b74d);
+            color: var(--white);
+            box-shadow: 0 6px 24px rgba(6,199,85,0.35);
+        }
+        .btn-line:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 36px rgba(6,199,85,0.45);
+        }
+
+        .btn-phone {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            box-shadow: 0 6px 24px var(--primary-glow);
+        }
+        .btn-phone:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 36px rgba(13,148,136,0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-warm {
+            background: linear-gradient(135deg, var(--accent-warm), #d97706);
+            color: var(--white);
+            box-shadow: 0 6px 24px rgba(245,158,11,0.35);
+        }
+        .btn-warm:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 36px rgba(245,158,11,0.45);
+        }
+
+        .btn-lg {
+            padding: 20px 44px;
+            font-size: 1.15rem;
+            border-radius: 18px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(165deg, #042f2e 0%, #0f3d3a 30%, #134e4a 60%, #0d3b38 100%);
+            overflow: hidden;
+            padding: 80px 0 60px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 80%;
+            height: 120%;
+            background: radial-gradient(ellipse, rgba(13,148,136,0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -20%;
+            width: 60%;
+            height: 80%;
+            background: radial-gradient(ellipse, rgba(245,158,11,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 40px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        .hero-content { text-align: center; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(245,158,11,0.15);
+            border: 1px solid rgba(245,158,11,0.3);
+            color: var(--accent-warm-light);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: var(--radius-full);
+            margin-bottom: 24px;
+            animation: fadeInDown 0.8s ease;
+        }
+        .hero-title {
+            font-size: clamp(1.8rem, 5.5vw, 3rem);
+            font-weight: 900;
+            color: var(--white);
+            line-height: 1.25;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+        .hero-title span {
+            background: linear-gradient(135deg, var(--accent-warm-light), var(--accent-warm));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-desc {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.75);
+            max-width: 520px;
+            margin: 0 auto 32px;
+            line-height: 1.8;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+        .hero-ctas {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+        .hero-trust {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 36px;
+            animation: fadeInUp 0.8s ease 0.8s both;
+        }
+        .hero-trust-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .hero-trust-item i {
+            color: var(--accent-warm-light);
+            font-size: 1rem;
+        }
+        .hero-image {
+            display: flex;
+            justify-content: center;
+            animation: fadeInUp 1s ease 0.5s both;
+        }
+        .hero-image img {
+            width: 100%;
+            max-width: 480px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 3px solid rgba(255,255,255,0.1);
+        }
+
+        /* ===== PAIN POINTS ===== */
+        .pain-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+        .pain-section .container { text-align: center; }
+        .pain-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .pain-card {
+            background: linear-gradient(135deg, #fff5f5, #fff1f2);
+            border: 1px solid rgba(244,63,94,0.12);
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            text-align: left;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .pain-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        .pain-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-rose), #e11d48);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+        .pain-card h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #9f1239;
+            margin-bottom: 6px;
+        }
+        .pain-card p {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ===== BENEFITS ===== */
+        .benefits-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, var(--bg-light) 0%, var(--white) 100%);
+        }
+        .benefits-section .container { text-align: center; }
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .benefit-card {
+            background: var(--white);
+            border: 1px solid rgba(13,148,136,0.1);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .benefit-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+        }
+        .benefit-card:hover::before { opacity: 1; }
+        .benefit-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(13,148,136,0.1), rgba(13,148,136,0.05));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            color: var(--primary);
+            font-size: 1.5rem;
+            transition: background 0.3s;
+        }
+        .benefit-card:hover .benefit-icon {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+        }
+        .benefit-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .benefit-card p {
+            font-size: 0.93rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+
+        /* ===== PRICING ===== */
+        .pricing-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+        .pricing-section .container { text-align: center; }
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .pricing-card {
+            background: var(--white);
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 36px 28px;
+            text-align: center;
+            transition: all 0.4s;
+            position: relative;
+        }
+        .pricing-card.featured {
+            border-color: var(--primary);
+            box-shadow: 0 8px 40px var(--primary-glow);
+            transform: scale(1.02);
+        }
+        .pricing-card.featured::before {
+            content: 'ยอดนิยม';
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 5px 22px;
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .pricing-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 40px var(--primary-glow);
+        }
+        .pricing-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+        }
+        .pricing-card .price-label {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .pricing-card .price {
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .pricing-card .price-unit {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        .pricing-card ul {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 28px;
+        }
+        .pricing-card ul li {
+            font-size: 0.93rem;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pricing-card ul li:last-child { border-bottom: none; }
+        .pricing-card ul li i {
+            color: var(--primary);
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .pricing-note {
+            margin-top: 32px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.03));
+            border: 1px solid rgba(245,158,11,0.15);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+        .pricing-note i { color: var(--accent-warm); margin-right: 6px; }
+
+        /* ===== SOCIAL PROOF ===== */
+        .proof-section {
+            padding: 80px 0;
+            background: linear-gradient(165deg, var(--bg-dark) 0%, var(--bg-dark-2) 100%);
+            color: var(--white);
+        }
+        .proof-section .container { text-align: center; }
+        .proof-section .section-title { color: var(--white); }
+        .proof-section .section-subtitle { color: rgba(255,255,255,0.6); }
+        .proof-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 48px;
+        }
+        .proof-stat {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px 16px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .proof-stat .number {
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-warm-light), var(--accent-warm));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+        .proof-stat .label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            font-weight: 500;
+        }
+        .proof-logos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .proof-logo {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            padding: 14px 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s;
+        }
+        .proof-logo:hover {
+            background: rgba(255,255,255,0.2);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* ===== PROCESS ===== */
+        .process-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+        .process-section .container { text-align: center; }
+        .process-steps {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .process-step {
+            position: relative;
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .process-step:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .process-step h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .process-step p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .process-arrow {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        /* ===== FAQ ===== */
+        .faq-section {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+        .faq-section .container { text-align: center; }
+        .faq-list {
+            max-width: 700px;
+            margin: 20px auto 0;
+            text-align: left;
+        }
+        .faq-item {
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            margin-bottom: 14px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+        .faq-item:hover { box-shadow: var(--shadow-sm); }
+        .faq-question {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            gap: 12px;
+            transition: color 0.3s;
+            user-select: none;
+        }
+        .faq-question:hover { color: var(--primary); }
+        .faq-question i {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: transform 0.3s;
+            flex-shrink: 0;
+        }
+        .faq-item.active .faq-question i { transform: rotate(180deg); color: var(--primary); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.3s ease;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+        }
+        .faq-answer-inner {
+            padding: 0 24px 20px;
+            font-size: 0.93rem;
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+
+        /* ===== FINAL CTA ===== */
+        .final-cta {
+            padding: 80px 0;
+            background: linear-gradient(165deg, #042f2e 0%, #134e4a 50%, #0f3d3a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .final-cta::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -20%;
+            width: 60%;
+            height: 100%;
+            background: radial-gradient(ellipse, rgba(245,158,11,0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .final-cta .container {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .final-cta .section-title {
+            color: var(--white);
+            font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+        }
+        .final-cta .section-subtitle {
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 36px;
+        }
+        .final-cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .final-cta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+        .final-cta-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.92rem;
+        }
+        .final-cta-info-item i {
+            color: var(--accent-warm-light);
+            font-size: 1rem;
+        }
+        .urgency-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(244,63,94,0.15);
+            border: 1px solid rgba(244,63,94,0.3);
+            color: #fda4af;
+            font-size: 0.88rem;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: var(--radius-full);
+            margin-bottom: 28px;
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 24px 0;
+            background: #020617;
+            text-align: center;
+        }
+        .footer p {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.35);
+        }
+
+        /* ===== FLOATING BUTTONS ===== */
+        .floating-buttons {
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .float-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .float-btn:hover {
+            transform: scale(1.12);
+        }
+        .float-btn-line {
+            background: linear-gradient(135deg, #06c755, #00b74d);
+        }
+        .float-btn-phone {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            animation: pulse-ring 2.5s infinite;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.3); }
+            50% { box-shadow: 0 0 0 12px rgba(244,63,94,0); }
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(13,148,136,0.5); }
+            70% { box-shadow: 0 0 0 14px rgba(13,148,136,0); }
+            100% { box-shadow: 0 0 0 0 rgba(13,148,136,0); }
+        }
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== MID CTA ===== */
+        .mid-cta {
+            padding: 48px 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            text-align: center;
+        }
+        .mid-cta h2 {
+            color: var(--white);
+            font-size: clamp(1.3rem, 3.5vw, 1.7rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .mid-cta p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+        .mid-cta .btn { background: var(--white); color: var(--primary); font-weight: 800; }
+        .mid-cta .btn:hover { background: #f0fdfa; transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 640px) {
+            .pain-grid { grid-template-columns: repeat(2, 1fr); }
+            .benefits-grid { grid-template-columns: repeat(2, 1fr); }
+            .pricing-cards { grid-template-columns: repeat(2, 1fr); }
+            .hero-ctas { flex-direction: row; justify-content: center; }
+            .final-cta-buttons { flex-direction: row; justify-content: center; }
+        }
+        @media (min-width: 768px) {
+            .process-steps {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+            }
+            .proof-stats { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .hero-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 60px;
+            }
+            .hero-content { text-align: left; }
+            .hero-desc { margin: 0 0 32px; }
+            .hero-ctas { justify-content: flex-start; }
+            .hero-trust { justify-content: flex-start; }
+            .benefits-grid { grid-template-columns: repeat(4, 1fr); }
+            .pricing-cards { grid-template-columns: repeat(3, 1fr); }
+            .pricing-card.featured { transform: scale(1.06); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-award"></i>
+                        30+ ปีประสบการณ์ในวงการบริการทำความสะอาด
+                    </div>
+                    <h1 class="hero-title">
+                        บริการจัดหา<span>แม่บ้านประจำ</span><br>สำนักงาน คอนโด อาคาร
+                    </h1>
+                    <p class="hero-desc">
+                        หมดกังวลเรื่องคนทำความสะอาด เราจัดหาแม่บ้านมืออาชีพ ผ่านการอบรม พร้อมระบบสำรองทดแทน ดูแลทุกเรื่องตั้งแต่การคัดเลือกจนถึงจ่ายเงินเดือน
+                    </p>
+                    <div class="hero-ctas">
+                        <a href="https://line.me/ti/p/@pattarishproclean" target="_blank" class="btn btn-line btn-lg" id="hero-cta-line">
+                            <i class="fab fa-line"></i> สอบถามราคา ผ่าน Line
+                        </a>
+                        <a href="tel:0636865134" class="btn btn-outline" id="hero-cta-phone">
+                            <i class="fas fa-phone"></i> โทร 063-686-5134
+                        </a>
+                    </div>
+                    <div class="hero-trust">
+                        <div class="hero-trust-item">
+                            <i class="fas fa-check-circle"></i>
+                            ไม่มีค่ามัดจำ
+                        </div>
+                        <div class="hero-trust-item">
+                            <i class="fas fa-check-circle"></i>
+                            ทดลองงานฟรี
+                        </div>
+                        <div class="hero-trust-item">
+                            <i class="fas fa-check-circle"></i>
+                            มีคนสำรองเสมอ
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1628177142898-93e36e4e3a50?auto=format&fit=crop&w=800&q=80" alt="บริการแม่บ้านประจำมืออาชีพ" loading="eager">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PAIN POINTS ===== -->
+    <section class="pain-section" id="pain-points">
+        <div class="container">
+            <div class="section-label animate-on-scroll"><i class="fas fa-exclamation-triangle"></i> ปัญหาที่คุณเจอ</div>
+            <h2 class="section-title animate-on-scroll">เคยประสบปัญหาเหล่านี้ไหม?</h2>
+            <p class="section-subtitle animate-on-scroll">ปัญหาที่องค์กรส่วนใหญ่ต้องเผชิญเมื่อจ้างแม่บ้านเอง</p>
+            <div class="pain-grid">
+                <div class="pain-card animate-on-scroll">
+                    <div class="pain-icon"><i class="fas fa-user-xmark"></i></div>
+                    <div>
+                        <h3>หาแม่บ้านเองไม่ได้คุณภาพ</h3>
+                        <p>สัมภาษณ์ทีหลายคน แต่ไม่มีระบบตรวจสอบประวัติ ไม่แน่ใจเรื่องความซื่อสัตย์และทักษะการทำงาน</p>
+                    </div>
+                </div>
+                <div class="pain-card animate-on-scroll">
+                    <div class="pain-icon"><i class="fas fa-calendar-xmark"></i></div>
+                    <div>
+                        <h3>แม่บ้านขาดงานบ่อย ไม่มีคนสำรอง</h3>
+                        <p>ลาป่วย ลากิจ หยุดกะทันหัน ไม่มีคนทำความสะอาดทดแทน สำนักงานสกปรก</p>
+                    </div>
+                </div>
+                <div class="pain-card animate-on-scroll">
+                    <div class="pain-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <div>
+                        <h3>ยุ่งยากเรื่องประกันสังคม จ่ายเงินเดือน</h3>
+                        <p>ต้องจัดการเอกสาร ยื่นภาษี สมทบประกันสังคม จ่ายเงินเดือน ค่าล่วงเวลา ทุกเดือน</p>
+                    </div>
+                </div>
+                <div class="pain-card animate-on-scroll">
+                    <div class="pain-icon"><i class="fas fa-face-frown"></i></div>
+                    <div>
+                        <h3>คุณภาพงานไม่สม่ำเสมอ</h3>
+                        <p>ไม่มีระบบตรวจสอบ QC แม่บ้านทำงานตามใจ ไม่มีมาตรฐาน ผลงานดีบ้างไม่ดีบ้าง</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MID CTA ===== -->
+    <section class="mid-cta">
+        <div class="container animate-on-scroll">
+            <h2>ให้เราช่วยแก้ปัญหาเหล่านี้ให้คุณ</h2>
+            <p>ปรึกษาฟรี ไม่มีค่าใช้จ่ายล่วงหน้า</p>
+            <a href="https://line.me/ti/p/@pattarishproclean" target="_blank" class="btn" id="mid-cta-line">
+                <i class="fab fa-line"></i> แอดไลน์ @pattarishproclean
+            </a>
+        </div>
+    </section>
+
+    <!-- ===== BENEFITS ===== -->
+    <section class="benefits-section" id="benefits">
+        <div class="container">
+            <div class="section-label animate-on-scroll"><i class="fas fa-sparkles"></i> ทำไมต้องเลือกเรา</div>
+            <h2 class="section-title animate-on-scroll">บริการครบวงจร หมดปัญหาทุกเรื่อง</h2>
+            <p class="section-subtitle animate-on-scroll">เราดูแลทุกขั้นตอน ตั้งแต่คัดเลือกจนถึงตรวจสอบคุณภาพ</p>
+            <div class="benefits-grid">
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h3>แม่บ้านผ่านการอบรม</h3>
+                    <p>ทุกคนผ่านหลักสูตรอบรมมาตรฐาน ทั้งเทคนิคทำความสะอาด การใช้อุปกรณ์ และมารยาท</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-icon"><i class="fas fa-people-arrows"></i></div>
+                    <h3>มีคนสำรองทดแทนทันที</h3>
+                    <p>หากแม่บ้านประจำไม่สามารถมาทำงานได้ เรามีบุคลากรสำรองพร้อมเข้าทดแทนภายในวันเดียว</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-icon"><i class="fas fa-money-check-dollar"></i></div>
+                    <h3>จัดการเงินเดือน/ประกันสังคมให้</h3>
+                    <p>ไม่ต้องยุ่งยากเรื่องเอกสาร เราจัดการเงินเดือน ภาษี ประกันสังคม ค่าล่วงเวลาให้ทั้งหมด</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-icon"><i class="fas fa-clipboard-check"></i></div>
+                    <h3>ดูแลคุณภาพโดยทีม QC</h3>
+                    <p>ทีม QC เข้าตรวจสอบคุณภาพงานสม่ำเสมอ มีรายงานผลให้ทุกครั้ง มั่นใจได้ในมาตรฐาน</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PRICING ===== -->
+    <section class="pricing-section" id="pricing">
+        <div class="container">
+            <div class="section-label animate-on-scroll"><i class="fas fa-tags"></i> ราคาโปร่งใส</div>
+            <h2 class="section-title animate-on-scroll">แพ็กเกจบริการแม่บ้านประจำ</h2>
+            <p class="section-subtitle animate-on-scroll">ราคาเริ่มต้นสุดคุ้ม ปรับเปลี่ยนได้ตามความต้องการ</p>
+            <div class="pricing-cards">
+                <div class="pricing-card animate-on-scroll">
+                    <h3>แม่บ้านประจำ 1 คน</h3>
+                    <p class="price-label">เหมาะกับสำนักงานขนาดเล็ก - คอนโด</p>
+                    <div class="price">฿12,000</div>
+                    <p class="price-unit">เริ่มต้น/คน/เดือน</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> ทำความสะอาดประจำวัน</li>
+                        <li><i class="fas fa-check"></i> มีคนสำรองทดแทน</li>
+                        <li><i class="fas fa-check"></i> ดูแลเงินเดือน/ประกันสังคม</li>
+                        <li><i class="fas fa-check"></i> ตรวจ QC เป็นระยะ</li>
+                    </ul>
+                    <a href="https://line.me/ti/p/@pattarishproclean" target="_blank" class="btn btn-phone" style="width:100%;" id="pricing-cta-1">
+                        <i class="fab fa-line"></i> สอบถามรายละเอียด
+                    </a>
+                </div>
+
+                <div class="pricing-card featured animate-on-scroll">
+                    <h3>แม่บ้านประจำ 2 คน</h3>
+                    <p class="price-label">เหมาะกับสำนักงาน/อาคารขนาดกลาง</p>
+                    <div class="price">฿22,000</div>
+                    <p class="price-unit">เริ่มต้น/2 คน/เดือน</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> ครอบคลุมพื้นที่มากขึ้น</li>
+                        <li><i class="fas fa-check"></i> มีคนสำรองทดแทน</li>
+                        <li><i class="fas fa-check"></i> ดูแลเงินเดือน/ประกันสังคม</li>
+                        <li><i class="fas fa-check"></i> หัวหน้างานประสานงาน</li>
+                        <li><i class="fas fa-check"></i> ตรวจ QC ทุก 2 สัปดาห์</li>
+                    </ul>
+                    <a href="https://line.me/ti/p/@pattarishproclean" target="_blank" class="btn btn-line" style="width:100%;" id="pricing-cta-2">
+                        <i class="fab fa-line"></i> ขอใบเสนอราคา
+                    </a>
+                </div>
+
+                <div class="pricing-card animate-on-scroll">
+                    <h3>แม่บ้านรายวัน</h3>
+                    <p class="price-label">เหมาะกับงานเสริม/ทดแทนชั่วคราว</p>
+                    <div class="price">฿550</div>
+                    <p class="price-unit">เริ่มต้น/วัน</p>
+                    <ul>
+                        <li><i class="fas fa-check"></i> ยืดหยุ่น เรียกใช้ตามต้องการ</li>
+                        <li><i class="fas fa-check"></i> เหมาะกับงานทำความสะอาดครั้งเดียว</li>
+                        <li><i class="fas fa-check"></i> แม่บ้านผ่านการอบรม</li>
+                        <li><i class="fas fa-check"></i> มีอุปกรณ์พร้อม</li>
+                    </ul>
+                    <a href="tel:0636865134" class="btn btn-phone" style="width:100%;" id="pricing-cta-daily">
+                        <i class="fas fa-phone"></i> โทรจองวันนี้
+                    </a>
+                </div>
+            </div>
+            <div class="pricing-note animate-on-scroll">
+                <i class="fas fa-info-circle"></i>
+                ราคาดังกล่าวเป็นราคาเริ่มต้น อาจเปลี่ยนแปลงตามพื้นที่ใช้งาน ระยะทาง และขอบเขตงาน กรุณาติดต่อเพื่อรับใบเสนอราคาที่เหมาะกับคุณ
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SOCIAL PROOF ===== -->
+    <section class="proof-section" id="social-proof">
+        <div class="container">
+            <div class="section-label animate-on-scroll" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);"><i class="fas fa-star"></i> ลูกค้าที่ไว้วางใจ</div>
+            <h2 class="section-title animate-on-scroll">กว่า 500 องค์กรไว้วางใจ</h2>
+            <p class="section-subtitle animate-on-scroll">บริษัทชั้นนำและอาคารสำนักงานทั่วกรุงเทพฯ เลือกใช้บริการของเรา</p>
+            <div class="proof-stats">
+                <div class="proof-stat animate-on-scroll">
+                    <div class="number">30+</div>
+                    <div class="label">ปีประสบการณ์</div>
+                </div>
+                <div class="proof-stat animate-on-scroll">
+                    <div class="number">500+</div>
+                    <div class="label">องค์กรที่ไว้วางใจ</div>
+                </div>
+                <div class="proof-stat animate-on-scroll">
+                    <div class="number">2,000+</div>
+                    <div class="label">บุคลากรพร้อมบริการ</div>
+                </div>
+                <div class="proof-stat animate-on-scroll">
+                    <div class="number">98%</div>
+                    <div class="label">ลูกค้าต่อสัญญา</div>
+                </div>
+            </div>
+            <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:16px;" class="animate-on-scroll">ตัวอย่างลูกค้าที่ใช้บริการ</p>
+            <div class="proof-logos animate-on-scroll">
+                <div class="proof-logo"><i class="fas fa-building"></i> สำนักงาน CBD</div>
+                <div class="proof-logo"><i class="fas fa-city"></i> คอนโดย่านสุขุมวิท</div>
+                <div class="proof-logo"><i class="fas fa-hospital"></i> คลินิก & สถานพยาบาล</div>
+                <div class="proof-logo"><i class="fas fa-store"></i> โชว์รูมรถยนต์</div>
+                <div class="proof-logo"><i class="fas fa-landmark"></i> สำนักงานราชการ</div>
+                <div class="proof-logo"><i class="fas fa-school"></i> สถาบันการศึกษา</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PROCESS ===== -->
+    <section class="process-section" id="process">
+        <div class="container">
+            <div class="section-label animate-on-scroll"><i class="fas fa-route"></i> ขั้นตอนง่ายๆ</div>
+            <h2 class="section-title animate-on-scroll">เริ่มต้นใช้บริการใน 4 ขั้นตอน</h2>
+            <p class="section-subtitle animate-on-scroll">กระบวนการที่เรียบง่าย รวดเร็ว เริ่มงานได้ภายใน 3 วัน</p>
+            <div class="process-steps">
+                <div class="process-step animate-on-scroll">
+                    <div class="step-number">1</div>
+                    <h3>ประเมินความต้องการ</h3>
+                    <p>แจ้งรายละเอียดพื้นที่ จำนวนคน และขอบเขตงานที่ต้องการ เราประเมินฟรี</p>
+                </div>
+                <div class="process-step animate-on-scroll">
+                    <div class="step-number">2</div>
+                    <h3>คัดเลือกบุคลากร</h3>
+                    <p>เราคัดเลือกแม่บ้านที่เหมาะสม ตรวจประวัติ อบรมทักษะก่อนส่งเข้าปฏิบัติงาน</p>
+                </div>
+                <div class="process-step animate-on-scroll">
+                    <div class="step-number">3</div>
+                    <h3>เริ่มปฏิบัติงาน</h3>
+                    <p>แม่บ้านเข้าประจำที่ตามวันและเวลาที่กำหนด พร้อมอุปกรณ์ครบชุด</p>
+                </div>
+                <div class="process-step animate-on-scroll">
+                    <div class="step-number">4</div>
+                    <h3>ตรวจสอบคุณภาพ</h3>
+                    <p>ทีม QC ตรวจสอบเป็นระยะ รับฟังฟีดแบ็กลูกค้า ปรับปรุงอย่างต่อเนื่อง</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="faq-section" id="faq">
+        <div class="container">
+            <div class="section-label animate-on-scroll"><i class="fas fa-circle-question"></i> คำถามที่พบบ่อย</div>
+            <h2 class="section-title animate-on-scroll">FAQ เกี่ยวกับบริการแม่บ้านประจำ</h2>
+            <div class="faq-list">
+                <div class="faq-item animate-on-scroll">
+                    <div class="faq-question" id="faq-q-1">
+                        <span>ถ้าแม่บ้านประจำลาหยุด จะมีคนทดแทนไหม?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            มีครับ/ค่ะ เรามีระบบสำรองบุคลากรตลอดเวลา หากแม่บ้านประจำไม่สามารถมาปฏิบัติงานได้ไม่ว่าจะด้วยเหตุผลใด เราจะจัดคนทดแทนเข้าไปภายในวันเดียวกัน เพื่อให้การทำงานไม่หยุดชะงัก
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item animate-on-scroll">
+                    <div class="faq-question" id="faq-q-2">
+                        <span>มีสัญญาขั้นต่ำกี่เดือน?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            สัญญาขั้นต่ำ 1 ปี แต่สามารถยกเลิกได้โดยแจ้งล่วงหน้า 30 วัน เรายืดหยุ่นและเน้นความพึงพอใจของลูกค้าเป็นหลัก หากไม่พอใจคุณภาพงาน สามารถขอเปลี่ยนพนักงานได้ทันที
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item animate-on-scroll">
+                    <div class="faq-question" id="faq-q-3">
+                        <span>แม่บ้านมีอุปกรณ์ทำความสะอาดให้ด้วยหรือเปล่า?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-inner">
+                            สามารถเลือกได้ทั้ง 2 แบบ คือ ใช้อุปกรณ์ของลูกค้า หรือเราจัดหาอุปกรณ์ทำความสะอาดและน้ำยาคุณภาพให้ครบ โดยมีค่าบริการเพิ่มเติมตามที่ตกลง เราใช้ผลิตภัณฑ์มาตรฐานที่ปลอดภัยเสมอ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FINAL CTA ===== -->
+    <section class="final-cta" id="final-cta">
+        <div class="container">
+            <div class="urgency-badge animate-on-scroll">
+                <i class="fas fa-bolt"></i>
+                รับส่วนลดพิเศษ สำหรับลูกค้าที่ลงทะเบียนเดือนนี้
+            </div>
+            <h2 class="section-title animate-on-scroll">พร้อมหมดปัญหาเรื่องแม่บ้าน?</h2>
+            <p class="section-subtitle animate-on-scroll">ติดต่อเราวันนี้ รับคำปรึกษาและใบเสนอราคาฟรี ไม่มีข้อผูกมัด</p>
+            <div class="final-cta-buttons animate-on-scroll">
+                <a href="https://line.me/ti/p/@pattarishproclean" target="_blank" class="btn btn-line btn-lg" id="final-cta-line">
+                    <i class="fab fa-line"></i> แอดไลน์ @pattarishproclean
+                </a>
+                <a href="tel:0636865134" class="btn btn-warm btn-lg" id="final-cta-hotline">
+                    <i class="fas fa-phone"></i> Hotline 063-686-5134
+                </a>
+                <a href="tel:0636865134" class="btn btn-outline" id="final-cta-office">
+                    <i class="fas fa-building"></i> สำนักงาน 063-686-5134
+                </a>
+            </div>
+            <div class="final-cta-info animate-on-scroll">
+                <div class="final-cta-info-item">
+                    <i class="fas fa-clock"></i>
+                    จ.-ส. 08:00-18:00
+                </div>
+                <div class="final-cta-info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    ให้บริการทั่วกรุงเทพฯ และปริมณฑล
+                </div>
+                <div class="final-cta-info-item">
+                    <i class="fas fa-globe"></i>
+                    pattarishproclean.com
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <p>&copy; 2026 Pattarish Pro Clean Co., Ltd. สงวนลิขสิทธิ์ทุกประการ</p>
+    </footer>
+
+    <!-- ===== FLOATING BUTTONS ===== -->
+    <div class="floating-buttons">
+        <a href="https://line.me/ti/p/@pattarishproclean" target="_blank" class="float-btn float-btn-line" id="float-line" aria-label="ติดต่อทาง Line">
+            <i class="fab fa-line"></i>
+        </a>
+        <a href="tel:0636865134" class="float-btn float-btn-phone" id="float-phone" aria-label="โทรหาเรา">
+            <i class="fas fa-phone"></i>
+        </a>
+    </div>
+
+    <script>
+        // ===== SCROLL ANIMATION (Intersection Observer) =====
+        (function() {
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+            document.querySelectorAll('.animate-on-scroll').forEach(function(el) {
+                observer.observe(el);
+            });
+        })();
+
+        // ===== FAQ ACCORDION =====
+        (function() {
+            var questions = document.querySelectorAll('.faq-question');
+            questions.forEach(function(q) {
+                q.addEventListener('click', function() {
+                    var item = this.parentElement;
+                    var wasActive = item.classList.contains('active');
+                    // close all
+                    document.querySelectorAll('.faq-item').forEach(function(fi) {
+                        fi.classList.remove('active');
+                    });
+                    // toggle
+                    if (!wasActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        })();
+
+        // ===== SMOOTH ENTRANCE FOR FLOATING BUTTONS =====
+        (function() {
+            var floatingBtns = document.querySelector('.floating-buttons');
+            floatingBtns.style.opacity = '0';
+            floatingBtns.style.transform = 'translateY(20px)';
+            floatingBtns.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            setTimeout(function() {
+                floatingBtns.style.opacity = '1';
+                floatingBtns.style.transform = 'translateY(0)';
+            }, 1500);
+        })();
+
+        // ===== COUNTER ANIMATION FOR STATS =====
+        (function() {
+            var animated = false;
+            var statSection = document.getElementById('social-proof');
+            if (!statSection) return;
+
+            var observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting && !animated) {
+                        animated = true;
+                        animateCounters();
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            observer.observe(statSection);
+
+            function animateCounters() {
+                var stats = document.querySelectorAll('.proof-stat .number');
+                stats.forEach(function(stat) {
+                    var text = stat.textContent;
+                    var suffix = text.replace(/[\d,]/g, '');
+                    var target = parseInt(text.replace(/[^\d]/g, ''));
+                    var current = 0;
+                    var increment = Math.ceil(target / 50);
+                    var interval = setInterval(function() {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(interval);
+                        }
+                        stat.textContent = current.toLocaleString() + suffix;
+                    }, 30);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
