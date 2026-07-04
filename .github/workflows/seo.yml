@@ -28,8 +28,8 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add posts/ seo/seo/compliance_report.md
-          git commit -m "[auto] SEO update $(date +'%Y-%m-%d %H:%M')"
+          git add posts/ seo/compliance_report.md || true
+          git commit -m "[auto] SEO update $(date +'%Y-%m-%d %H:%M')" || true
           git push origin main
       - name: Notify on Failure
         if: failure()
