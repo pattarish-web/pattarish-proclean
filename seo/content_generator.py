@@ -56,13 +56,23 @@ def main():
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(f"# {title}\n\n{body}\n")
             
+        # Image pool
+        img_pool = [
+            "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1585421514284-efb74c2b69ba?auto=format&fit=crop&w=600&q=80",
+            "https://images.unsplash.com/photo-1628177142898-93e46e623666?auto=format&fit=crop&w=600&q=80"
+        ]
+        import random
+
         # Add to posts.json if not exists
         if title not in existing_titles:
             new_post = {
                 "title": title,
                 "description": f"บริการทำความสะอาด {kw} ครบวงจรด้วยทีมงานมืออาชีพและอุปกรณ์ทันสมัย",
                 "category": "บริการ",
-                "image": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80",
+                "image": random.choice(img_pool),
                 "date": datetime.datetime.today().strftime('%Y-%m-%d')
             }
             posts_data.append(new_post)
