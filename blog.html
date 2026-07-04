@@ -218,7 +218,7 @@
 
         let allPosts = [];
 
-        fetch('posts.json')
+        fetch('posts.json?v=' + new Date().getTime(), { cache: "no-store" })
             .then(res => res.json())
             .then(data => {
                 allPosts = data.slice().reverse(); // newest first
