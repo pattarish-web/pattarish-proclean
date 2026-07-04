@@ -41,7 +41,7 @@ def main():
         file_path = posts_dir / f"{slug}.md"
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(f"# {title}\n\n{body}\n")
-        print(f"Generated post: {file_path}")
+        # print(f"Generated post: {file_path}")
 
 if __name__ == "__main__":
     main()

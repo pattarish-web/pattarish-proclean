@@ -1,4 +1,3 @@
-# seo/compliance_rules.json
 {
   "prohibited_topics": ["politics", "religion", "government criticism"],
   "legal_disclaimers_required": true,
