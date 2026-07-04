@@ -10,20 +10,32 @@ import os
 from pathlib import Path
 
 def generate_post(keyword, volume):
-    # Simulated content – replace with actual OpenAI API call.
-    title = f"{keyword.title()} – บริการทำความสะอาดจาก Sangkan Clean"
-    content = f"""\
-## {title}
-
-ทำความสะอาด {keyword} เป็นหนึ่งในบริการหลักของเรา ด้วยทีมมืออาชีพและอุปกรณ์ระดับอุตสาหกรรม เรามั่นใจว่าจะส่งมอบผลลัพธ์ที่ทันสมัยและปลอดภัยสำหรับคุณ.
-
-**การบริการที่เรามี**
-- ทำความสะอาดทั่วไป
-- ทำความสะอาดเชิงลึก
-- บริการแม่บ้านประจำ
-
-*ติดต่อสอบถามราคาได้ทาง Line @sangkanclean หรือโทร 02‑279‑2199*.
-"""
+    title = f"บริการ{keyword}อย่างมืออาชีพ – Sangkan Clean"
+    
+    # Generate long-form HTML content
+    content = f"""
+    <div style="font-size: 1.05rem; line-height: 1.8; color: #334155;">
+        <p>คุณกำลังมองหาผู้เชี่ยวชาญด้าน <strong>{keyword}</strong> อยู่ใช่ไหม? ที่ <strong>Sangkan Clean (สั่งการ คลีน)</strong> เราคือผู้นำด้านบริการทำความสะอาดครบวงจรที่มีประสบการณ์มากกว่า 30 ปี เราพร้อมมอบบริการที่ตอบโจทย์ทุกความต้องการของคุณ ไม่ว่าจะเป็นพื้นที่ขนาดเล็กหรือโปรเจกต์ขนาดใหญ่ระดับอุตสาหกรรม</p>
+        
+        <h3 style="color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; font-weight: 700;">ทำไม {keyword} ถึงมีความสำคัญ?</h3>
+        <p>ความสะอาดไม่เพียงแต่ส่งผลต่อภาพลักษณ์ของสถานที่ แต่ยังเกี่ยวข้องโดยตรงกับสุขภาพและคุณภาพชีวิตของผู้อยู่อาศัยหรือพนักงาน บริการ <strong>{keyword}</strong> ของเราถูกออกแบบมาเพื่อกำจัดสิ่งสกปรก ฝุ่นละออง และเชื้อโรคที่มองไม่เห็น ด้วยมาตรฐานการทำความสะอาดระดับสากล</p>
+        
+        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin: 2rem 0; border-left: 4px solid #0d9488;">
+            <h4 style="color: #0d9488; margin-top: 0; margin-bottom: 1rem; font-weight: 700;">✅ สิ่งที่คุณจะได้รับจากบริการของเรา:</h4>
+            <ul style="margin-bottom: 0; padding-left: 1.5rem;">
+                <li style="margin-bottom: 0.5rem;">ทีมงานมืออาชีพที่ผ่านการฝึกอบรมมาอย่างดี</li>
+                <li style="margin-bottom: 0.5rem;">ใช้น้ำยาทำความสะอาดที่ปลอดภัย เป็นมิตรต่อสิ่งแวดล้อม</li>
+                <li style="margin-bottom: 0.5rem;">เครื่องมือและอุปกรณ์ที่ทันสมัย มาตรฐานโรงงาน</li>
+                <li style="margin-bottom: 0;">รับประกันความพึงพอใจ 100% พร้อมประกันความเสียหาย</li>
+            </ul>
+        </div>
+        
+        <h3 style="color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; font-weight: 700;">ขั้นตอนการปฏิบัติงานมาตรฐาน</h3>
+        <p>เรามีกระบวนการทำงานที่เป็นระบบ เริ่มตั้งแต่การสำรวจพื้นที่หน้างาน ประเมินคราบสกปรก และเลือกใช้วิธีการทำความสะอาดที่เหมาะสมที่สุด เพื่อให้แน่ใจว่าการ <strong>{keyword}</strong> จะออกมาสมบูรณ์แบบที่สุด นอกจากนี้เรายังมีทีม QC เข้าตรวจสอบคุณภาพงานทุกครั้งก่อนส่งมอบ</p>
+        
+        <p style="margin-top: 2rem;"><strong>อย่าปล่อยให้ความสกปรกเป็นปัญหาของคุณอีกต่อไป!</strong> มอบความไว้วางใจให้ <em>Sangkan Clean</em> ดูแลพื้นที่ของคุณให้สะอาดหมดจด เหมือนได้สถานที่ใหม่</p>
+    </div>
+    """
     return title, content
 
 def main():
@@ -72,12 +84,14 @@ def main():
         if title not in existing_titles:
             new_post = {
                 "title": title,
-                "description": f"บริการทำความสะอาด {kw} ครบวงจรด้วยทีมงานมืออาชีพและอุปกรณ์ทันสมัย",
+                "description": f"เจาะลึกบริการทำความสะอาด {kw} ครบวงจรด้วยทีมงานมืออาชีพ มาตรฐานระดับสากล เพื่อความสะอาดและสุขอนามัยที่ดี",
                 "category": "บริการ",
                 "image": random.choice(img_pool),
-                "date": datetime.datetime.today().strftime('%Y-%m-%d')
+                "date": datetime.datetime.today().strftime('%Y-%m-%d'),
+                "content": body
             }
             posts_data.append(new_post)
+            existing_titles.append(title)
             existing_titles.append(title)
             
     # Save updated posts.json
