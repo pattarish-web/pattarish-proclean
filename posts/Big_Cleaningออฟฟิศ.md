@@ -1,19 +1,9 @@
-# Big Cleaningออฟฟิศ แบบมืออาชีพ – Sangkan Clean
+# บริการ Big Cleaningออฟฟิศ ระดับมืออาชีพ – Sangkan Clean
 
-
-    <div style="font-size: 1.05rem; line-height: 1.8; color: #334155;">
-        <p>การรักษาความสะอาดคือหัวใจสำคัญของทุกสถานที่ สำหรับบริการ <strong>Big Cleaningออฟฟิศ</strong> เรามีทีมงานที่ผ่านการฝึกอบรมเฉพาะทาง พร้อมเครื่องมือทันสมัยที่จะช่วยเนรมิตพื้นที่ของคุณให้กลับมาเหมือนใหม่อีกครั้ง</p>
-        
-        <h3 style="color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; font-weight: 700;">ทำไม Big Cleaningออฟฟิศ ถึงมีความสำคัญ?</h3>
-        <p>ความสะอาดไม่เพียงแต่ส่งผลต่อภาพลักษณ์ของสถานที่ แต่ยังเกี่ยวข้องโดยตรงกับสุขภาพ บริการ <strong>Big Cleaningออฟฟิศ</strong> ของเราถูกออกแบบมาเพื่อกำจัดสิ่งสกปรกและเชื้อโรคที่มองไม่เห็น ด้วยมาตรฐานระดับสากล</p>
-        
-        <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin: 2rem 0; border-left: 4px solid #0d9488;">
-            <h4 style="color: #0d9488; margin-top: 0; margin-bottom: 1rem; font-weight: 700;">สิ่งที่คุณจะได้รับจากบริการของเรา:</h4>
-            <ul style="margin-bottom: 0; padding-left: 1rem; list-style-type: none;">
-                <li style='margin-bottom: 0.5rem;'>✅ เข้าประเมินพื้นที่และเสนอราคาฟรี</li><li style='margin-bottom: 0.5rem;'>✅ ไม่มีค่าใช้จ่ายแอบแฝง โปร่งใสทุกขั้นตอน</li><li style='margin-bottom: 0.5rem;'>✅ มีประกันความเสียหายระหว่างการปฏิบัติงาน</li><li style='margin-bottom: 0.5rem;'>✅ จัดทีมเข้าทำงานได้รวดเร็วทันใจ</li>
-            </ul>
-        </div>
-        
-        <p style="margin-top: 2rem;"><strong>จบทุกปัญหาความสะอาดในที่เดียว!</strong> ทักหาทีมงาน <em>Sangkan Clean</em> ตอนนี้ เราพร้อมให้บริการคุณด้วยรอยยิ้ม</p>
+<div style='font-size: 1.05rem; line-height: 1.8; color: #334155;'><p>สัมผัสประสบการณ์ความสะอาดเหนือระดับกับ <strong>Big Cleaningออฟฟิศ</strong> จากทีมงาน <em>Sangkan Clean</em> ที่มีประสบการณ์กว่า 30 ปี เราพร้อมเปลี่ยนพื้นที่ของคุณให้กลับมาน่าอยู่และปลอดภัย</p>
+    <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin: 2rem 0; border-left: 4px solid #0d9488;">
+        <h4 style="color: #0d9488; margin-top: 0; margin-bottom: 1rem;">ทำไมต้องเลือกเรา?</h4>
+        <ul style="list-style: none; padding: 0; margin: 0;"><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> มีประกันความเสียหายระหว่างการทำงานเต็มวงเงิน</li><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> ราคาโปร่งใส คุ้มค่า ไม่มีบวกเพิ่มหน้างาน</li><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> พนักงานทุกคนผ่านการอบรมอย่างเข้มงวด</li></ul>
     </div>
     
+<h3 style='color: #0f172a; margin-top: 2rem;'>คำถามที่พบบ่อย (FAQ)</h3><p><strong>Q: รับประกันงานไหม?</strong><br>A: เรารับประกันความพึงพอใจ หากไม่เรียบร้อย เรายินดีแก้ไขให้ทันที</p><p><strong>Q: ต้องเตรียมอุปกรณ์อะไรไหม?</strong><br>A: ไม่ต้องเลยครับ ทีมงานของเราเตรียมอุปกรณ์และน้ำยาไปครบจบในตัว</p><p style='margin-top: 2rem; font-weight: 600; color: #0f172a;'>จบทุกปัญหาความสะอาดด้วย <strong>Big Cleaningออฟฟิศ</strong> จาก Sangkan Clean ติดต่อประเมินราคาฟรีได้เลยครับ!</p></div>
