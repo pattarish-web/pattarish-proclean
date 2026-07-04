@@ -27,21 +27,50 @@ def generate_post(keyword, volume):
     return title, content
 
 def main():
+    import datetime
     # Load keywords
     with open("seo/keywords.json", "r", encoding="utf-8") as f:
         keywords = json.load(f)
+        
+    # Load posts.json for website frontend
+    posts_json_path = "posts.json"
+    if os.path.exists(posts_json_path):
+        with open(posts_json_path, "r", encoding="utf-8") as f:
+            posts_data = json.load(f)
+    else:
+        posts_data = []
+    
+    existing_titles = [p.get("title") for p in posts_data]
+
     posts_dir = Path("posts")
     posts_dir.mkdir(exist_ok=True)
+    
     for entry in keywords:
         kw = entry.get("keyword")
         vol = entry.get("search_volume", 0)
         title, body = generate_post(kw, vol)
-        # slugify keyword for filename
+        
+        # Save markdown file
         slug = kw.replace(" ", "_").replace("/", "_")
         file_path = posts_dir / f"{slug}.md"
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(f"# {title}\n\n{body}\n")
-        # print(f"Generated post: {file_path}")
+            
+        # Add to posts.json if not exists
+        if title not in existing_titles:
+            new_post = {
+                "title": title,
+                "description": f"บริการทำความสะอาด {kw} ครบวงจรด้วยทีมงานมืออาชีพและอุปกรณ์ทันสมัย",
+                "category": "บริการ",
+                "image": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=600&q=80",
+                "date": datetime.datetime.today().strftime('%Y-%m-%d')
+            }
+            posts_data.append(new_post)
+            existing_titles.append(title)
+            
+    # Save updated posts.json
+    with open(posts_json_path, "w", encoding="utf-8") as f:
+        json.dump(posts_data, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
     main()
