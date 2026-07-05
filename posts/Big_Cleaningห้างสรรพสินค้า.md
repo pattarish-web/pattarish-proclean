@@ -1,13 +1,12 @@
 # บริการ Big Cleaningห้างสรรพสินค้า ระดับมืออาชีพ – Sangkan Clean
 
-<div style='font-size: 1.05rem; line-height: 1.8; color: #334155;'><p>ถ้าคุณกำลังหาคนดูแลเรื่อง <strong>Big Cleaningห้างสรรพสินค้า</strong> คุณมาถูกที่แล้วครับ! เราเชี่ยวชาญด้านการจัดการความสะอาดแบบครบวงจร ไม่ว่าจะเป็นคราบฝังลึกหรือฝุ่นสะสม เราจัดการได้หมด</p>
-    <h3 style="color: #0f172a; margin-top: 2rem;">ขั้นตอนการทำงานของเรา</h3>
-    <ol style="padding-left: 1.5rem; color: #475569;"><li style='margin-bottom: 0.8rem;'><strong>ขั้นตอน:</strong> เตรียมอุปกรณ์และน้ำยาเฉพาะทางให้พร้อม</li><li style='margin-bottom: 0.8rem;'><strong>ขั้นตอน:</strong> กำจัดเชื้อโรคและแบคทีเรียด้วยน้ำยาฆ่าเชื้อ</li><li style='margin-bottom: 0.8rem;'><strong>ขั้นตอน:</strong> ลงมือทำความสะอาดเชิงลึกทุกซอกมุม</li></ol>
-    
-
+<div style='font-size: 1.05rem; line-height: 1.8; color: #334155;'><p>สัมผัสประสบการณ์ความสะอาดเหนือระดับกับ <strong>Big Cleaningห้างสรรพสินค้า</strong> จากทีมงาน <em>Sangkan Clean</em> ที่มีประสบการณ์กว่า 30 ปี เราพร้อมเปลี่ยนพื้นที่ของคุณให้กลับมาน่าอยู่และปลอดภัย</p>
     <div style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin: 2rem 0; border-left: 4px solid #0d9488;">
         <h4 style="color: #0d9488; margin-top: 0; margin-bottom: 1rem;">ทำไมต้องเลือกเรา?</h4>
-        <ul style="list-style: none; padding: 0; margin: 0;"><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> ใช้น้ำยาทำความสะอาดเกรดพรีเมียม ปลอดภัยไร้สารตกค้าง</li><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> มีประกันความเสียหายระหว่างการทำงานเต็มวงเงิน</li><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> อุปกรณ์ทันสมัยนำเข้าจากต่างประเทศ</li></ul>
+        <ul style="list-style: none; padding: 0; margin: 0;"><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> พนักงานทุกคนผ่านการอบรมอย่างเข้มงวด</li><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> ใช้น้ำยาทำความสะอาดเกรดพรีเมียม ปลอดภัยไร้สารตกค้าง</li><li style='margin-bottom: 0.5rem;'><i class='fa-solid fa-check text-success'></i> อุปกรณ์ทันสมัยนำเข้าจากต่างประเทศ</li></ul>
     </div>
     
-<p>หลายคนมักคิดว่าการทำความสะอาดเองนั้นประหยัดกว่า แต่ในความเป็นจริงแล้ว <strong>Big Cleaningห้างสรรพสินค้า</strong> ต้องอาศัยความชำนาญและเครื่องมือเฉพาะทาง การจ้างมืออาชีพจะช่วยประหยัดเวลาและได้ผลลัพธ์ที่สมบูรณ์แบบกว่าอย่างเห็นได้ชัด</p><p style='margin-top: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px;'><strong>อย่ารอช้า!</strong> ทักหา <em>Sangkan Clean</em> วันนี้ เพื่อรับโปรโมชั่นพิเศษสำหรับ <strong>Big Cleaningห้างสรรพสินค้า</strong> พร้อมคืนความสะอาดสดใสให้กับพื้นที่ของคุณ</p></div>
+
+    <h3 style="color: #0f172a; margin-top: 2rem;">ขั้นตอนการทำงานของเรา</h3>
+    <ol style="padding-left: 1.5rem; color: #475569;"><li style='margin-bottom: 0.8rem;'><strong>ขั้นตอน:</strong> เตรียมอุปกรณ์และน้ำยาเฉพาะทางให้พร้อม</li><li style='margin-bottom: 0.8rem;'><strong>ขั้นตอน:</strong> ตรวจสอบคุณภาพ (QC) โดยหัวหน้างานก่อนส่งมอบ</li><li style='margin-bottom: 0.8rem;'><strong>ขั้นตอน:</strong> ลงมือทำความสะอาดเชิงลึกทุกซอกมุม</li></ol>
+    <p style='margin-top: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px;'><strong>อย่ารอช้า!</strong> ทักหา <em>Sangkan Clean</em> วันนี้ เพื่อรับโปรโมชั่นพิเศษสำหรับ <strong>Big Cleaningห้างสรรพสินค้า</strong> พร้อมคืนความสะอาดสดใสให้กับพื้นที่ของคุณ</p></div>
