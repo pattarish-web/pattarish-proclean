@@ -7,7 +7,7 @@ def get_api_key():
     return os.environ.get("GEMINI_API_KEY")
 
 def generate_geo_content(api_key, title, description):
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
     headers = {'Content-Type': 'application/json'}
     
     prompt = f"""
