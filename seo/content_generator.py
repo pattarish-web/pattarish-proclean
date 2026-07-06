@@ -47,11 +47,12 @@ def get_unique_image():
     return selected
 
 def gen_intro(kw):
+    prefix = "" if kw.startswith("บริการ") else "บริการ "
     return random.choice([
-        f"<p>กำลังเจอปัญหาเรื่องความสกปรกอยู่หรือเปล่า? บริการ <strong>{kw}</strong> ของ <strong>Sangkan Clean</strong> พร้อมเป็นผู้ช่วยเบอร์หนึ่งของคุณ ด้วยทีมงานมืออาชีพที่พร้อมเข้าจัดการทุกปัญหา</p>",
+        f"<p>กำลังเจอปัญหาเรื่องความสกปรกอยู่หรือเปล่า? {prefix}<strong>{kw}</strong> ของ <strong>Sangkan Clean</strong> พร้อมเป็นผู้ช่วยเบอร์หนึ่งของคุณ ด้วยทีมงานมืออาชีพที่พร้อมเข้าจัดการทุกปัญหา</p>",
         f"<p>สัมผัสประสบการณ์ความสะอาดเหนือระดับกับ <strong>{kw}</strong> จากทีมงาน <em>Sangkan Clean</em> ที่มีประสบการณ์กว่า 30 ปี เราพร้อมเปลี่ยนพื้นที่ของคุณให้กลับมาน่าอยู่และปลอดภัย</p>",
         f"<p>ถ้าคุณกำลังหาคนดูแลเรื่อง <strong>{kw}</strong> คุณมาถูกที่แล้วครับ! เราเชี่ยวชาญด้านการจัดการความสะอาดแบบครบวงจร ไม่ว่าจะเป็นคราบฝังลึกหรือฝุ่นสะสม เราจัดการได้หมด</p>",
-        f"<p>ยินดีต้อนรับสู่บริการ <strong>{kw}</strong> มาตรฐานพรีเมียมจาก <strong>Sangkan Clean</strong> ผู้นำด้านการทำความสะอาดที่ได้รับความไว้วางใจจากลูกค้ากว่า 5,000 รายทั่วประเทศ</p>"
+        f"<p>ยินดีต้อนรับสู่{prefix}<strong>{kw}</strong> มาตรฐานพรีเมียมจาก <strong>Sangkan Clean</strong> ผู้นำด้านการทำความสะอาดที่ได้รับความไว้วางใจจากลูกค้ากว่า 5,000 รายทั่วประเทศ</p>"
     ])
 
 def gen_benefits(kw):
@@ -86,9 +87,59 @@ def gen_process(kw):
     """
 
 def gen_why_important(kw):
+    prefix = "" if kw.startswith("บริการ") else "บริการ "
     paras = [
         f"<p>รู้หรือไม่ว่าการละเลย <strong>{kw}</strong> อาจส่งผลเสียต่อสุขภาพของผู้อยู่อาศัยหรือพนักงานได้ ฝุ่นละอองและไรฝุ่นที่สะสมเป็นสาเหตุหลักของโรคภูมิแพ้ การให้ผู้เชี่ยวชาญเข้ามาดูแลจึงเป็นการลงทุนที่คุ้มค่าที่สุด</p>",
-        f"<p>ภาพลักษณ์ที่ดีเริ่มต้นที่ความสะอาด! การใช้บริการ <strong>{kw}</strong> อย่างสม่ำเสมอไม่เพียงแต่ช่วยยืดอายุการใช้งานของเฟอร์นิเจอร์และพื้นผิวต่างๆ แต่ยังสร้างความประทับใจแรกพบให้กับแขกหรือลูกค้าที่มาเยือนอีกด้วย</p>",
+        f"<p>ภาพลักษณ์ที่ดีเริ่มต้นที่ความสะอาด! การใช้{prefix}<strong>{kw}</strong> อย่างสม่ำเสมอไม่เพียงแต่ช่วยยืดอายุการใช้งานของเฟอร์นิเจอร์และพื้นผิวต่างๆ แต่ยังสร้างความประทับใจแรกพบให้กับแขกหรือลูกค้าที่มาเยือนอีกด้วย</p>",
+        f"<p>หลายคนมักคิดว่าการทำความสะอาดเองนั้นประหยัดกว่า แต่ในความเป็นจริงแล้ว <strong>{kw}</strong> ต้องอาศัยความชำนาญและเครื่องมือเฉพาะทาง การจ้างมืออาชีพจะช่วยประหยัดเวลาและได้ผลลัพธ์ที่สมบูรณ์แบบกว่าอย่างเห็นได้ชัด</p>"
+    ]
+    return random.choice(paras)
+
+def gen_faq(kw):
+    qa = [
+        ("ต้องเตรียมอุปกรณ์อะไรไหม?", "ไม่ต้องเลยครับ ทีมงานของเราเตรียมอุปกรณ์และน้ำยาไปครบจบในตัว"),
+        ("ใช้เวลาทำงานนานแค่ไหน?", "ขึ้นอยู่กับขนาดพื้นที่ครับ แต่เราทำงานอย่างเป็นระบบ ทำให้เสร็จรวดเร็วตามกำหนดแน่นอน"),
+        ("รับประกันงานไหม?", "เรารับประกันความพึงพอใจ หากไม่เรียบร้อย เรายินดีแก้ไขให้ทันที"),
+        ("น้ำยาที่ใช้ปลอดภัยไหม?", "เราเลือกใช้น้ำยาที่เป็นมิตรต่อสิ่งแวดล้อม ปลอดภัยต่อเด็กและสัตว์เลี้ยง 100%")
+    ]
+    selected_qa = random.sample(qa, 2)
+    faqs = "".join([f"<p><strong>Q: {q}</strong><br>A: {a}</p>" for q, a in selected_qa])
+    return f"<h3 style='color: #0f172a; margin-top: 2rem;'>คำถามที่พบบ่อย (FAQ)</h3>{faqs}"
+
+def gen_outro(kw):
+    return random.choice([
+        f"<p style='margin-top: 2rem; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 8px;'><strong>อย่ารอช้า!</strong> ทักหา <em>Sangkan Clean</em> วันนี้ เพื่อรับโปรโมชั่นพิเศษสำหรับ <strong>{kw}</strong> พร้อมคืนความสะอาดสดใสให้กับพื้นที่ของคุณ</p>",
+        f"<p style='margin-top: 2rem; font-weight: 600; color: #0f172a;'>จบทุกปัญหาความสะอาดด้วย <strong>{kw}</strong> จาก Sangkan Clean ติดต่อประเมินราคาฟรีได้เลยครับ!</p>"
+    ])
+
+def generate_post(keyword):
+    if keyword.startswith("บริการ"):
+        title = f"{keyword} ระดับมืออาชีพ – Sangkan Clean"
+    else:
+        title = f"บริการ {keyword} ระดับมืออาชีพ – Sangkan Clean"
+    
+    # Randomly select a structure (mix of 3-5 modules)
+    modules = [
+        gen_intro(keyword),
+        gen_why_important(keyword),
+        gen_benefits(keyword),
+        gen_process(keyword),
+        gen_faq(keyword),
+        gen_outro(keyword)
+    ]
+    
+    # Shuffle modules 2,3,4 to create massive variation in structure
+    middle = [modules[1], modules[2], modules[3], modules[4]]
+    random.shuffle(middle)
+    
+    # Keep intro first, outro last, pick 2 or 3 middle sections
+    num_middle = random.randint(2, 4)
+    selected_middle = middle[:num_middle]
+    
+    final_html = modules[0] + "\n".join(selected_middle) + modules[5]
+    content = f"<div style='font-size: 1.05rem; line-height: 1.8; color: #334155;'>{final_html}</div>"
+    
+    return title, contentอร์นิเจอร์และพื้นผิวต่างๆ แต่ยังสร้างความประทับใจแรกพบให้กับแขกหรือลูกค้าที่มาเยือนอีกด้วย</p>",
         f"<p>หลายคนมักคิดว่าการทำความสะอาดเองนั้นประหยัดกว่า แต่ในความเป็นจริงแล้ว <strong>{kw}</strong> ต้องอาศัยความชำนาญและเครื่องมือเฉพาะทาง การจ้างมืออาชีพจะช่วยประหยัดเวลาและได้ผลลัพธ์ที่สมบูรณ์แบบกว่าอย่างเห็นได้ชัด</p>"
     ]
     return random.choice(paras)

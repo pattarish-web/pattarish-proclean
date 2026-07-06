@@ -5,5 +5,4 @@ Allow: /
 Sitemap: https://sangkanclean.com/sitemap.xml
 
 # ไม่ให้ crawl ไฟล์ที่ไม่จำเป็น
-Disallow: /posts.json
 Disallow: /generate_blog.py
