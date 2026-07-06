@@ -61,8 +61,9 @@ def upgrade_posts():
     upgraded_count = 0
     
     for idx, post in enumerate(posts):
-        # ถ้าไม่มี content หรือ content ว่าง
-        if not post.get("content"):
+        content = post.get("content", "")
+        # เช็คว่าถ้าเนื้อหาเดิมยังไม่มีคำว่า "สรุปประเด็นสำคัญ" แปลว่ายังไม่ใช่ GEO ให้เขียนทับใหม่
+        if "สรุปประเด็นสำคัญ" not in content:
             print(f"[{idx+1}/{len(posts)}] Upgrading: {post['title']}")
             
             content = generate_geo_content(api_key, post['title'], post['description'])
