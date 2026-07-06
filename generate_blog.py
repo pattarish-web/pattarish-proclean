@@ -72,7 +72,7 @@ def generate_blog_post():
     print(f"Generating post for keyword: {keyword} in category: {category}")
 
     # เรียกใช้ Gemini API (Gemini 1.5 Flash เพื่อการเจนข้อความภาษาไทยที่ดีและประหยัด)
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
     
     prompt = f"""
     คุณเป็นนักเขียนบทความและผู้เชี่ยวชาญด้านการทำความสะอาดและบริการจัดหาแม่บ้าน (SEO Content Creator)
