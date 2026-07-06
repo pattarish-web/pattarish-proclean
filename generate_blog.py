@@ -107,6 +107,7 @@ def generate_blog_post():
         new_post = {
             "title": result["title"],
             "description": result["description"],
+            "content": result.get("content", ""),
             "category": category,
             "image": random.choice(CLEANING_IMAGES),
             "date": datetime.today().strftime('%Y-%m-%d')

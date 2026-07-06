@@ -41,7 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function calculateCost() {
         if (!serviceType || !areaSize || !totalPrice) return;
 
-        const size = parseInt(areaSize.value, 10);
+        let size = parseInt(areaSize.value, 10);
+        if (isNaN(size) || size < 20) {
+            size = 20;
+            if (areaSize.type === 'number') areaSize.value = 20;
+        }
         areaVal.textContent = `${size} ตร.ม.`;
 
         const selectedOption = serviceType.options[serviceType.selectedIndex];
@@ -121,49 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 
-    // 5. Dynamic Blog Loader
-    const articlesGrid = document.getElementById('articlesGrid');
-    if (articlesGrid) {
-        fetch('posts.json?v=' + new Date().getTime(), { cache: "no-store" })
-            .then(res => res.json())
-            .then(data => {
-                // Get latest 3 articles
-                const latestArticles = data.slice(-3).reverse();
-                if (latestArticles.length > 0) {
-                    articlesGrid.innerHTML = latestArticles.map(article => `
-                        <article class="article-card">
-                            <div class="article-img">
-                                <img src="${article.image}" alt="${article.title}">
-                                <span class="article-tag">${article.category}</span>
-                            </div>
-                            <div class="article-body">
-                                <h3>${article.title}</h3>
-                                <p>${article.description}</p>
-                                <a href="blog.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
-                            </div>
-                        </article>
-                    `).join('');
-                }
-                
-                // Trigger scroll animation for dynamically loaded articles
-                document.querySelectorAll('.article-card').forEach((el, index) => {
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(30px)';
-                    el.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
-                    observer.observe(el);
-                });
-            })
-            .catch(err => {
-                console.log('Error loading dynamic posts, using static fallback:', err);
-                // Trigger scroll animation for existing static fallback articles
-                document.querySelectorAll('.article-card').forEach((el, index) => {
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(30px)';
-                    el.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
-                    observer.observe(el);
-                });
-            });
-    }
+    // 5. Blog Scroll Animation
+    document.querySelectorAll('.article-card').forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(el);
+    });
 
     // 6. Navbar scroll effect
     let lastScroll = 0;

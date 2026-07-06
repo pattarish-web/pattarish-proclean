@@ -7,6 +7,32 @@
     <title>{{title}} | Sangkan Clean</title>
     <meta name="description" content="{{description}}">
     <link rel="canonical" href="https://sangkanclean.com/blog/{{slug}}.html">
+    
+    <!-- GEO/AIO Article Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "{{title}}",
+      "image": "{{image}}",
+      "datePublished": "{{date}}",
+      "author": {
+        "@type": "Organization",
+        "name": "Sangkan Clean",
+        "url": "https://sangkanclean.com/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Sangkan Clean",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://sangkanclean.com/logo.png"
+        }
+      },
+      "description": "{{description}}"
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
