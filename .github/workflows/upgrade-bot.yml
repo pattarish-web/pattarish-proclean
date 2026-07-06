@@ -33,4 +33,5 @@ jobs:
         git config --global user.email "bot@pattarishproclean.com"
         git add posts.json blog/ sitemap.xml
         git diff-index --quiet HEAD || git commit -m "chore: mass upgrade old blogs to GEO [skip ci]"
+        git pull --rebase origin main
         git push

@@ -38,4 +38,5 @@ jobs:
         git add posts.json blog/ sitemap.xml
         # เช็คว่ามีไฟล์เปลี่ยนจริงหรือไม่ก่อนเซฟ เพื่อไม่ให้เออร์เรอร์
         git diff-index --quiet HEAD || git commit -m "chore: auto-generate daily blog post [skip ci]"
+        git pull --rebase origin main
         git push
