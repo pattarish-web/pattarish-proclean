@@ -37,8 +37,8 @@ def generate_geo_content(api_key, title, description):
         }
     }
     
-    max_retries = 5
-    base_delay = 12  # รอขั้นต่ำ 12 วินาทีหากชนลิมิต
+    max_retries = 8
+    base_delay = 15  # รอขั้นต่ำ 15 วินาทีหากชนลิมิต
     
     for attempt in range(max_retries):
         try:
@@ -75,7 +75,7 @@ def upgrade_posts():
     if not api_key:
         print("Error: GEMINI_API_KEY environment variable not found.")
         return
-
+    
     with open('posts.json', 'r', encoding='utf-8') as f:
         posts = json.load(f)
 
@@ -97,11 +97,11 @@ def upgrade_posts():
                 with open('posts.json', 'w', encoding='utf-8') as f:
                     json.dump(posts, f, ensure_ascii=False, indent=2)
                     
-                print(f"  -> Success! Wait 4 seconds...")
-                time.sleep(4) # พัก 4 วินาทีเพื่อไม่ให้ API โดนตัด (Rate limit)
+                print(f"  -> Success! Wait 12 seconds...")
+                time.sleep(12) # พัก 12 วินาทีเพื่อไม่ให้ API โดนตัด (Rate limit)
             else:
                 print(f"  -> Failed to generate content.")
-                time.sleep(2)
+                time.sleep(5)
         else:
             print(f"[{idx+1}/{len(posts)}] Skip: Already has content.")
 
