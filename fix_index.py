@@ -28,8 +28,8 @@ if start_idx != -1 and end_idx != -1:
       "@graph": [
         {
           "@type": "LocalBusiness",
-          "name": "Sangkan Clean สั่งการ คลีน บริการสะอาด สั่งได้ดั่งใจ",
-          "description": "สั่งการ คลีน บริการสะอาด สั่งได้ดั่งใจ Big Cleaning แม่บ้านประจำ ทำความสะอาดบ้าน คอนโด ออฟฟิศ โรงงาน",
+          "name": "Sangkan Clean สั่งการคลีน บริการทำความสะอาด สั่งได้ดั่งใจ",
+          "description": "สั่งการคลีน บริการทำความสะอาด สั่งได้ดั่งใจ Big Cleaning แม่บ้านประจำ ทำความสะอาดบ้าน คอนโด ออฟฟิศ โรงงาน",
           "url": "https://sangkanclean.com/",
           "telephone": "+66636865134",
           "email": "pattarish@gmail.com",
