@@ -3,8 +3,13 @@ import os
 import time
 import requests
 
-def get_api_key():
-    return os.environ.get("GEMINI_API_KEY")
+def get_api_keys():
+    raw_key = os.environ.get("GEMINI_API_KEY", "")
+    if not raw_key:
+        return []
+    if "," in raw_key:
+        return [k.strip() for k in raw_key.split(",") if k.strip()]
+    return [raw_key.strip()]
 
 def generate_geo_content(api_key, title, description):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
@@ -47,7 +52,7 @@ def generate_geo_content(api_key, title, description):
             # ถ้าชนลิมิต หรือโควตาหมดชั่วคราว
             if response.status_code == 429 or (response.status_code == 400 and "RESOURCE_EXHAUSTED" in response.text):
                 wait_time = base_delay * (1.5 ** attempt)
-                print(f"  -> Rate limit hit (RESOURCE_EXHAUSTED). Retrying in {wait_time:.1f}s...")
+                print(f"  -> Rate limit hit (RESOURCE_EXHAUSTED) for key {api_key[:10]}... Retrying in {wait_time:.1f}s...")
                 time.sleep(wait_time)
                 continue
                 
@@ -71,8 +76,8 @@ def generate_geo_content(api_key, title, description):
     return ""
 
 def upgrade_posts():
-    api_key = get_api_key()
-    if not api_key:
+    api_keys = get_api_keys()
+    if not api_keys:
         print("Error: GEMINI_API_KEY environment variable not found.")
         return
     
@@ -80,6 +85,7 @@ def upgrade_posts():
         posts = json.load(f)
 
     upgraded_count = 0
+    key_index = 0
     
     for idx, post in enumerate(posts):
         content = post.get("content", "")
@@ -87,7 +93,10 @@ def upgrade_posts():
         if "สรุปประเด็นสำคัญ" not in content:
             print(f"[{idx+1}/{len(posts)}] Upgrading: {post['title']}")
             
-            content = generate_geo_content(api_key, post['title'], post['description'])
+            # สลับใช้คีย์แบบวนลูป (Round-Robin Key Rotation)
+            current_key = api_keys[key_index % len(api_keys)]
+            content = generate_geo_content(current_key, post['title'], post['description'])
+            key_index += 1
             
             if content:
                 post['content'] = content
@@ -97,8 +106,10 @@ def upgrade_posts():
                 with open('posts.json', 'w', encoding='utf-8') as f:
                     json.dump(posts, f, ensure_ascii=False, indent=2)
                     
-                print(f"  -> Success! Wait 12 seconds...")
-                time.sleep(12) # พัก 12 วินาทีเพื่อไม่ให้ API โดนตัด (Rate limit)
+                # ถ้ามีหลายคีย์ สลับคีย์แล้ว พักแค่ 4 วินาทีพอ / ถ้ามีคีย์เดียว พัก 12 วินาทีเพื่อความปลอดภัย
+                sleep_time = 4 if len(api_keys) > 1 else 12
+                print(f"  -> Success! Wait {sleep_time} seconds...")
+                time.sleep(sleep_time)
             else:
                 print(f"  -> Failed to generate content.")
                 time.sleep(5)
