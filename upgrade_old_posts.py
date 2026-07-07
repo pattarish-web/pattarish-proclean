@@ -97,11 +97,9 @@ def upgrade_posts():
 
     if upgraded_count > 0:
         try:
-            import build_blogs
-            build_blogs.build_blogs()
-            import update_sitemap
-            update_sitemap.update_sitemap()
-            print("HTML and Sitemap rebuilt successfully.")
+            import build_site
+            build_site.build_all()
+            print("HTML, local pages, and sitemap rebuilt successfully.")
         except Exception as e:
             print(f"Error rebuilding: {e}")
 

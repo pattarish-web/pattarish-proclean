@@ -2,7 +2,6 @@
 <html lang="th">
 <head>
     <link rel="icon" type="image/png" href="logo.png?v=2">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>บทความ | Sangkan Clean</title>
@@ -10,300 +9,152 @@
     <link rel="canonical" href="https://www.sangkanclean.com/blog.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        .blog-hero {
-            background: linear-gradient(135deg, #0f172a 0%, #0d9488 100%);
-            padding: 6rem 0 4rem;
-            text-align: center;
-            color: white;
-        }
+        .blog-hero { background: linear-gradient(135deg, #0f172a 0%, #0d9488 100%); padding: 6rem 0 3rem; text-align: center; color: white; }
         .blog-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; }
-        .blog-hero p { font-size: 1.1rem; opacity: 0.85; }
-
-        .blog-grid-section { padding: 4rem 0; background: #f8fafc; }
-        .blog-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-        .blog-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-        .blog-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.12); }
-        .blog-card-img { width: 100%; height: 200px; object-fit: cover; display: block; }
-        .blog-card-body { padding: 1.5rem; }
-        .blog-card-tag {
-            display: inline-block;
-            background: rgba(13,148,136,0.1);
-            color: #0d9488;
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.3rem 0.8rem;
-            border-radius: 99px;
-            margin-bottom: 0.75rem;
-        }
-        .blog-card-title { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 0.75rem; line-height: 1.5; }
-        .blog-card-desc { font-size: 0.88rem; color: #64748b; line-height: 1.7; margin-bottom: 1rem; }
-        .blog-card-date { font-size: 0.78rem; color: #94a3b8; }
-        .blog-card-read { color: #0d9488; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.4rem; }
-
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            overflow-y: auto;
-            padding: 2rem 1rem;
-        }
-        .modal-overlay.active { display: flex; align-items: flex-start; justify-content: center; }
-        .modal {
-            background: white;
-            border-radius: 20px;
-            max-width: 760px;
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-            margin: auto;
-        }
-        .modal-img { width: 100%; height: 300px; object-fit: cover; }
-        .modal-body { padding: 2.5rem; }
-        .modal-tag {
-            display: inline-block;
-            background: rgba(13,148,136,0.1);
-            color: #0d9488;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 0.3rem 0.8rem;
-            border-radius: 99px;
-            margin-bottom: 1rem;
-        }
-        .modal-title { font-size: 1.7rem; font-weight: 800; color: #0f172a; line-height: 1.4; margin-bottom: 1rem; }
-        .modal-date { font-size: 0.82rem; color: #94a3b8; margin-bottom: 1.5rem; }
-        .modal-content { font-size: 1rem; color: #334155; line-height: 1.9; }
-        .modal-close {
-            position: absolute; top: 1rem; right: 1rem;
-            width: 40px; height: 40px;
-            background: rgba(0,0,0,0.4);
-            color: white; border: none;
-            border-radius: 50%; cursor: pointer;
-            font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.2s;
-        }
-        .modal-close:hover { background: rgba(0,0,0,0.7); }
-        .modal-cta {
-            margin-top: 2.5rem;
-            padding: 2rem;
-            background: linear-gradient(135deg, #0d9488, #0f766e);
-            border-radius: 16px;
-            text-align: center;
-            color: white;
-        }
-        .modal-cta h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .modal-cta p { font-size: 0.9rem; opacity: 0.85; margin-bottom: 1.25rem; }
-        .modal-cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-        .modal-cta-btn {
-            display: inline-flex; align-items: center; gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 99px;
-            font-weight: 700; font-size: 0.95rem;
-            text-decoration: none;
-            transition: transform 0.2s;
-        }
-        .modal-cta-btn:hover { transform: translateY(-2px); }
-        .btn-line-cta { background: #06c755; color: white; }
-        .btn-phone-cta { background: white; color: #0d9488; }
-
-        .no-posts { text-align: center; padding: 4rem; color: #94a3b8; font-size: 1.1rem; }
-
-        @media (max-width: 640px) {
-            .blog-hero h1 { font-size: 1.8rem; }
-            .modal-body { padding: 1.5rem; }
-            .modal-title { font-size: 1.3rem; }
-        }
+        .blog-toolbar { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .blog-search { flex: 1; min-width: 220px; padding: 0.75rem 1rem; border: none; border-radius: 99px; font-size: 1rem; }
+        .blog-grid-section { padding: 3rem 0 4rem; background: #f8fafc; }
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .blog-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.07); transition: transform 0.3s; text-decoration: none; color: inherit; display: block; }
+        .blog-card:hover { transform: translateY(-4px); }
+        .blog-card-img { width: 100%; height: 180px; object-fit: cover; }
+        .blog-card-body { padding: 1.25rem; }
+        .blog-card-tag { display: inline-block; background: rgba(13,148,136,0.1); color: #0d9488; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 99px; }
+        .blog-card-title { font-size: 1.05rem; font-weight: 700; margin: 0.75rem 0; line-height: 1.5; color: #0f172a; }
+        .blog-card-desc { font-size: 0.88rem; color: #64748b; line-height: 1.6; margin-bottom: 0.75rem; }
+        .pagination { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; flex-wrap: wrap; }
+        .pagination button { padding: 0.5rem 1rem; border: 1px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; }
+        .pagination button.active { background: #0d9488; color: white; border-color: #0d9488; }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .blog-count { text-align: center; color: #64748b; margin-top: 1rem; font-size: 0.9rem; }
     </style>
-
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18299765093"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'AW-18299765093');
-    </script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18299765093');</script>
 </head>
 <body>
-
-    <!-- Navbar -->
     <header class="navbar">
         <div class="container">
-            <a href="index.html" class="logo">
-                <img src="logo.png" alt="Sangkan Clean" style="height: 45px; width: auto; margin-right: 8px;"><span>Sangkan<span> Clean</span></span>
-            </a>
+            <a href="index.html" class="logo"><img src="logo.png" alt="Sangkan Clean" style="height:45px;margin-right:8px;"><span>Sangkan<span> Clean</span></span></a>
             <nav class="nav-menu" id="navMenu">
                 <a href="index.html#services" class="nav-link">บริการของเรา</a>
                 <a href="index.html#calculator" class="nav-link">คำนวณราคา</a>
                 <a href="index.html#faq" class="nav-link">FAQ</a>
-                <a href="blog.html" class="nav-link" style="color: var(--primary); font-weight:700;">บทความ</a>
-                <a href="index.html#contact" class="btn btn-primary nav-cta">ติดต่อจองคิว</a>
+                <a href="blog.html" class="nav-link" style="color:var(--primary);font-weight:700;">บทความ</a>
+                <a href="index.html#quote" class="btn btn-primary nav-cta">ขอใบเสนอราคา</a>
             </nav>
-            <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+            <button class="menu-toggle" id="menuToggle" aria-label="เมนู"><i class="fa-solid fa-bars"></i></button>
         </div>
     </header>
 
-    <!-- Blog Hero -->
     <section class="blog-hero">
         <div class="container">
-            <span class="badge" style="background:rgba(255,255,255,0.15); color:white; margin-bottom:1rem;">
-                <i class="fa-solid fa-newspaper"></i> ARTICLES
-            </span>
             <h1>บทความน่ารู้<br>เกี่ยวกับการทำความสะอาด</h1>
-            <p>เคล็ดลับ ความรู้ และคำแนะนำจากผู้เชี่ยวชาญ อัปเดตใหม่ทุกวัน</p>
+            <p>เคล็ดลับและความรู้จากผู้เชี่ยวชาญ Sangkan Clean</p>
+            <div class="blog-toolbar">
+                <input type="search" id="blogSearch" class="blog-search" placeholder="ค้นหาบทความ..." aria-label="ค้นหาบทความ">
+            </div>
         </div>
     </section>
 
-    <!-- Blog Grid -->
     <section class="blog-grid-section">
         <div class="container">
-            <div class="blog-grid" id="blogGrid">
-                <div class="no-posts"><i class="fa-solid fa-spinner fa-spin"></i> กำลังโหลดบทความ...</div>
-            </div>
+            <div class="blog-grid" id="blogGrid"><p style="text-align:center;grid-column:1/-1;">กำลังโหลด...</p></div>
+            <p class="blog-count" id="blogCount"></p>
+            <div class="pagination" id="pagination"></div>
         </div>
     </section>
 
-    <!-- Article Modal -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal" id="modal">
-            <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
-            <img src="" alt="" class="modal-img" id="modalImg">
-            <div class="modal-body">
-                <span class="modal-tag" id="modalTag"></span>
-                <h2 class="modal-title" id="modalTitle"></h2>
-                <p class="modal-date" id="modalDate"></p>
-                <div class="modal-content" id="modalContent"></div>
-                <div class="modal-cta">
-                    <h3>สนใจบริการทำความสะอาด?</h3>
-                    <p>ทีมมืออาชีพพร้อมให้คำปรึกษาและเสนอราคาฟรี ไม่มีข้อผูกมัด</p>
-                    <div class="modal-cta-btns">
-                        <a href="https://line.me/ti/p/@sangkanclean" target="_blank" class="modal-cta-btn btn-line-cta">
-                            <i class="fa-brands fa-line"></i> แอดไลน์
-                        </a>
-                        <a href="tel:0636865134" class="modal-cta-btn btn-phone-cta">
-                            <i class="fa-solid fa-phone"></i> 063-686-5134
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Floating Buttons -->
     <div class="floating-contacts">
-        <a href="tel:0636865134" class="float-btn float-phone" aria-label="โทรเลย">
-            <i class="fa-solid fa-phone"></i>
-        </a>
-        <a href="https://line.me/ti/p/@sangkanclean" target="_blank" class="float-btn float-line" aria-label="Line">
-            <i class="fa-brands fa-line"></i>
-        </a>
+        <a href="tel:0636865134" class="float-btn float-phone" aria-label="โทรเลย"><i class="fa-solid fa-phone"></i></a>
+        <a href="https://line.me/ti/p/@sangkanclean" target="_blank" rel="noopener" class="float-btn float-line" aria-label="Line"><i class="fa-brands fa-line"></i></a>
     </div>
 
+    <script src="tracking.js"></script>
     <script>
-        // Load blog posts from posts.json
-        const blogGrid = document.getElementById('blogGrid');
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-
+        const PER_PAGE = 12;
         let allPosts = [];
+        let filtered = [];
+        let currentPage = 1;
 
-        fetch('posts.json?v=' + new Date().getTime(), { cache: "no-store" })
-            .then(res => res.json())
+        const blogGrid = document.getElementById('blogGrid');
+        const pagination = document.getElementById('pagination');
+        const blogSearch = document.getElementById('blogSearch');
+        const blogCount = document.getElementById('blogCount');
+
+        fetch('posts.json')
+            .then(r => r.json())
             .then(data => {
-                allPosts = data.slice().reverse(); // newest first
-                renderGrid(allPosts);
+                allPosts = data.slice().reverse();
+                filtered = allPosts;
+                render();
             })
-            .catch(() => {
-                blogGrid.innerHTML = '<div class="no-posts">ไม่พบบทความในขณะนี้ กรุณาลองใหม่ภายหลังครับ</div>';
-            });
+            .catch(() => { blogGrid.innerHTML = '<p style="text-align:center;grid-column:1/-1;">ไม่สามารถโหลดบทความได้</p>'; });
 
-        function renderGrid(posts) {
-            if (posts.length === 0) {
-                blogGrid.innerHTML = '<div class="no-posts">ยังไม่มีบทความในขณะนี้ครับ</div>';
+        blogSearch.addEventListener('input', () => {
+            const q = blogSearch.value.trim().toLowerCase();
+            filtered = q ? allPosts.filter(p =>
+                (p.title + p.description + (p.category||'')).toLowerCase().includes(q)
+            ) : allPosts;
+            currentPage = 1;
+            render();
+        });
+
+        function render() {
+            const start = (currentPage - 1) * PER_PAGE;
+            const pagePosts = filtered.slice(start, start + PER_PAGE);
+
+            if (!pagePosts.length) {
+                blogGrid.innerHTML = '<p style="text-align:center;grid-column:1/-1;">ไม่พบบทความ</p>';
+                pagination.innerHTML = '';
+                blogCount.textContent = '';
                 return;
             }
-            blogGrid.innerHTML = posts.map((post) => {
+
+            blogGrid.innerHTML = pagePosts.map(post => {
                 const slug = post.slug || 'post';
-                return `
-                <a href="blog/${slug}.html" class="blog-card" style="text-decoration:none;">
-                    <img src="${post.image}" alt="${post.title}" class="blog-card-img">
+                return `<a href="blog/${slug}.html" class="blog-card">
+                    <img src="${post.image}" alt="${post.title}" class="blog-card-img" loading="lazy" width="400" height="180">
                     <div class="blog-card-body">
-                        <span class="blog-card-tag">${post.category}</span>
+                        <span class="blog-card-tag">${post.category || 'บทความ'}</span>
                         <h2 class="blog-card-title">${post.title}</h2>
                         <p class="blog-card-desc">${post.description}</p>
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <span class="blog-card-date"><i class="fa-regular fa-calendar"></i> ${post.date}</span>
-                            <span class="blog-card-read">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></span>
-                        </div>
+                        <span style="font-size:0.78rem;color:#94a3b8;"><i class="fa-regular fa-calendar"></i> ${post.date}</span>
                     </div>
-                </a>
-                `;
+                </a>`;
             }).join('');
+
+            const totalPages = Math.ceil(filtered.length / PER_PAGE);
+            blogCount.textContent = `แสดง ${start + 1}-${start + pagePosts.length} จาก ${filtered.length} บทความ`;
+            renderPagination(totalPages);
         }
 
-        function openModal(index) {
-            const post = allPosts[index];
-            document.getElementById('modalImg').src = post.image;
-            document.getElementById('modalImg').alt = post.title;
-            document.getElementById('modalTag').textContent = post.category;
-            document.getElementById('modalTitle').textContent = post.title;
-            document.getElementById('modalDate').innerHTML = `<i class="fa-regular fa-calendar"></i> ${post.date}`;
-            document.getElementById('modalContent').innerHTML = post.content
-                ? post.content
-                : `<p>${post.description}</p>
-                   <p>บทความนี้กำลังอยู่ในระหว่างการจัดทำเนื้อหาเพิ่มเติม โปรดติดตามอัปเดตจากเราได้เร็วๆ นี้ครับ</p>
-                   <p>สนใจสอบถามบริการทำความสะอาดเพิ่มเติม ติดต่อทีมงาน Sangkan Clean ได้เลยครับ</p>`;
-            modalOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+        function renderPagination(totalPages) {
+            if (totalPages <= 1) { pagination.innerHTML = ''; return; }
+            let html = `<button ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">ก่อนหน้า</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) {
+                    html += `<button class="${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+                } else if (Math.abs(i - currentPage) === 3) {
+                    html += '<span>...</span>';
+                }
+            }
+            html += `<button ${currentPage===totalPages?'disabled':''} onclick="goPage(${currentPage+1})">ถัดไป</button>`;
+            pagination.innerHTML = html;
         }
 
-        function closeModal() {
-            modalOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        window.goPage = function(p) {
+            currentPage = p;
+            render();
+            window.scrollTo({ top: document.querySelector('.blog-grid-section').offsetTop - 80, behavior: 'smooth' });
+        };
 
-        modalClose.addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) closeModal();
-        });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        // Navbar toggle
         const menuToggle = document.getElementById('menuToggle');
         const navMenu = document.getElementById('navMenu');
-        if (menuToggle && navMenu) {
-            menuToggle.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-                const icon = menuToggle.querySelector('i');
-                icon.className = navMenu.classList.contains('active') ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
-            });
-        }
+        if (menuToggle) menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
     </script>
 </body>
 </html>

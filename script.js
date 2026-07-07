@@ -75,9 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
 
-        // Animate price
+        // Animate price + track calculator
         totalPrice.style.transform = 'scale(1.05)';
         totalPrice.textContent = `฿${finalTotal.toLocaleString()}`;
+        if (typeof trackEvent === 'function') {
+            trackEvent('calculator_result', { event_category: 'engagement', value: finalTotal, service: config.label });
+        }
         setTimeout(() => { totalPrice.style.transform = 'scale(1)'; }, 200);
     }
 
@@ -125,7 +128,36 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 
-    // 5. Blog Scroll Animation
+    // 5. Load latest blog posts on homepage
+    const articlesGrid = document.getElementById('articlesGrid');
+    if (articlesGrid) {
+        fetch('posts.json')
+            .then(r => r.json())
+            .then(posts => {
+                const latest = posts.slice().reverse().slice(0, 3);
+                articlesGrid.innerHTML = latest.map(p => `
+                    <article class="article-card">
+                        <div class="article-img">
+                            <img src="${p.image}" alt="${p.title}" loading="lazy" width="400" height="240">
+                            <span class="article-tag">${p.category || 'บทความ'}</span>
+                        </div>
+                        <div class="article-body">
+                            <h3>${p.title}</h3>
+                            <p>${p.description}</p>
+                            <a href="blog/${p.slug || 'post'}.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </article>`).join('');
+                articlesGrid.querySelectorAll('.article-card').forEach((el, i) => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(30px)';
+                    el.style.transition = `opacity 0.6s ease ${i * 0.1}s, transform 0.6s ease ${i * 0.1}s`;
+                    observer.observe(el);
+                });
+            })
+            .catch(() => { articlesGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;"><a href="blog.html">ดูบทความทั้งหมด</a></p>'; });
+    }
+
+    // 6. Blog Scroll Animation (fallback for static cards)
     document.querySelectorAll('.article-card').forEach((el, index) => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';

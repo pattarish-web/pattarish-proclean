@@ -6,3 +6,5 @@ Sitemap: https://www.sangkanclean.com/sitemap.xml
 
 # ไม่ให้ crawl ไฟล์ที่ไม่จำเป็น
 Disallow: /generate_blog.py
+Disallow: /build_*.py
+Disallow: /seo/
