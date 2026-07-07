@@ -37,19 +37,38 @@ def generate_geo_content(api_key, title, description):
         }
     }
     
-    try:
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code != 200:
-            print(f"Gemini API Error details: {response.text}")
-        response.raise_for_status()
-        result_json = response.json()
-        
-        text_response = result_json['candidates'][0]['content']['parts'][0]['text']
-        parsed_result = json.loads(text_response)
-        return parsed_result.get("content", "")
-    except Exception as e:
-        print(f"Error calling Gemini API for '{title}': {e}")
-        return ""
+    max_retries = 5
+    base_delay = 12  # รอขั้นต่ำ 12 วินาทีหากชนลิมิต
+    
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            
+            # ถ้าชนลิมิต หรือโควตาหมดชั่วคราว
+            if response.status_code == 429 or (response.status_code == 400 and "RESOURCE_EXHAUSTED" in response.text):
+                wait_time = base_delay * (1.5 ** attempt)
+                print(f"  -> Rate limit hit (RESOURCE_EXHAUSTED). Retrying in {wait_time:.1f}s...")
+                time.sleep(wait_time)
+                continue
+                
+            if response.status_code != 200:
+                print(f"Gemini API Error details: {response.text}")
+            response.raise_for_status()
+            result_json = response.json()
+            
+            text_response = result_json['candidates'][0]['content']['parts'][0]['text']
+            parsed_result = json.loads(text_response)
+            return parsed_result.get("content", "")
+            
+        except Exception as e:
+            if attempt == max_retries - 1:
+                print(f"Error calling Gemini API for '{title}': {e}")
+                return ""
+            wait_time = base_delay * (1.5 ** attempt)
+            print(f"  -> Request failed ({e}). Retrying in {wait_time:.1f}s...")
+            time.sleep(wait_time)
+            
+    return ""
 
 def upgrade_posts():
     api_key = get_api_key()
