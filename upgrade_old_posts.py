@@ -16,17 +16,17 @@ def generate_geo_content(api_key, title, description):
     headers = {'Content-Type': 'application/json'}
     
     prompt = f"""
-    คุณเป็นผู้เชี่ยวชาญด้านการทำความสะอาดและนักเขียนบทความ SEO/GEO (Generative Engine Optimization)
+    คุณเป็นผู้เชี่ยวชาญด้านการทำความสะอาดและนักเขียนบทความ SEO/GEO (Generative Engine Op[...]
     ช่วยเขียนบทความบล็อกภาษาไทยแบบเจาะลึก
     
     ชื่อบทความ: "{title}"
     คำอธิบาย: "{description}"
     
     ข้อกำหนด (สำคัญมากสำหรับการทำ GEO เพื่อให้ AI นำไปอ้างอิง):
-    เนื้อหาบทความ (content) ต้องเป็นโค้ด HTML semantic ล้วนๆ (ไม่ต้องมี <html> <body> ให้อยู่ใน tag <div> หรือ <article> ได้เลย) โดยบังคับให้มีโครงสร้างดังนี้:
+    เนื้อหาบทความ (content) ต้องเป็นโค้ด HTML semantic ล้วนๆ (ไม่ต้องมี <html> <body> ให้อยู่ใน tag [...]
     - <h2>สรุปประเด็นสำคัญ (Key Takeaways)</h2> ตามด้วย <ul><li> 3-4 ข้อสั้นๆ
-    - <h2>เนื้อหาหลัก</h2> อธิบายเนื้อหาแบบเจาะลึก มีการใช้ <strong> เพื่อเน้นคำสำคัญ
-    - <h2>ข้อมูลสถิติที่น่าสนใจ</h2> บังคับให้สร้างตัวเลขสถิติหรือข้อเท็จจริง (Facts) ที่อ้างอิงได้แบบสมจริง (เช่น "จากการศึกษาพบว่า...") เพื่อให้ AI นำไปอ้างอิงได้
+    - <h2>เนื้อหาหลัก</h2> อธิบายเนื้อหาแบบเจาะลึก มีการใช้ <strong> เพื่อเน้นคำสำค[...]
+    - <h2>ข้อมูลสถิติที่น่าสนใจ</h2> บังคับให้สร้างตัวเลขสถิติหรือข้อเท็จจริ[...]
     - <h2>คำถามที่พบบ่อย (FAQ)</h2> ถามตอบ 2-3 ข้อแบบสั้นๆ ตรงประเด็น
     
     ส่งกลับมาในรูปแบบ JSON เท่านั้น ห้ามมีข้อความอื่น โครงสร้างดังนี้:
@@ -42,7 +42,7 @@ def generate_geo_content(api_key, title, description):
         }
     }
     
-    max_retries = 8
+    max_retries = 3  # ← ลดจาก 8 เหลือ 3
     base_delay = 15  # รอขั้นต่ำ 15 วินาทีหากชนลิมิต
     
     for attempt in range(max_retries):
@@ -68,12 +68,12 @@ def generate_geo_content(api_key, title, description):
         except Exception as e:
             if attempt == max_retries - 1:
                 print(f"Error calling Gemini API for '{title}': {e}")
-                return ""
+                return None  # ← เปลี่ยนจาก "" เป็น None (เพื่อแยกความแตกต่าง)
             wait_time = base_delay * (1.5 ** attempt)
             print(f"  -> Request failed ({e}). Retrying in {wait_time:.1f}s...")
             time.sleep(wait_time)
             
-    return ""
+    return None
 
 def upgrade_posts():
     api_keys = get_api_keys()
@@ -85,38 +85,45 @@ def upgrade_posts():
         posts = json.load(f)
 
     upgraded_count = 0
+    skipped_count = 0  # ← เพิ่มตัวนับ
     key_index = 0
     
     for idx, post in enumerate(posts):
         content = post.get("content", "")
-        # เช็คว่าถ้าเนื้อหาเดิมยังไม่มีคำว่า "สรุปประเด็นสำคัญ" แปลว่ายังไม่ใช่ GEO ให้เขียนทับใหม่
+        # เช็คว่าถ้าเนื้อหาเดิมยังไม่มีคำว่า "สรุปประเด็นสำคัญ" แปลว่ายังไม่ได้อัปเกรด
         if "สรุปประเด็นสำคัญ" not in content:
             print(f"[{idx+1}/{len(posts)}] Upgrading: {post['title']}")
             
             # สลับใช้คีย์แบบวนลูป (Round-Robin Key Rotation)
             current_key = api_keys[key_index % len(api_keys)]
-            content = generate_geo_content(current_key, post['title'], post['description'])
+            new_content = generate_geo_content(current_key, post['title'], post['description'])
             key_index += 1
             
-            if content:
-                post['content'] = content
+            # ← เพิ่มการเช็คผลลัพธ์
+            if new_content and "สรุปประเด็นสำคัญ" in new_content:
+                post['content'] = new_content
                 upgraded_count += 1
                 
                 # เซฟทุกครั้งที่เขียนเสร็จ 1 บทความ (Auto-save)
                 with open('posts.json', 'w', encoding='utf-8') as f:
                     json.dump(posts, f, ensure_ascii=False, indent=2)
                     
-                # ถ้ามีหลายคีย์ สลับคีย์แล้ว พักแค่ 4 วินาทีพอ / ถ้ามีคีย์เดียว พัก 12 วินาทีเพื่อความปลอดภัย
+                # ถ้ามีหลายคีย์ สลับคีย์แล้ว พักแค่ 4 วินาทีพอ / ถ้ามีคีย์เดียว พัก 12 วินาที
                 sleep_time = 4 if len(api_keys) > 1 else 12
                 print(f"  -> Success! Wait {sleep_time} seconds...")
                 time.sleep(sleep_time)
             else:
-                print(f"  -> Failed to generate content.")
-                time.sleep(5)
+                # ← ข้ามไปถ้า API ล้มเหลว
+                print(f"  -> Failed to generate content. Skipping...")
+                skipped_count += 1
         else:
             print(f"[{idx+1}/{len(posts)}] Skip: Already has content.")
 
-    print(f"Upgrade Complete! Total upgraded: {upgraded_count}")
+    print(f"\n{'='*50}")
+    print(f"Upgrade Complete!")
+    print(f"Total upgraded: {upgraded_count}")
+    print(f"Total skipped: {skipped_count}")
+    print(f"{'='*50}\n")
     
     # สั่ง Build HTML ใหม่ทั้งหมด
     if upgraded_count > 0:
