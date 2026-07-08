@@ -93,6 +93,57 @@ def prune_orphan_blogs(valid_slugs):
     return removed
 
 
+def render_blog_html(posts, idx, template):
+    post = posts[idx]
+    slug = post.get("slug") or slugify(post["title"]) or f"post-{idx}"
+    post["slug"] = slug
+
+    content = post.get("content", "")
+    if not content:
+        content = f"""<p>{post['description']}</p>
+                   <p>บทความนี้กำลังอยู่ในระหว่างการจัดทำเนื้อหาเพิ่มเติม โปรดติดตามอัปเดตจากเราได้เร็วๆ นี้ครับ</p>
+                   <p>สนใจสอบถามบริการทำความสะอาดเพิ่มเติม ติดต่อทีมงาน Sangkan Clean ได้เลยครับ</p>"""
+
+    related = build_related_posts_html(posts, idx)
+    canonical = f"{SITE_URL}/blog/{slug}.html"
+    date_modified = post.get("dateModified", post.get("date", ""))
+    word_count = len(re.sub(r"<[^>]+>", " ", content).split())
+    faq_schema = extract_faq_schema(content)
+
+    html = template
+    replacements = {
+        "{{title}}": post["title"],
+        "{{description}}": post["description"],
+        "{{image}}": post["image"],
+        "{{category}}": post.get("category", "บทความ"),
+        "{{date}}": post.get("date", ""),
+        "{{date_modified}}": date_modified,
+        "{{word_count}}": str(word_count),
+        "{{slug}}": slug,
+        "{{content}}": content,
+        "{{canonical}}": canonical,
+        "{{related_posts}}": related,
+        "{{faq_schema}}": faq_schema,
+        "{{analytics_script}}": analytics_script_tag("../"),
+    }
+    for key, value in replacements.items():
+        html = html.replace(key, value)
+    return slug, html
+
+
+def build_single_blog(posts, idx):
+    """Build one blog HTML file (used for per-post checkpoint saves)."""
+    if not os.path.exists("blog"):
+        os.makedirs("blog")
+    with open("blog_template.html", "r", encoding="utf-8") as f:
+        template = f.read()
+    slug, html = render_blog_html(posts, idx, template)
+    filepath = os.path.join("blog", f"{slug}.html")
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(html)
+    return slug
+
+
 def build_blogs():
     if not os.path.exists("blog"):
         os.makedirs("blog")
@@ -107,40 +158,8 @@ def build_blogs():
     valid_slugs = set()
 
     for i, post in enumerate(posts):
-        slug = post.get("slug") or slugify(post["title"]) or f"post-{i}"
-        post["slug"] = slug
+        slug, html = render_blog_html(posts, i, template)
         valid_slugs.add(slug)
-
-        content = post.get("content", "")
-        if not content:
-            content = f"""<p>{post['description']}</p>
-                   <p>บทความนี้กำลังอยู่ในระหว่างการจัดทำเนื้อหาเพิ่มเติม โปรดติดตามอัปเดตจากเราได้เร็วๆ นี้ครับ</p>
-                   <p>สนใจสอบถามบริการทำความสะอาดเพิ่มเติม ติดต่อทีมงาน Sangkan Clean ได้เลยครับ</p>"""
-
-        related = build_related_posts_html(posts, i)
-        canonical = f"{SITE_URL}/blog/{slug}.html"
-        date_modified = post.get("dateModified", post.get("date", ""))
-        word_count = len(re.sub(r"<[^>]+>", " ", content).split())
-        faq_schema = extract_faq_schema(content)
-
-        html = template
-        replacements = {
-            "{{title}}": post["title"],
-            "{{description}}": post["description"],
-            "{{image}}": post["image"],
-            "{{category}}": post.get("category", "บทความ"),
-            "{{date}}": post.get("date", ""),
-            "{{date_modified}}": date_modified,
-            "{{word_count}}": str(word_count),
-            "{{slug}}": slug,
-            "{{content}}": content,
-            "{{canonical}}": canonical,
-            "{{related_posts}}": related,
-            "{{faq_schema}}": faq_schema,
-            "{{analytics_script}}": analytics_script_tag("../"),
-        }
-        for key, value in replacements.items():
-            html = html.replace(key, value)
 
         filepath = os.path.join("blog", f"{slug}.html")
         with open(filepath, "w", encoding="utf-8") as f:

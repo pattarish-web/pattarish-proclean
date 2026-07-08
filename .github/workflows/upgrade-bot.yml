@@ -43,6 +43,7 @@ jobs:
         echo "  batch_limit : ${{ inputs.batch_limit }} (0 = all pending)"
         echo "  workers     : ${{ inputs.workers }}"
         echo "  sleep/key   : 15s (auto-increases on 429)"
+        echo "  save mode   : per-post (git push after each)"
         echo "  retry passes: 3 (3-min cooldown between passes)"
         KEY_COUNT=$(echo "$GEMINI_API_KEY" | tr ',' '\n' | sed '/^$/d' | wc -l)
         echo "  API keys    : $KEY_COUNT detected"
@@ -55,12 +56,13 @@ jobs:
         GEO_BATCH_LIMIT: ${{ inputs.batch_limit }}
         GEO_WORKERS: ${{ inputs.workers }}
         GEO_SLEEP_SEC: "15"
+        GEO_INCREMENTAL_COMMIT: "1"
       run: python upgrade_old_posts.py --limit ${{ inputs.batch_limit }} --workers ${{ inputs.workers }} --sleep 15
 
-    - name: Commit and Push changes
+    - name: Final commit (sitemap & site build)
       run: |
         echo "============================================================"
-        echo " COMMIT & PUSH"
+        echo " FINAL COMMIT — sitemap, areas, remaining artifacts"
         echo "============================================================"
         git config --global user.name "Pattarish Upgrade Bot"
         git config --global user.email "bot@pattarishproclean.com"

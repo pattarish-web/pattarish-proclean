@@ -1,20 +1,25 @@
 import argparse
 import json
 import os
+import subprocess
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from queue import Queue
 
+from build_blogs import build_single_blog
 from gemini_api import call_gemini_json, reset_429_strikes
 from geo_log import banner, format_eta, key_label, log, milestone, progress
 
 DEFAULT_SLEEP = 15
 DEFAULT_LIMIT = 0
 MAX_RETRY_PASSES = 3
-QUOTA_COOLDOWN_SEC = 180  # 3 min between retry passes
-CHECKPOINT_EVERY = 5
+QUOTA_COOLDOWN_SEC = 180
+PROGRESS_EVERY = 5
+
+_save_lock = threading.Lock()
+_git_configured = False
 
 
 def get_api_keys():
@@ -60,20 +65,75 @@ def generate_geo_content(api_keys, api_key, title, description):
     return None
 
 
+def _incremental_git_push(slug: str, title: str) -> None:
+    """Push each upgraded post immediately so cancel does not lose progress."""
+    global _git_configured
+    if os.environ.get("GITHUB_ACTIONS") != "true":
+        return
+    if os.environ.get("GEO_INCREMENTAL_COMMIT", "1") != "1":
+        return
+
+    if not _git_configured:
+        subprocess.run(["git", "config", "user.name", "Pattarish Upgrade Bot"], check=True)
+        subprocess.run(["git", "config", "user.email", "bot@pattarishproclean.com"], check=True)
+        _git_configured = True
+
+    subprocess.run(["git", "add", "posts.json", f"blog/{slug}.html"], check=True)
+    if subprocess.run(["git", "diff", "--cached", "--quiet"]).returncode == 0:
+        return
+
+    safe_title = title.replace('"', "'")[:55]
+    commit = subprocess.run(
+        ["git", "commit", "-m", f"chore: GEO +1 {safe_title} [skip ci]"],
+        capture_output=True,
+        text=True,
+    )
+    if commit.returncode != 0:
+        log(f"git commit skipped: {commit.stderr.strip()}", level="WARN")
+        return
+
+    pull = subprocess.run(
+        ["git", "pull", "--rebase", "origin", "main"],
+        capture_output=True,
+        text=True,
+    )
+    if pull.returncode != 0:
+        log(f"git pull failed: {pull.stderr.strip()}", level="WARN")
+        return
+
+    push = subprocess.run(
+        ["git", "push", "origin", "HEAD:main"],
+        capture_output=True,
+        text=True,
+    )
+    if push.returncode == 0:
+        log(f"git pushed → blog/{slug}.html")
+    else:
+        log(f"git push failed: {push.stderr.strip()}", level="WARN")
+
+
+def checkpoint_post(posts, idx: int) -> None:
+    """Save posts.json + one blog HTML; push to GitHub if running in Actions."""
+    post = posts[idx]
+    title = post.get("title", "")[:55]
+
+    with _save_lock:
+        with open("posts.json", "w", encoding="utf-8") as f:
+            json.dump(posts, f, ensure_ascii=False, indent=2)
+        slug = build_single_blog(posts, idx)
+        log(f"checkpoint saved → {title}")
+        _incremental_git_push(slug, post.get("title", ""))
+
+
 def _upgrade_one(posts, api_keys, api_key, idx):
     post = posts[idx]
     new_content = generate_geo_content(api_keys, api_key, post["title"], post["description"])
     if new_content:
         post["content"] = new_content
         post["dateModified"] = datetime.today().strftime("%Y-%m-%d")
+        checkpoint_post(posts, idx)
         return True
     return False
-
-
-def save_posts(posts, path="posts.json"):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(posts, f, ensure_ascii=False, indent=2)
-    log("checkpoint → posts.json saved")
 
 
 def _run_sequential(posts, pending_indices, api_keys, sleep_sec, t0):
@@ -88,7 +148,6 @@ def _run_sequential(posts, pending_indices, api_keys, sleep_sec, t0):
 
         if _upgrade_one(posts, api_keys, key, idx):
             upgraded_count += 1
-            save_posts(posts)
         else:
             failed_indices.append(idx)
 
@@ -112,14 +171,13 @@ def _run_parallel(posts, pending_indices, api_keys, workers, t0):
     state = {"done": 0, "ok": 0, "fail": 0}
     state_lock = threading.Lock()
 
-    def maybe_checkpoint():
+    def maybe_log_progress():
         with state_lock:
-            if state["done"] % CHECKPOINT_EVERY == 0 or state["done"] >= total:
-                save_posts(posts)
+            if state["done"] % PROGRESS_EVERY == 0 or state["done"] >= total:
                 log(progress(state["done"], total, state["ok"], state["fail"], time.time() - t0))
                 if state["done"] % 25 == 0:
                     milestone(
-                        f"GEO checkpoint: {state['done']}/{total} "
+                        f"GEO progress: {state['done']}/{total} "
                         f"({state['ok']} ok, {state['fail']} fail)"
                     )
 
@@ -150,7 +208,7 @@ def _run_parallel(posts, pending_indices, api_keys, workers, t0):
                     state["fail"] += 1
                     local_fail.append(idx)
 
-            maybe_checkpoint()
+            maybe_log_progress()
             work_queue.task_done()
 
         log(f"Worker {worker_id + 1} ({label}) finished → ok={local_ok} fail={len(local_fail)}")
@@ -190,6 +248,7 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
 
     banner("GEO UPGRADE START")
     log(f"API keys: {len(api_keys)} | workers: {workers} | interval: {sleep_sec}s/key")
+    log(f"Save mode: per-post checkpoint" + (" + git push" if os.environ.get("GITHUB_ACTIONS") == "true" else ""))
     log(f"Models: {os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash → 3.1-flash-lite → 3.5-flash')}")
     log(f"Posts total: {len(posts)} | already GEO: {already_geo} | pending: {len(pending_indices)}")
     for i, k in enumerate(api_keys, 1):
@@ -263,8 +322,8 @@ def main():
         help="Max posts per run (default 0=unlimited)",
     )
     parser.add_argument(
-        "--sleep", type=float, default=float(os.environ.get("GEO_SLEEP_SEC", "6")),
-        help="Min seconds between requests per API key (default 6)",
+        "--sleep", type=float, default=float(os.environ.get("GEO_SLEEP_SEC", "15")),
+        help="Min seconds between requests per API key (default 15)",
     )
     parser.add_argument(
         "--workers", type=int, default=int(os.environ.get("GEO_WORKERS", "0")),
