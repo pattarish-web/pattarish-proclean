@@ -1,6 +1,7 @@
 """Run all site build steps."""
 
 import build_blogs
+import build_listings
 import build_local_pages
 import build_service_landings
 import update_sitemap
@@ -11,6 +12,7 @@ def build_all():
     write_analytics_js()
     patch_root_html_files()
     build_blogs.build_blogs()
+    build_listings.build_listings()
     build_local_pages.build_local_pages()
     build_service_landings.build_service_landings()
     update_sitemap.update_sitemap()

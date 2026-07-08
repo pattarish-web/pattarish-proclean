@@ -9,4 +9,5 @@ Disallow: /generate_blog.py
 Disallow: /build_*.py
 Disallow: /seo/
 Disallow: /posts.json
+Allow: /posts-index.json
 Disallow: /__pycache__/

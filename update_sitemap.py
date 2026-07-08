@@ -1,15 +1,25 @@
 import json
 import os
 from datetime import datetime
+from urllib.parse import quote
 
 from site_config import LOCAL_AREAS, SERVICE_LANDINGS, SITE_URL
 
 
+def encode_url_path(path):
+    """Percent-encode path segments for valid XML sitemap URLs."""
+    if not path:
+        return SITE_URL + "/"
+    encoded = "/".join(quote(part, safe="") for part in path.split("/"))
+    return f"{SITE_URL}/{encoded}"
+
+
 def url_entry(path, priority, changefreq, lastmod=None):
     lastmod = lastmod or datetime.today().strftime("%Y-%m-%d")
+    loc = encode_url_path(path)
     return f"""
   <url>
-    <loc>{SITE_URL}/{path}</loc>
+    <loc>{loc}</loc>
     <lastmod>{lastmod}</lastmod>
     <changefreq>{changefreq}</changefreq>
     <priority>{priority}</priority>

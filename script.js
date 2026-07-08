@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. Load latest blog posts on homepage
     const articlesGrid = document.getElementById('articlesGrid');
     if (articlesGrid) {
-        fetch('posts.json')
+        fetch('posts-index.json')
             .then(r => r.json())
             .then(posts => {
                 const latest = posts.slice().reverse().slice(0, 3);
