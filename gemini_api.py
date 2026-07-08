@@ -17,10 +17,25 @@ DEFAULT_MODELS = [
 _limiter_lock = threading.Lock()
 _key_locks: dict[str, threading.Lock] = {}
 _key_last_call: dict[str, float] = {}
+_key_interval: dict[str, float] = {}
 
 
-def _min_interval() -> float:
-    return float(os.environ.get("GEMINI_MIN_INTERVAL", "6"))
+def _base_interval() -> float:
+    return float(os.environ.get("GEMINI_MIN_INTERVAL", "10"))
+
+
+def _interval_for_key(api_key: str) -> float:
+    return _key_interval.get(api_key, _base_interval())
+
+
+def bump_key_cooldown(api_key: str, tag: str = "") -> None:
+    """Slow down a key after 429 so we don't hammer the same quota."""
+    with _limiter_lock:
+        current = _key_interval.get(api_key, _base_interval())
+        new_interval = min(max(current * 1.5, current + 3), 30)
+        _key_interval[api_key] = new_interval
+    label = tag or f"{api_key[:8]}…"
+    log(f"{label} cooldown → {new_interval:.0f}s/key", level="WARN")
 
 
 def wait_for_key(api_key: str) -> None:
@@ -32,8 +47,9 @@ def wait_for_key(api_key: str) -> None:
         key_lock = _key_locks[api_key]
 
     with key_lock:
+        interval = _interval_for_key(api_key)
         now = time.monotonic()
-        wait = _min_interval() - (now - _key_last_call[api_key])
+        wait = interval - (now - _key_last_call[api_key])
         if wait > 0:
             time.sleep(wait)
         _key_last_call[api_key] = time.monotonic()
@@ -58,10 +74,10 @@ def _retry_wait(response: requests.Response | None, attempt: int, base_delay: fl
         retry_after = response.headers.get("Retry-After")
         if retry_after:
             try:
-                return max(float(retry_after), base_delay)
+                return min(max(float(retry_after), base_delay), 90)
             except ValueError:
                 pass
-    return base_delay * (2**attempt)
+    return min(base_delay * (2**attempt), 90)
 
 
 def call_gemini_json(
@@ -69,9 +85,9 @@ def call_gemini_json(
     prompt: str,
     *,
     key_label: str = "",
-    max_retries: int = 6,
-    base_delay: float = 8,
-    timeout: int = 60,
+    max_retries: int = 8,
+    base_delay: float = 10,
+    timeout: int = 90,
 ) -> dict | None:
     tag = key_label or f"{api_key[:8]}…"
     headers = {"Content-Type": "application/json"}
@@ -97,6 +113,7 @@ def call_gemini_json(
                 if response.status_code == 429 or (
                     response.status_code == 400 and "RESOURCE_EXHAUSTED" in response.text
                 ):
+                    bump_key_cooldown(api_key, tag)
                     wait_time = _retry_wait(response, attempt, base_delay)
                     log(
                         f"{tag} RATE LIMIT (429) → wait {wait_time:.0f}s "
@@ -128,8 +145,9 @@ def call_gemini_json(
                 if attempt == max_retries - 1:
                     log(f"{tag} failed after {max_retries} retries: {exc}", level="ERROR")
                     break
-                wait_time = base_delay * (2**attempt)
+                wait_time = min(base_delay * (2**attempt), 90)
                 log(f"{tag} error: {exc} → retry in {wait_time:.0f}s", level="WARN")
                 time.sleep(wait_time)
 
     log(f"{tag} all models exhausted — giving up", level="ERROR")
+    return None

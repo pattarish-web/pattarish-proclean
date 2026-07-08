@@ -10,7 +10,7 @@ from queue import Queue
 from gemini_api import call_gemini_json
 from geo_log import banner, format_eta, key_label, log, milestone, progress
 
-DEFAULT_SLEEP = 6
+DEFAULT_SLEEP = 10
 DEFAULT_LIMIT = 0
 MAX_RETRY_PASSES = 2
 CHECKPOINT_EVERY = 5
@@ -125,6 +125,10 @@ def _run_parallel(posts, pending_indices, api_keys, workers, t0):
     def worker(worker_id):
         key = api_keys[worker_id % len(api_keys)]
         label = key_label(api_keys, key)
+        stagger = worker_id * 4
+        if stagger:
+            log(f"Worker {worker_id + 1} stagger start +{stagger}s")
+            time.sleep(stagger)
         log(f"Worker {worker_id + 1} started → {label}")
         local_ok = 0
         local_fail = []
