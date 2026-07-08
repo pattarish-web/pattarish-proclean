@@ -41,6 +41,9 @@ jobs:
       - name: Compliance Check
         run: python seo/compliance_checker.py
       - name: Build Site HTML
+        env:
+          GA4_MEASUREMENT_ID: ${{ secrets.GA4_MEASUREMENT_ID || 'G-MJG0VZPFKS' }}
+          ADS_LEAD_CONVERSION_LABEL: ${{ secrets.ADS_LEAD_CONVERSION_LABEL }}
         run: python build_site.py
       - name: Update Domain Configuration
         run: python update_domain.py

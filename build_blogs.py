@@ -77,21 +77,55 @@ def extract_faq_schema(content):
     ):
         pairs.append((_strip_tags(q), _strip_tags(a)))
 
+    # Gemini: <dl><dt>Q: ...</dt><dd>A: ...</dd></dl> or plain dt/dd
+    for q, a in re.findall(
+        r"<dt[^>]*>(.*?)</dt>\s*<dd[^>]*>(.*?)</dd>",
+        content,
+        flags=re.IGNORECASE | re.DOTALL,
+    ):
+        q_clean = _strip_tags(q)
+        a_clean = _strip_tags(a)
+        q_clean = re.sub(r"^Q\s*\d*\s*[:：]\s*", "", q_clean, flags=re.IGNORECASE).strip()
+        a_clean = re.sub(r"^A\s*\d*\s*[:：]\s*", "", a_clean, flags=re.IGNORECASE).strip()
+        if q_clean and a_clean:
+            pairs.append((q_clean, a_clean))
+
+    # Gemini: <ul><li><strong>Q: ...</strong><br>A: ...</li></ul>
+    for block in re.findall(r"<li[^>]*>(.*?)</li>", content, flags=re.I | re.S):
+        if "<strong>" not in block.lower():
+            continue
+        m = re.search(
+            r"<strong[^>]*>(.*?)</strong>\s*(?:<br\s*/?>)?\s*(.*)",
+            block,
+            flags=re.I | re.S,
+        )
+        if not m:
+            continue
+        strong_clean = _strip_tags(m.group(1))
+        answer = _strip_tags(m.group(2))
+        qm = re.match(r"^(?:ถาม|Q)\s*\d*\s*[:：]\s*(.+)$", strong_clean, flags=re.I)
+        if not qm:
+            continue
+        question = qm.group(1).strip()
+        answer = re.sub(r"^(?:ตอบ|A)\s*\d*\s*[:：]\s*", "", answer, flags=re.I).strip()
+        if question and answer:
+            pairs.append((question, answer))
+
     # Gemini / offline: <p><strong>ถาม: ...</strong><br>ตอบ: ...</p>
-    # Also legacy matrix: <p><strong>Q: ...</strong><br>A: ...</p>
+    # Also legacy matrix: <p><strong>Q: ...</strong><br>A: ...</p> and Q1/A1
     for block in re.findall(r"<p[^>]*>\s*<strong>(.*?)</strong>(.*?)</p>", content, flags=re.I | re.S):
         strong, rest = block
         strong_clean = _strip_tags(strong)
         answer = _strip_tags(rest)
         m = re.match(
-            r"^(?:ถาม|Q)\s*[:：]\s*(.+)$",
+            r"^(?:ถาม|Q)\s*\d*\s*[:：]\s*(.+)$",
             strong_clean,
             flags=re.IGNORECASE,
         )
         if not m:
             continue
         question = m.group(1).strip()
-        answer = re.sub(r"^(?:ตอบ|A)\s*[:：]\s*", "", answer, flags=re.IGNORECASE).strip()
+        answer = re.sub(r"^(?:ตอบ|A)\s*\d*\s*[:：]\s*", "", answer, flags=re.IGNORECASE).strip()
         if question and answer:
             pairs.append((question, answer))
 

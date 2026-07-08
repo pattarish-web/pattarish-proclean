@@ -1,0 +1,60 @@
+# One-time / occasional: mark GA4 key events + rebuild site with Ads label from secrets
+name: Analytics Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      mark_ga4_key_events:
+        description: "Mark GA4 key events via Admin API (needs GOOGLE_CREDENTIALS_JSON secret)"
+        type: boolean
+        default: true
+      rebuild_site:
+        description: "Run build_site.py (injects ADS_LEAD_CONVERSION_LABEL into HTML)"
+        type: boolean
+        default: true
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-analytics-admin google-auth
+
+      - name: Mark GA4 key events
+        if: inputs.mark_ga4_key_events
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/gcp.json
+          GA4_MEASUREMENT_ID: ${{ secrets.GA4_MEASUREMENT_ID || 'G-MJG0VZPFKS' }}
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID || '544613303' }}
+        run: |
+          if [ -z "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" ]; then
+            echo "::warning::GOOGLE_CREDENTIALS_JSON secret missing — skip GA4 key events (see docs/ga4-key-events.md)"
+            exit 0
+          fi
+          echo '${{ secrets.GOOGLE_CREDENTIALS_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
+          python setup_ga4_key_events.py
+
+      - name: Build site with analytics env
+        if: inputs.rebuild_site
+        env:
+          GA4_MEASUREMENT_ID: ${{ secrets.GA4_MEASUREMENT_ID || 'G-MJG0VZPFKS' }}
+          ADS_LEAD_CONVERSION_LABEL: ${{ secrets.ADS_LEAD_CONVERSION_LABEL }}
+        run: python build_site.py
+
+      - name: Commit analytics rebuild
+        if: inputs.rebuild_site && success()
+        run: |
+          git config user.name "Sangkan Clean Analytics Bot"
+          git config user.email "bot@sangkanclean.com"
+          git add analytics.js index.html blog.html privacy.html landing-*.html blog/ || true
+          git diff-index --quiet HEAD || git commit -m "chore: rebuild analytics snippets"
+          git pull --rebase origin main || true
+          git push origin main || true

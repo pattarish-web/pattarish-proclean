@@ -26,6 +26,11 @@
         });
     }
 
+    function fireAdsConversion(extra) {
+        if (!window.adsLeadSendTo) return;
+        trackEvent('conversion', Object.assign({ send_to: window.adsLeadSendTo }, extra || {}));
+    }
+
     function trackLeadSuccess() {
         var key = 'sc_lead_' + pagePath() + '_' + (window.location.search || '');
         try {
@@ -39,9 +44,7 @@
             currency: 'THB',
             event_category: 'lead',
         });
-        if (window.adsLeadSendTo) {
-            trackEvent('conversion', { send_to: window.adsLeadSendTo });
-        }
+        fireAdsConversion();
     }
 
     document.addEventListener('DOMContentLoaded', function () {

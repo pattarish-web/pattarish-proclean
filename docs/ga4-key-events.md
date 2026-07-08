@@ -63,4 +63,36 @@ Property ที่ใช้: **G-MJG0VZPFKS** (Sangkan Clean)
 
 ---
 
-อัปเดตล่าสุดให้ตรงกับโค้ดใน `tracking.js` หลัง commit GA4 wiring
+## F) Google Ads conversion label (`ADS_LEAD_CONVERSION_LABEL`)
+
+เว็บยิง `gtag('event', 'conversion', { send_to: 'AW-18299765093/LABEL' })` เมื่อฟอร์มสำเร็จ — ต้องมี **LABEL** จาก Google Ads
+
+1. [Google Ads](https://ads.google.com/) → **Goals** → **Conversions** → **Summary**
+2. สร้างหรือเปิด conversion ประเภท **Website** (เช่น "Lead - Quote form")
+3. **Tag setup** → เลือก **Use Google tag on your website** → คัดลอกส่วนหลัง `/` ใน `send_to`
+   - ตัวอย่าง snippet: `AW-18299765093/AbCdEfGhIj` → ใส่ secret เป็น `AbCdEfGhIj`
+4. GitHub repo → **Settings → Secrets** → เพิ่ม `ADS_LEAD_CONVERSION_LABEL`
+5. รัน workflow **Analytics Setup** (หรือ `ADS_LEAD_CONVERSION_LABEL=xxx python build_site.py` แล้ว deploy)
+
+**ทางเลือก (ไม่ต้องมี label):** เชื่อม GA4 กับ Ads แล้ว **Import** key event `generate_lead` เป็น conversion ใน Ads (Goals → Conversions → New → Import from GA4)
+
+---
+
+## G) มาร์ก Key events อัตโนมัติ (Admin API)
+
+1. สร้าง Service Account ใน GCP → เปิด **Google Analytics Admin API**
+2. GA4 Admin → Property access management → เพิ่ม service account เป็น **Editor**
+3. GitHub Secret `GOOGLE_CREDENTIALS_JSON` = เนื้อหาไฟล์ JSON
+4. (ทางเลือก) Secret `GA4_PROPERTY_ID` = ตัวเลข property; ถ้าไม่ใส่ script หา property จาก `G-MJG0VZPFKS` เอง
+5. Actions → **Analytics Setup** → Run workflow
+
+หรือรันเครื่องตัวเองหลัง `gcloud auth application-default login`:
+
+```bash
+pip install google-analytics-admin google-auth
+GA4_MEASUREMENT_ID=G-MJG0VZPFKS python setup_ga4_key_events.py
+```
+
+---
+
+อัปเดตล่าสุดให้ตรงกับโค้ดใน `tracking.js` และ workflow `analytics-setup.yml`
