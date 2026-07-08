@@ -99,6 +99,15 @@ def _incremental_git_push(slug: str, title: str) -> None:
         log(f"git commit skipped: {commit.stderr.strip()}", level="WARN")
         return
 
+    # GitHub Actions runner can have additional unstaged changes after content generation
+    # (e.g., other generated artifacts). `git pull --rebase` refuses to run in that case.
+    # We only care about pushing the committed checkpoint, so force a clean tree first.
+    try:
+        subprocess.run(["git", "reset", "--hard"], check=True, capture_output=True, text=True)
+        subprocess.run(["git", "clean", "-fd"], check=True, capture_output=True, text=True)
+    except Exception as exc:
+        log(f"git clean/reset failed: {exc}", level="WARN")
+
     pull = subprocess.run(
         ["git", "pull", "--rebase", "origin", "main"],
         capture_output=True,
