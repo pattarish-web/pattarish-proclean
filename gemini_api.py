@@ -20,7 +20,8 @@ _key_last_call: dict[str, float] = {}
 _key_interval: dict[str, float] = {}
 _key_429_strikes: dict[str, int] = {}
 _exhausted_keys: set[str] = set()
-MAX_429_RETRIES = 3
+# Free-tier RPD burns fast on retries — pause the key on first 429.
+MAX_429_RETRIES = 1
 
 
 def reset_429_strikes() -> None:
@@ -55,7 +56,7 @@ def clear_key_health(api_key: str) -> None:
 
 
 def _base_interval() -> float:
-    return float(os.environ.get("GEMINI_MIN_INTERVAL", "10"))
+    return float(os.environ.get("GEMINI_MIN_INTERVAL", "30"))
 
 
 def _interval_for_key(api_key: str) -> float:
@@ -164,18 +165,10 @@ def call_gemini_json(
                 if response.status_code == 429 or (
                     response.status_code == 400 and "RESOURCE_EXHAUSTED" in response.text
                 ):
+                    # Don't retry/fall through models — each call burns daily quota.
                     bump_key_cooldown(api_key, tag)
-                    if is_key_exhausted(api_key):
-                        log(f"{tag} quota exhausted — key paused", level="WARN")
-                        return None
-                    wait_time = _retry_wait(response, attempt, base_delay)
-                    log(
-                        f"{tag} RATE LIMIT (429) → wait {wait_time:.0f}s "
-                        f"[retry {attempt + 1}/{max_retries}]",
-                        level="WARN",
-                    )
-                    time.sleep(wait_time)
-                    continue
+                    log(f"{tag} RATE LIMIT (429) — pausing key (no retry)", level="WARN")
+                    return None
 
                 if response.status_code != 200:
                     log(f"{tag} API error {response.status_code}: {response.text[:200]}", level="WARN")

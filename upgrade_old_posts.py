@@ -18,10 +18,10 @@ from gemini_api import (
 )
 from geo_log import banner, format_eta, key_label, log, milestone, progress
 
-DEFAULT_SLEEP = 15
+DEFAULT_SLEEP = 45
 DEFAULT_LIMIT = 0
-MAX_RETRY_PASSES = 3
-QUOTA_COOLDOWN_SEC = 300  # 5 min when all keys paused
+MAX_RETRY_PASSES = 2
+QUOTA_COOLDOWN_SEC = 900  # 15 min when all keys paused (free-tier RPD)
 PROGRESS_EVERY = 5
 
 _save_lock = threading.Lock()
@@ -146,10 +146,14 @@ def _upgrade_one(posts, api_keys, api_key, idx):
         return "quota"
 
     post = posts[idx]
+    if post.get("geo_source") == "gemini":
+        return "skip"
+
     new_content = generate_geo_content(api_keys, api_key, post["title"], post["description"])
     if new_content:
         post["content"] = new_content
         post["dateModified"] = datetime.today().strftime("%Y-%m-%d")
+        post["geo_source"] = "gemini"
         checkpoint_post(posts, idx)
         return "ok"
     if is_key_exhausted(api_key):
@@ -178,7 +182,8 @@ def _wait_for_quota(api_keys, workers):
         banner("ALL ACTIVE KEYS PAUSED — waiting for quota")
         log(f"Cooling down {QUOTA_COOLDOWN_SEC}s before retrying…", level="WARN")
         milestone(
-            f"All {active_count} active API keys hit quota — pausing {QUOTA_COOLDOWN_SEC // 60} min"
+            f"All {active_count} active API keys hit quota — pausing {QUOTA_COOLDOWN_SEC // 60} min "
+            f"(free-tier daily quota may need until tomorrow)"
         )
         time.sleep(QUOTA_COOLDOWN_SEC)
         reset_429_strikes()
@@ -200,6 +205,9 @@ def _run_sequential(posts, pending_indices, api_keys, sleep_sec, t0):
 
         result = _upgrade_one(posts, api_keys, key, idx)
         if result == "quota":
+            continue
+        if result == "skip":
+            n += 1
             continue
 
         n += 1
@@ -262,6 +270,9 @@ def _run_parallel(posts, pending_indices, api_keys, workers, t0):
                 work_queue.put(idx)
                 _wait_for_quota(api_keys, workers)
                 continue
+            if result == "skip":
+                work_queue.task_done()
+                continue
 
             with state_lock:
                 state["done"] += 1
@@ -303,25 +314,35 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
     with open("posts.json", "r", encoding="utf-8") as f:
         posts = json.load(f)
 
-    already_geo = sum(1 for p in posts if "สรุปประเด็นสำคัญ" in p.get("content", ""))
+    # Preserve earlier Gemini posts that have GEO content but no source flag yet.
+    for p in posts:
+        if "สรุปประเด็นสำคัญ" in p.get("content", "") and not p.get("geo_source"):
+            p["geo_source"] = "gemini"
+
+    already_gemini = sum(1 for p in posts if p.get("geo_source") == "gemini")
+    already_offline = sum(1 for p in posts if p.get("geo_source") == "offline")
+    # Drain path: rewrite offline (or unmarked non-gemini) posts to Gemini quality.
     pending_indices = [
         i for i, p in enumerate(posts)
-        if "สรุปประเด็นสำคัญ" not in p.get("content", "")
+        if p.get("geo_source") != "gemini"
     ]
 
     if limit > 0:
         pending_indices = pending_indices[:limit]
 
-    banner("GEO UPGRADE START")
+    banner("GEO UPGRADE START (Gemini drain)")
     log(f"API keys: {len(api_keys)} | workers: {workers} | interval: {sleep_sec}s/key")
     log(f"Save mode: per-post checkpoint" + (" + git push" if os.environ.get("GITHUB_ACTIONS") == "true" else ""))
     log(f"Models: {os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash → 3.1-flash-lite → 3.5-flash')}")
-    log(f"Posts total: {len(posts)} | already GEO: {already_geo} | pending: {len(pending_indices)}")
+    log(
+        f"Posts total: {len(posts)} | gemini: {already_gemini} | offline: {already_offline} | "
+        f"pending Gemini rewrite: {len(pending_indices)}"
+    )
     for i, k in enumerate(api_keys, 1):
         log(f"  Key#{i}: {k[:8]}…{k[-4:]}")
 
     if not pending_indices:
-        log("Nothing to upgrade — all posts already have GEO content")
+        log("Nothing to upgrade — all posts already marked geo_source=gemini")
         return 0
 
     upgraded_count = 0
@@ -350,19 +371,18 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
         failed_indices = fails
 
     elapsed = time.time() - t0
-    remaining = sum(
-        1 for p in posts if "สรุปประเด็นสำคัญ" not in p.get("content", "")
-    )
+    remaining = sum(1 for p in posts if p.get("geo_source") != "gemini")
+    gemini_total = sum(1 for p in posts if p.get("geo_source") == "gemini")
 
     banner("GEO UPGRADE DONE")
     milestone(
-        f"FINISHED — upgraded {upgraded_count} posts | "
-        f"{len(posts) - remaining}/{len(posts)} total GEO | "
+        f"FINISHED — upgraded {upgraded_count} posts to Gemini | "
+        f"{gemini_total}/{len(posts)} geo_source=gemini | "
         f"failed {len(failed_indices)} | elapsed {format_eta(elapsed)}"
     )
     log(f"Elapsed: {format_eta(elapsed)} | upgraded this run: {upgraded_count} | still failed: {len(failed_indices)}")
-    log(f"Site status: {len(posts) - remaining}/{len(posts)} posts now have GEO content")
-    log(f"Remaining pending: {remaining}")
+    log(f"Site status: {gemini_total}/{len(posts)} posts now have Gemini GEO content")
+    log(f"Remaining pending Gemini rewrite: {remaining}")
 
     if failed_indices:
         log("Failed posts:", level="WARN")
@@ -388,8 +408,8 @@ def main():
         help="Max posts per run (default 0=unlimited)",
     )
     parser.add_argument(
-        "--sleep", type=float, default=float(os.environ.get("GEO_SLEEP_SEC", "15")),
-        help="Min seconds between requests per API key (default 15)",
+        "--sleep", type=float, default=float(os.environ.get("GEO_SLEEP_SEC", "45")),
+        help="Min seconds between requests per API key (default 45)",
     )
     parser.add_argument(
         "--workers", type=int, default=int(os.environ.get("GEO_WORKERS", "0")),

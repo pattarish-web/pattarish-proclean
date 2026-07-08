@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       batch_limit:
-        description: "Posts per run (0 = all pending)"
+        description: "Posts per run (0 = all pending offline→Gemini)"
         required: false
-        default: "0"
+        default: "20"
       workers:
-        description: "Parallel workers (3 = use all API keys)"
+        description: "Parallel workers (1 safer for free tier, 3 = all keys)"
         required: false
-        default: "3"
+        default: "1"
 
 jobs:
   upgrade:
@@ -38,13 +38,14 @@ jobs:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
         echo "============================================================"
-        echo " GEO Upgrade — run config"
+        echo " GEO Upgrade — slow drain (offline → Gemini)"
         echo "============================================================"
         echo "  batch_limit : ${{ inputs.batch_limit }} (0 = all pending)"
         echo "  workers     : ${{ inputs.workers }}"
-        echo "  sleep/key   : 15s (auto-increases on 429)"
+        echo "  sleep/key   : 45s (pause key immediately on 429)"
         echo "  save mode   : per-post (git push after each)"
-        echo "  retry passes: 3 (3-min cooldown between passes)"
+        echo "  skip rule   : geo_source=gemini already done"
+        echo "  retry passes: 2 (15-min cooldown between passes)"
         KEY_COUNT=$(echo "$GEMINI_API_KEY" | tr ',' '\n' | sed '/^$/d' | wc -l)
         echo "  API keys    : $KEY_COUNT detected"
         echo "============================================================"
@@ -55,9 +56,10 @@ jobs:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         GEO_BATCH_LIMIT: ${{ inputs.batch_limit }}
         GEO_WORKERS: ${{ inputs.workers }}
-        GEO_SLEEP_SEC: "15"
+        GEO_SLEEP_SEC: "45"
         GEO_INCREMENTAL_COMMIT: "1"
-      run: python upgrade_old_posts.py --limit ${{ inputs.batch_limit }} --workers ${{ inputs.workers }} --sleep 15
+        GEMINI_MIN_INTERVAL: "45"
+      run: python upgrade_old_posts.py --limit ${{ inputs.batch_limit }} --workers ${{ inputs.workers }} --sleep 45
 
     - name: Final commit (sitemap & site build)
       run: |
@@ -77,6 +79,8 @@ jobs:
           git commit -m "chore: GEO upgrade batch (${{ inputs.batch_limit }} posts) [skip ci]"
           echo "::notice::Committed GEO upgrade changes"
         fi
+        git reset --hard
+        git clean -fd
         git pull --rebase origin main
         git push origin HEAD:main
         echo "::notice::Pushed to main successfully"
