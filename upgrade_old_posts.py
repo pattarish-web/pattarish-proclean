@@ -29,20 +29,23 @@ def generate_geo_content(api_keys, api_key, title, description):
     label = key_label(api_keys, api_key)
     log(f"{label} → generating: {title[:60]}")
 
-    prompt = f"""เขียนบทความ SEO/GEO ภาษาไทยสำหรับหัวข้อ: "{title}"
+    prompt = f"""คุณเป็นผู้เชี่ยวชาญด้านการทำความสะอาดและนักเขียนบทความ SEO/GEO (Generative Engine Optimization)
+ช่วยเขียนบทความบล็อกภาษาไทยแบบเจาะลึก
+
+ชื่อบทความ: "{title}"
 คำอธิบาย: "{description}"
 
-ตอบเป็น JSON เท่านั้น: {{"content": "..."}}
+ข้อกำหนด (สำคัญมากสำหรับการทำ GEO เพื่อให้ AI นำไปอ้างอิง):
+เนื้อหาบทความ (content) ต้องเป็นโค้ด HTML semantic ล้วนๆ (ไม่ต้องมี <html> <body> tag)
+- <h2>สรุปประเด็นสำคัญ (Key Takeaways)</h2> ตามด้วย <ul><li> 3-4 ข้อสั้นๆ
+- <h2>เนื้อหาหลัก</h2> อธิบายเนื้อหาแบบเจาะลึก มีการใช้ <strong> เพื่อเน้นคำสำคัญ
+- <h2>ข้อมูลสถิติที่น่าสนใจ</h2> สร้างข้อมูลเชิงประมาณหรือแนวโน้มทั่วไปในอุตสาหกรรม (ไม่ใช่ตัวเลขเฉพาะบริษัท) พร้อมข้อความว่า "ข้อมูลโดยประมาณจากแนวโน้มอุตสาหกรรม"
+- <h2>คำถามที่พบบ่อย (FAQ)</h2> ถามตอบ 2-3 ข้อแบบสั้นๆ ตรงประเด็น
 
-content เป็น HTML semantic (ไม่มี html/body) ประกอบด้วย:
-- <h2>สรุปประเด็นสำคัญ (Key Takeaways)</h2> + <ul> 3-4 ข้อ
-- <h2>เนื้อหาหลัก</h2> 2-3 ย่อหน้า ใช้ <strong> เน้นคำสำคัญ
-- <h2>ข้อมูลสถิติที่น่าสนใจ</h2> แนวโน้มอุตสาหกรรม (ระบุว่าเป็นข้อมูลโดยประมาณ)
-- <h2>คำถามที่พบบ่อย (FAQ)</h2> 2-3 คำถาม ใช้ <h3>คำถาม</h3><p>คำตอบ</p>
+ตอบกลับเป็น JSON format เท่านั้น:
+{{"content": "<h2>สรุปประเด็น...</h2>..."}}"""
 
-เขียนกระชับ ไม่เกิน 800 คำ"""
-
-    parsed_result = call_gemini_json(api_key, prompt, key_label=label, timeout=60)
+    parsed_result = call_gemini_json(api_key, prompt, key_label=label, timeout=90)
     if not parsed_result:
         log(f"{label} ✗ no response", level="WARN")
         return None
@@ -177,7 +180,7 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
 
     banner("GEO UPGRADE START")
     log(f"API keys: {len(api_keys)} | workers: {workers} | interval: {sleep_sec}s/key")
-    log(f"Models: {os.environ.get('GEMINI_MODEL', 'gemini-3.1-flash-lite → 2.5-flash → 3.5-flash')}")
+    log(f"Models: {os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash → 3.1-flash-lite → 3.5-flash')}")
     log(f"Posts total: {len(posts)} | already GEO: {already_geo} | pending: {len(pending_indices)}")
     for i, k in enumerate(api_keys, 1):
         log(f"  Key#{i}: {k[:8]}…{k[-4:]}")

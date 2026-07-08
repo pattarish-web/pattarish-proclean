@@ -9,8 +9,8 @@ from geo_log import log
 
 # July 2026: gemini-pro / gemini-2.0-* are shut down. Use current models on v1beta.
 DEFAULT_MODELS = [
-    "gemini-3.1-flash-lite",
     "gemini-2.5-flash",
+    "gemini-3.1-flash-lite",
     "gemini-3.5-flash",
 ]
 
