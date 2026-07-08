@@ -9,16 +9,17 @@ from datetime import datetime
 from queue import Queue
 
 from build_blogs import build_single_blog
-from gemini_api import call_gemini_json, reset_429_strikes
+from gemini_api import all_keys_exhausted, call_gemini_json, is_key_exhausted, reset_429_strikes
 from geo_log import banner, format_eta, key_label, log, milestone, progress
 
 DEFAULT_SLEEP = 15
 DEFAULT_LIMIT = 0
 MAX_RETRY_PASSES = 3
-QUOTA_COOLDOWN_SEC = 180
+QUOTA_COOLDOWN_SEC = 300  # 5 min when all keys paused
 PROGRESS_EVERY = 5
 
 _save_lock = threading.Lock()
+_quota_wait_lock = threading.Lock()
 _git_configured = False
 
 
@@ -126,14 +127,33 @@ def checkpoint_post(posts, idx: int) -> None:
 
 
 def _upgrade_one(posts, api_keys, api_key, idx):
+    if is_key_exhausted(api_key):
+        return "quota"
+
     post = posts[idx]
     new_content = generate_geo_content(api_keys, api_key, post["title"], post["description"])
     if new_content:
         post["content"] = new_content
         post["dateModified"] = datetime.today().strftime("%Y-%m-%d")
         checkpoint_post(posts, idx)
-        return True
-    return False
+        return "ok"
+    if is_key_exhausted(api_key):
+        return "quota"
+    return "fail"
+
+
+def _wait_for_quota(api_keys):
+    if not all_keys_exhausted(api_keys):
+        return
+    with _quota_wait_lock:
+        if not all_keys_exhausted(api_keys):
+            return
+        banner("ALL KEYS PAUSED — waiting for quota")
+        log(f"Cooling down {QUOTA_COOLDOWN_SEC}s before retrying…", level="WARN")
+        milestone(f"All {len(api_keys)} API keys hit quota — pausing {QUOTA_COOLDOWN_SEC // 60} min")
+        time.sleep(QUOTA_COOLDOWN_SEC)
+        reset_429_strikes()
+        log("Quota cooldown done — resuming")
 
 
 def _run_sequential(posts, pending_indices, api_keys, sleep_sec, t0):
@@ -141,12 +161,20 @@ def _run_sequential(posts, pending_indices, api_keys, sleep_sec, t0):
     failed_indices = []
     total = len(pending_indices)
 
-    for n, idx in enumerate(pending_indices, 1):
+    n = 0
+    while n < len(pending_indices):
+        _wait_for_quota(api_keys)
+        idx = pending_indices[n]
         post = posts[idx]
-        key = api_keys[(n - 1) % len(api_keys)]
-        log(f"[{n}/{total}] {post['title'][:55]}")
+        key = api_keys[n % len(api_keys)]
+        log(f"[{n + 1}/{total}] {post['title'][:55]}")
 
-        if _upgrade_one(posts, api_keys, key, idx):
+        result = _upgrade_one(posts, api_keys, key, idx)
+        if result == "quota":
+            continue
+
+        n += 1
+        if result == "ok":
             upgraded_count += 1
         else:
             failed_indices.append(idx)
@@ -193,15 +221,21 @@ def _run_parallel(posts, pending_indices, api_keys, workers, t0):
         local_fail = []
 
         while True:
+            _wait_for_quota(api_keys)
             try:
                 idx = work_queue.get_nowait()
             except Exception:
                 break
 
-            ok = _upgrade_one(posts, api_keys, key, idx)
+            result = _upgrade_one(posts, api_keys, key, idx)
+            if result == "quota":
+                work_queue.put(idx)
+                _wait_for_quota(api_keys)
+                continue
+
             with state_lock:
                 state["done"] += 1
-                if ok:
+                if result == "ok":
                     state["ok"] += 1
                     local_ok += 1
                 else:

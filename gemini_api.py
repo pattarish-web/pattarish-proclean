@@ -19,13 +19,31 @@ _key_locks: dict[str, threading.Lock] = {}
 _key_last_call: dict[str, float] = {}
 _key_interval: dict[str, float] = {}
 _key_429_strikes: dict[str, int] = {}
-MAX_429_RETRIES = 3  # fail fast — let retry pass handle later
+_exhausted_keys: set[str] = set()
+MAX_429_RETRIES = 3
 
 
 def reset_429_strikes() -> None:
-    """Clear per-key 429 counters between retry passes."""
+    """Clear per-key 429 state between retry passes."""
     with _limiter_lock:
         _key_429_strikes.clear()
+        _exhausted_keys.clear()
+        _key_interval.clear()
+
+
+def is_key_exhausted(api_key: str) -> bool:
+    return api_key in _exhausted_keys
+
+
+def all_keys_exhausted(api_keys: list[str]) -> bool:
+    return bool(api_keys) and all(k in _exhausted_keys for k in api_keys)
+
+
+def clear_key_health(api_key: str) -> None:
+    with _limiter_lock:
+        _key_429_strikes.pop(api_key, None)
+        _exhausted_keys.discard(api_key)
+        _key_interval.pop(api_key, None)
 
 
 def _base_interval() -> float:
@@ -39,13 +57,18 @@ def _interval_for_key(api_key: str) -> float:
 def bump_key_cooldown(api_key: str, tag: str = "") -> float:
     """Slow down a key after 429 so we don't hammer the same quota."""
     with _limiter_lock:
+        if api_key in _exhausted_keys:
+            return _key_interval.get(api_key, _base_interval())
         current = _key_interval.get(api_key, _base_interval())
         new_interval = min(max(current * 1.5, current + 5), 45)
         _key_interval[api_key] = new_interval
         strikes = _key_429_strikes.get(api_key, 0) + 1
         _key_429_strikes[api_key] = strikes
+        if strikes >= MAX_429_RETRIES:
+            _exhausted_keys.add(api_key)
     label = tag or f"{api_key[:8]}…"
-    log(f"{label} cooldown → {new_interval:.0f}s/key (429 strike {strikes}/{MAX_429_RETRIES})", level="WARN")
+    shown = min(strikes, MAX_429_RETRIES)
+    log(f"{label} cooldown → {new_interval:.0f}s/key (429 strike {shown}/{MAX_429_RETRIES})", level="WARN")
     return new_interval
 
 
@@ -105,6 +128,11 @@ def call_gemini_json(
     timeout: int = 90,
 ) -> dict | None:
     tag = key_label or f"{api_key[:8]}…"
+
+    if is_key_exhausted(api_key):
+        log(f"{tag} key paused (quota) — skip", level="WARN")
+        return None
+
     headers = {"Content-Type": "application/json"}
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -129,12 +157,8 @@ def call_gemini_json(
                     response.status_code == 400 and "RESOURCE_EXHAUSTED" in response.text
                 ):
                     bump_key_cooldown(api_key, tag)
-                    if _429_strikes(api_key) >= MAX_429_RETRIES:
-                        log(
-                            f"{tag} quota exhausted — skip post "
-                            f"(will retry in next pass after cooldown)",
-                            level="WARN",
-                        )
+                    if is_key_exhausted(api_key):
+                        log(f"{tag} quota exhausted — key paused", level="WARN")
                         return None
                     wait_time = _retry_wait(response, attempt, base_delay)
                     log(
@@ -157,6 +181,7 @@ def call_gemini_json(
                 result_json = response.json()
                 text_response = result_json["candidates"][0]["content"]["parts"][0]["text"]
                 log(f"{tag} model '{model}' → success")
+                clear_key_health(api_key)
                 return json.loads(text_response)
 
             except requests.Timeout:
