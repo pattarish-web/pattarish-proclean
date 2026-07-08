@@ -8,9 +8,9 @@ on:
         required: false
         default: "0"
       workers:
-        description: "Parallel workers (2 recommended to avoid 429)"
+        description: "Parallel workers (3 = use all API keys)"
         required: false
-        default: "2"
+        default: "3"
 
 jobs:
   upgrade:

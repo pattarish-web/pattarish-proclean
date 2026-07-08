@@ -39,6 +39,14 @@ def all_keys_exhausted(api_keys: list[str]) -> bool:
     return bool(api_keys) and all(k in _exhausted_keys for k in api_keys)
 
 
+def active_keys_exhausted(api_keys: list[str], workers: int) -> bool:
+    """True when every key assigned to a worker is paused."""
+    if not api_keys:
+        return True
+    active = {api_keys[i % len(api_keys)] for i in range(min(workers, len(api_keys)))}
+    return all(k in _exhausted_keys for k in active)
+
+
 def clear_key_health(api_key: str) -> None:
     with _limiter_lock:
         _key_429_strikes.pop(api_key, None)

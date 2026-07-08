@@ -9,7 +9,13 @@ from datetime import datetime
 from queue import Queue
 
 from build_blogs import build_single_blog
-from gemini_api import all_keys_exhausted, call_gemini_json, is_key_exhausted, reset_429_strikes
+from gemini_api import (
+    active_keys_exhausted,
+    all_keys_exhausted,
+    call_gemini_json,
+    is_key_exhausted,
+    reset_429_strikes,
+)
 from geo_log import banner, format_eta, key_label, log, milestone, progress
 
 DEFAULT_SLEEP = 15
@@ -142,15 +148,29 @@ def _upgrade_one(posts, api_keys, api_key, idx):
     return "fail"
 
 
-def _wait_for_quota(api_keys):
-    if not all_keys_exhausted(api_keys):
+def _pick_key(api_keys, worker_id):
+    """Pick a healthy key for this worker; rotate if assigned key is paused."""
+    preferred = api_keys[worker_id % len(api_keys)]
+    if not is_key_exhausted(preferred):
+        return preferred
+    for k in api_keys:
+        if not is_key_exhausted(k):
+            return k
+    return preferred
+
+
+def _wait_for_quota(api_keys, workers):
+    if not active_keys_exhausted(api_keys, workers):
         return
     with _quota_wait_lock:
-        if not all_keys_exhausted(api_keys):
+        if not active_keys_exhausted(api_keys, workers):
             return
-        banner("ALL KEYS PAUSED — waiting for quota")
+        active_count = min(workers, len(api_keys))
+        banner("ALL ACTIVE KEYS PAUSED — waiting for quota")
         log(f"Cooling down {QUOTA_COOLDOWN_SEC}s before retrying…", level="WARN")
-        milestone(f"All {len(api_keys)} API keys hit quota — pausing {QUOTA_COOLDOWN_SEC // 60} min")
+        milestone(
+            f"All {active_count} active API keys hit quota — pausing {QUOTA_COOLDOWN_SEC // 60} min"
+        )
         time.sleep(QUOTA_COOLDOWN_SEC)
         reset_429_strikes()
         log("Quota cooldown done — resuming")
@@ -163,10 +183,10 @@ def _run_sequential(posts, pending_indices, api_keys, sleep_sec, t0):
 
     n = 0
     while n < len(pending_indices):
-        _wait_for_quota(api_keys)
+        _wait_for_quota(api_keys, workers)
         idx = pending_indices[n]
         post = posts[idx]
-        key = api_keys[n % len(api_keys)]
+        key = _pick_key(api_keys, n % len(api_keys))
         log(f"[{n + 1}/{total}] {post['title'][:55]}")
 
         result = _upgrade_one(posts, api_keys, key, idx)
@@ -210,27 +230,28 @@ def _run_parallel(posts, pending_indices, api_keys, workers, t0):
                     )
 
     def worker(worker_id):
-        key = api_keys[worker_id % len(api_keys)]
-        label = key_label(api_keys, key)
+        label = ""
         stagger = worker_id * 4
         if stagger:
             log(f"Worker {worker_id + 1} stagger start +{stagger}s")
             time.sleep(stagger)
-        log(f"Worker {worker_id + 1} started → {label}")
+        log(f"Worker {worker_id + 1} started")
         local_ok = 0
         local_fail = []
 
         while True:
-            _wait_for_quota(api_keys)
+            _wait_for_quota(api_keys, workers)
             try:
                 idx = work_queue.get_nowait()
             except Exception:
                 break
 
+            key = _pick_key(api_keys, worker_id)
+            label = key_label(api_keys, key)
             result = _upgrade_one(posts, api_keys, key, idx)
             if result == "quota":
                 work_queue.put(idx)
-                _wait_for_quota(api_keys)
+                _wait_for_quota(api_keys, workers)
                 continue
 
             with state_lock:
@@ -265,6 +286,8 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
         return 0
 
     workers = workers or min(len(api_keys), 3)
+    if len(api_keys) >= 3 and workers < 3:
+        log("Tip: use workers=3 to use all API keys", level="WARN")
     if sleep_sec > 0:
         os.environ.setdefault("GEMINI_MIN_INTERVAL", str(sleep_sec))
 
