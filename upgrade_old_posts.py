@@ -194,6 +194,7 @@ def _run_sequential(posts, pending_indices, api_keys, sleep_sec, t0):
     upgraded_count = 0
     failed_indices = []
     total = len(pending_indices)
+    workers = 1  # sequential mode always uses one active key slot
 
     n = 0
     while n < len(pending_indices):
