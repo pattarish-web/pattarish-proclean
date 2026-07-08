@@ -10,7 +10,11 @@ def _has_ga4():
 
 
 GTAG_BLOCK = re.compile(
-    r"<!-- Google tag \(gtag\.js\) -->.*?</script>\s*",
+    r"<!-- Google tag \(gtag\.js\) -->.*?(?:<script[^>]*>.*?</script>\s*)+",
+    re.DOTALL,
+)
+ORPHAN_GTAG_INLINE = re.compile(
+    r"<script>\s*window\.dataLayer = window\.dataLayer \|\| \[\];\s*function gtag\(\).*?</script>\s*",
     re.DOTALL,
 )
 
@@ -64,5 +68,10 @@ def patch_root_html_files():
                 snippet,
                 1,
             )
+        while True:
+            matches = list(ORPHAN_GTAG_INLINE.finditer(html))
+            if len(matches) <= 1:
+                break
+            html = ORPHAN_GTAG_INLINE.sub("", html, count=1)
         with open(path, "w", encoding="utf-8") as f:
             f.write(html)
