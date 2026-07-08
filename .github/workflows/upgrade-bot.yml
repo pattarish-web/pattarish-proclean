@@ -1,12 +1,21 @@
 name: Mass Upgrade Old Blogs (GEO)
 
 on:
-  workflow_dispatch: # ทำให้สามารถกดปุ่มรันมือเองบนเว็บได้เท่านั้น
+  workflow_dispatch:
+    inputs:
+      batch_limit:
+        description: "Posts per run (0 = all pending)"
+        required: false
+        default: "0"
+      workers:
+        description: "Parallel workers (3 if you have 3 API keys from different accounts)"
+        required: false
+        default: "3"
 
 jobs:
   upgrade:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 90
 
     steps:
     - name: Checkout code
@@ -15,24 +24,40 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install requests
+      run: pip install requests
 
-    - name: Run GEO Upgrader Script
+    - name: Show run config
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
-        python upgrade_old_posts.py
+        echo "============================================================"
+        echo " GEO Upgrade — run config"
+        echo "============================================================"
+        echo "  batch_limit : ${{ inputs.batch_limit }} (0 = all pending)"
+        echo "  workers     : ${{ inputs.workers }}"
+        echo "  sleep/key   : 6s"
+        echo "  retry passes: 2"
+        KEY_COUNT=$(echo "$GEMINI_API_KEY" | tr ',' '\n' | sed '/^$/d' | wc -l)
+        echo "  API keys    : $KEY_COUNT detected"
+        echo "============================================================"
+
+    - name: Run GEO Upgrader (batch)
+      env:
+        PYTHONUNBUFFERED: "1"
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        GEO_BATCH_LIMIT: ${{ inputs.batch_limit }}
+        GEO_WORKERS: ${{ inputs.workers }}
+        GEO_SLEEP_SEC: "6"
+      run: python upgrade_old_posts.py --limit ${{ inputs.batch_limit }} --workers ${{ inputs.workers }} --sleep 6
 
     - name: Commit and Push changes
       run: |
         git config --global user.name "Pattarish Upgrade Bot"
         git config --global user.email "bot@pattarishproclean.com"
         git add posts.json blog/ areas/ sitemap.xml analytics.js landing-*.html privacy.html
-        git diff-index --quiet HEAD || git commit -m "chore: mass upgrade old blogs to GEO [skip ci]"
+        git diff-index --quiet HEAD || git commit -m "chore: GEO upgrade batch (${{ inputs.batch_limit }} posts) [skip ci]"
         git pull --rebase origin main
         git push
