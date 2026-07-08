@@ -3,7 +3,7 @@
   var adsLeadLabel='';
   var s=document.createElement('script');
   s.async=true;
-  s.src='https://www.googletagmanager.com/gtag/js?id=G-MJG0VZPFKS';
+  s.src='https://www.googletagmanager.com/gtag/js?id=AW-18299765093';
   document.head.appendChild(s);
   window.dataLayer=window.dataLayer||[];
   function gtag(){dataLayer.push(arguments);}

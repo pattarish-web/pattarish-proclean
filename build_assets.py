@@ -1,5 +1,7 @@
 """Generate shared JS assets from site_config."""
 
+import re
+
 from site_config import ADS_CONVERSION_ID, ADS_LEAD_CONVERSION_LABEL, GA4_MEASUREMENT_ID, analytics_script_tag
 
 
@@ -7,10 +9,15 @@ def _has_ga4():
     return bool(GA4_MEASUREMENT_ID and GA4_MEASUREMENT_ID != "G-PLACEHOLDER")
 
 
+GTAG_BLOCK = re.compile(
+    r"<!-- Google tag \(gtag\.js\) -->.*?</script>\s*",
+    re.DOTALL,
+)
+
+
 def write_analytics_js():
     """Keep analytics.js in sync for legacy references."""
     ads_label = ADS_LEAD_CONVERSION_LABEL.replace("'", "")
-    primary = GA4_MEASUREMENT_ID if _has_ga4() else ADS_CONVERSION_ID
     ga4_config = (
         f"gtag('config','{GA4_MEASUREMENT_ID}');"
         if _has_ga4()
@@ -21,7 +28,7 @@ def write_analytics_js():
   var adsLeadLabel='{ads_label}';
   var s=document.createElement('script');
   s.async=true;
-  s.src='https://www.googletagmanager.com/gtag/js?id={primary}';
+  s.src='https://www.googletagmanager.com/gtag/js?id={ADS_CONVERSION_ID}';
   document.head.appendChild(s);
   window.dataLayer=window.dataLayer||[];
   function gtag(){{dataLayer.push(arguments);}}
@@ -37,35 +44,25 @@ def write_analytics_js():
 
 
 def patch_root_html_files():
-    """Replace deferred analytics.js with inline gtag on hand-maintained root pages."""
-    import re
-
+    """Refresh inline gtag snippet on hand-maintained root pages."""
     snippet = analytics_script_tag("")
-    files = {
-        "index.html": (
-            r'    <script src="analytics\.js" defer></script>\s*\n',
-            snippet + "\n",
-        ),
-        "blog.html": (
-            r'    <script src="analytics\.js" defer></script>\s*\n',
-            snippet + "\n",
-        ),
-        "privacy.html": (
-            r'    <script src="analytics\.js" defer></script>\s*\n',
-            snippet + "\n",
-        ),
-        "landing-bigcleaning.html": (
-            r'    <script src="analytics\.js" defer></script>\s*\n',
-            snippet + "\n",
-        ),
-        "landing-maid.html": (
-            r'    <script src="analytics\.js" defer></script>\s*\n',
-            snippet + "\n",
-        ),
-    }
-    for path, (pattern, replacement) in files.items():
+    files = [
+        "index.html",
+        "blog.html",
+        "privacy.html",
+        "landing-bigcleaning.html",
+        "landing-maid.html",
+    ]
+    for path in files:
         with open(path, "r", encoding="utf-8") as f:
             html = f.read()
-        html = re.sub(pattern, replacement, html, count=1)
+        if GTAG_BLOCK.search(html):
+            html = GTAG_BLOCK.sub(snippet + "\n", html, count=1)
+        else:
+            html = html.replace(
+                '<script src="analytics.js" defer></script>',
+                snippet,
+                1,
+            )
         with open(path, "w", encoding="utf-8") as f:
             f.write(html)

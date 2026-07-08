@@ -135,11 +135,11 @@ def _has_ga4():
 
 def analytics_script_tag(prefix=""):
     """Return standard Google gtag snippet for <head>; prefix is '' or '../'."""
-    primary = GA4_MEASUREMENT_ID if _has_ga4() else ADS_CONVERSION_ID
+    # Load gtag.js via Ads ID (always valid). GA4 G- IDs may 404 until property propagates.
     ga4_config = f"  gtag('config', '{GA4_MEASUREMENT_ID}');\n" if _has_ga4() else ""
     ads_label = ADS_LEAD_CONVERSION_LABEL.replace("'", "")
     return f"""<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={primary}"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id={ADS_CONVERSION_ID}"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){{dataLayer.push(arguments);}}
