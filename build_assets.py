@@ -57,6 +57,7 @@ def patch_root_html_files():
         "landing-bigcleaning.html",
         "landing-maid.html",
     ]
+    tracking_tag = '<script src="tracking.js"></script>'
     for path in files:
         with open(path, "r", encoding="utf-8") as f:
             html = f.read()
@@ -73,5 +74,7 @@ def patch_root_html_files():
             if len(matches) <= 1:
                 break
             html = ORPHAN_GTAG_INLINE.sub("", html, count=1)
+        if tracking_tag not in html and "</body>" in html:
+            html = html.replace("</body>", f"    {tracking_tag}\n</body>", 1)
         with open(path, "w", encoding="utf-8") as f:
             f.write(html)
