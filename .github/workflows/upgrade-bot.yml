@@ -11,13 +11,13 @@ on:
         required: false
         default: "20"
       workers:
-        description: "Parallel workers (1 safer for free tier, 3 = all keys)"
+        description: "Parallel workers (3 recommended with 4 API keys in secret)"
         required: false
-        default: "1"
+        default: "3"
 
 env:
   BATCH_LIMIT: ${{ github.event.inputs.batch_limit || '20' }}
-  GEO_WORKERS: ${{ github.event.inputs.workers || '1' }}
+  GEO_WORKERS: ${{ github.event.inputs.workers || '3' }}
 
 jobs:
   upgrade:

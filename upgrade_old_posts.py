@@ -38,6 +38,22 @@ def get_api_keys():
     return [raw_key.strip()]
 
 
+def _log_worker_key_plan(api_keys: list[str], workers: int) -> None:
+    """Show which API key each parallel worker uses (requires one key per worker)."""
+    log(f"Worker/key plan ({workers} workers, {len(api_keys)} keys):")
+    for i in range(workers):
+        key = api_keys[i % len(api_keys)]
+        log(f"  Worker {i + 1} → {key_label(api_keys, key)}")
+    if len(api_keys) > workers:
+        spare = [key_label(api_keys, k) for k in api_keys[workers:]]
+        log(f"  Spare keys (failover on 429): {', '.join(spare)}")
+    if len(api_keys) < workers:
+        log(
+            f"Only {len(api_keys)} key(s) for {workers} workers — some workers will share a key via rotation",
+            level="WARN",
+        )
+
+
 def generate_geo_content(api_keys, api_key, title, description):
     label = key_label(api_keys, api_key)
     log(f"{label} → generating: {title[:60]}")
@@ -308,7 +324,13 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
 
     workers = workers or min(len(api_keys), 3)
     if len(api_keys) >= 3 and workers < 3:
-        log("Tip: use workers=3 to use all API keys", level="WARN")
+        log("Tip: use workers=3 with 3–4 API keys (4th key = spare on 429)", level="WARN")
+    if workers > 1 and len(api_keys) < workers:
+        log(
+            f"workers={workers} but only {len(api_keys)} key(s) — add keys to GEMINI_API_KEY "
+            f"(comma-separated) so each worker uses a different key",
+            level="WARN",
+        )
     if sleep_sec > 0:
         os.environ.setdefault("GEMINI_MIN_INTERVAL", str(sleep_sec))
 
@@ -341,6 +363,8 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
     )
     for i, k in enumerate(api_keys, 1):
         log(f"  Key#{i}: {k[:8]}…{k[-4:]}")
+    if workers > 1:
+        _log_worker_key_plan(api_keys, workers)
 
     if not pending_indices:
         log("Nothing to upgrade — all posts already marked geo_source=gemini")
