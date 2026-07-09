@@ -1,6 +1,9 @@
 name: Mass Upgrade Old Blogs (GEO)
 
 on:
+  schedule:
+    # 02:00 UTC ≈ 09:00 น. ไทย — หลัง Daily Blog Bot (01:00 UTC)
+    - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       batch_limit:
@@ -11,6 +14,10 @@ on:
         description: "Parallel workers (1 safer for free tier, 3 = all keys)"
         required: false
         default: "1"
+
+env:
+  BATCH_LIMIT: ${{ github.event.inputs.batch_limit || '20' }}
+  GEO_WORKERS: ${{ github.event.inputs.workers || '1' }}
 
 jobs:
   upgrade:
@@ -40,8 +47,8 @@ jobs:
         echo "============================================================"
         echo " GEO Upgrade — slow drain (offline → Gemini)"
         echo "============================================================"
-        echo "  batch_limit : ${{ inputs.batch_limit }} (0 = all pending)"
-        echo "  workers     : ${{ inputs.workers }}"
+        echo "  batch_limit : $BATCH_LIMIT (0 = all pending)"
+        echo "  workers     : $GEO_WORKERS"
         echo "  sleep/key   : 45s (pause key immediately on 429)"
         echo "  save mode   : per-post (git push after each)"
         echo "  skip rule   : geo_source=gemini already done"
@@ -54,12 +61,12 @@ jobs:
       env:
         PYTHONUNBUFFERED: "1"
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        GEO_BATCH_LIMIT: ${{ inputs.batch_limit }}
-        GEO_WORKERS: ${{ inputs.workers }}
+        GEO_BATCH_LIMIT: ${{ env.BATCH_LIMIT }}
+        GEO_WORKERS: ${{ env.GEO_WORKERS }}
         GEO_SLEEP_SEC: "45"
         GEO_INCREMENTAL_COMMIT: "1"
         GEMINI_MIN_INTERVAL: "45"
-      run: python upgrade_old_posts.py --limit ${{ inputs.batch_limit }} --workers ${{ inputs.workers }} --sleep 45
+      run: python upgrade_old_posts.py --limit ${{ env.BATCH_LIMIT }} --workers ${{ env.GEO_WORKERS }} --sleep 45
 
     - name: Final commit (sitemap & site build)
       run: |
@@ -76,7 +83,7 @@ jobs:
         if git diff-index --quiet HEAD; then
           echo "::warning::No changes to commit — upgrade may have failed or nothing pending"
         else
-          git commit -m "chore: GEO upgrade batch (${{ inputs.batch_limit }} posts) [skip ci]"
+          git commit -m "chore: GEO upgrade batch (${{ env.BATCH_LIMIT }} posts) [skip ci]"
           echo "::notice::Committed GEO upgrade changes"
         fi
         git reset --hard
