@@ -1,0 +1,54 @@
+---
+description: Gemini API quota, 429 handling, and multi-key batch patterns (copy to other projects)
+globs: "**/*gemini*,**/generate_blog.py,**/upgrade_*.py,**/.github/workflows/*bot*.yml"
+alwaysApply: false
+---
+
+# Gemini API — กฎที่ใช้ได้ทุกโปรเจกต์
+
+## Quota (สำคัญ)
+
+- โควต้าอยู่ที่ **Google Cloud project** ไม่ใช่ต่อ API key
+- หลาย key ใน project เดียว = **แชร์โควต้า**
+- หลาย key **คนละอีเมล/account** = มักคนละ project = **โควต้าแยก** (แนวทางที่ต้องการ)
+- `workers` ควรเท่ากับจำนวน key ที่แยก project จริง (**1 worker : 1 key**)
+
+## HTTP 429 — อย่าสรุปผิด
+
+Google ส่ง **429 เหมือนกัน** สำหรับ RPM, TPM, RPD:
+
+| ชนิด | หมายถึง | รับมือ |
+|------|---------|--------|
+| **RPM/TPM** | ยิงเร็วเกิน / token ต่อนาทีเต็ม | อ่าน `Retry-After`, รอแล้ว retry |
+| **RPD** | โควต้ารายวันหมด | หยุดจน reset วันใหม่ (~เที่ยงคืน US Pacific) |
+
+- **อย่า pause key ทันทีเมื่อเจอ 429 ครั้งแรก** — มักเป็น RPM ไม่ใช่ RPD
+- Log ให้แยก `RPM throttle` vs `daily quota exhausted`
+- ได้แค่ 6/N โพสต์ **ไม่ได้แปลว่า RPD หมดเสมอไป**
+
+## การรัน batch ยาว
+
+- ใช้ **`batch_limit=0`** (ทำทุกงานค้าง) + **หน่วง `sleep` ต่อ key** แทนการจำกัดจำนวนต่อรอบ
+- ค่าที่พิสูจน์แล้ว: **120s/key**, **3 workers**, **3 keys คนละอีเมล**
+- **Checkpoint ทีละรายการ** — บันทึก + deploy ทันที อย่ารอจบทั้ง batch
+- Workflow timeout ต้องพอ (เช่น **6 ชม.**) เมื่อมี push ต่อรายการ
+- Retry pass ระหว่างรัน: cooldown **15 นาที** แล้ว `reset` สถานะ 429 ก่อนลองใหม่
+
+## Secret / env
+
+- `GEMINI_API_KEY` แบบ comma-separated: `key1,key2,key3`
+- ทุก script ต้อง **split** แล้วส่ง **key เดียว** ต่อ request — ห้ามส่งทั้งสตริงไป API
+- Workflow ที่แชร์ secret เดียวกัน อย่ารันพร้อมกัน (เช่น blog bot + GEO upgrade)
+
+## Logging (งานยาวใน CI)
+
+- แต่ละรายการสำเร็จ: log เด่นชัด (`✅ SUCCESS` + `::notice::` ใน GitHub Actions)
+- แสดง worker → key mapping ตอนเริ่มรัน
+- แสดงความคืบหน้า `gemini_done/total` หลังแต่ละรายการ
+
+## สิ่งที่หลีกเลี่ยง
+
+- หลาย key ใน project เดียวแล้วคิดว่าได้ 3× quota
+- `MAX_429_RETRIES = 1` แล้ว log ว่า "daily quota"
+- Retry/fallback หลาย model ต่อ request เดียวบน free tier (เผา RPD)
+- รัน manual ซ้อน cron วันเดียวกันเมื่อโดน limit แล้ว
