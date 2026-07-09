@@ -11,7 +11,7 @@ on:
         required: false
         default: "20"
       workers:
-        description: "Parallel workers (3 recommended with 4 API keys in secret)"
+        description: "Parallel workers (3 = one per API key in secret)"
         required: false
         default: "3"
 

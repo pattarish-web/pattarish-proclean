@@ -324,11 +324,16 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
 
     workers = workers or min(len(api_keys), 3)
     if len(api_keys) >= 3 and workers < 3:
-        log("Tip: use workers=3 with 3–4 API keys (4th key = spare on 429)", level="WARN")
+        log("Tip: use workers=3 with 3 API keys in GEMINI_API_KEY (one key per worker)", level="WARN")
     if workers > 1 and len(api_keys) < workers:
         log(
             f"workers={workers} but only {len(api_keys)} key(s) — add keys to GEMINI_API_KEY "
             f"(comma-separated) so each worker uses a different key",
+            level="WARN",
+        )
+    elif workers == 3 and len(api_keys) != 3:
+        log(
+            f"Expected 3 API keys for 3 workers, found {len(api_keys)} in GEMINI_API_KEY",
             level="WARN",
         )
     if sleep_sec > 0:
