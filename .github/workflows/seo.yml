@@ -43,6 +43,8 @@ jobs:
       - name: Build Site HTML
         env:
           GA4_MEASUREMENT_ID: ${{ secrets.GA4_MEASUREMENT_ID || 'G-MJG0VZPFKS' }}
+          ADS_PHONE_CONVERSION_LABEL: ${{ secrets.ADS_PHONE_CONVERSION_LABEL }}
+          ADS_LINE_CONVERSION_LABEL: ${{ secrets.ADS_LINE_CONVERSION_LABEL }}
           ADS_LEAD_CONVERSION_LABEL: ${{ secrets.ADS_LEAD_CONVERSION_LABEL }}
         run: python build_site.py
       - name: Update Domain Configuration

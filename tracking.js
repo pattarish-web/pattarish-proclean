@@ -1,4 +1,4 @@
-/** Shared conversion tracking for Sangkan Clean (GA4 + optional Ads lead) */
+/** Shared conversion tracking for Sangkan Clean (GA4 + Google Ads) */
 (function () {
     function pagePath() {
         try {
@@ -14,6 +14,24 @@
         gtag('event', eventName, payload);
     };
 
+    function adsSendTo(kind) {
+        var map = window.adsConversions || {};
+        if (kind && map[kind]) return map[kind];
+        return window.adsLeadSendTo || '';
+    }
+
+    function fireAdsConversion(kind, extra) {
+        var sendTo = adsSendTo(kind);
+        if (!sendTo) return false;
+        var key = 'sc_ads_conv_' + kind + '_' + pagePath();
+        try {
+            if (sessionStorage.getItem(key) === '1') return false;
+            sessionStorage.setItem(key, '1');
+        } catch (e) { /* private mode */ }
+        trackEvent('conversion', Object.assign({ send_to: sendTo }, extra || {}));
+        return true;
+    }
+
     function bindClick(selector, eventName, extra) {
         document.querySelectorAll(selector).forEach(function (el) {
             if (el.dataset.gaBound === eventName) return;
@@ -26,9 +44,37 @@
         });
     }
 
-    function fireAdsConversion(extra) {
-        if (!window.adsLeadSendTo) return;
-        trackEvent('conversion', Object.assign({ send_to: window.adsLeadSendTo }, extra || {}));
+    function bindContactClicks() {
+        bindClick('a[href^="tel:"]', 'click_phone', { method: 'phone' });
+        bindClick('a[href*="line.me"]', 'click_line', { method: 'line' });
+        bindClick('a[href*="m.me"]', 'click_messenger', { method: 'messenger' });
+        bindClick('a[href*="facebook.com"]', 'click_facebook', { method: 'facebook' });
+
+        document.querySelectorAll('a[href^="tel:"]').forEach(function (el) {
+            if (el.dataset.adsPhoneBound) return;
+            el.dataset.adsPhoneBound = '1';
+            el.addEventListener('click', function () {
+                fireAdsConversion('phone', { event_category: 'lead', method: 'phone' });
+                trackEvent('generate_lead', {
+                    method: 'phone',
+                    currency: 'THB',
+                    event_category: 'lead',
+                });
+            });
+        });
+
+        document.querySelectorAll('a[href*="line.me"]').forEach(function (el) {
+            if (el.dataset.adsLineBound) return;
+            el.dataset.adsLineBound = '1';
+            el.addEventListener('click', function () {
+                fireAdsConversion('line', { event_category: 'lead', method: 'line' });
+                trackEvent('generate_lead', {
+                    method: 'line',
+                    currency: 'THB',
+                    event_category: 'lead',
+                });
+            });
+        });
     }
 
     function trackLeadSuccess() {
@@ -44,14 +90,11 @@
             currency: 'THB',
             event_category: 'lead',
         });
-        fireAdsConversion();
+        fireAdsConversion('lead', { event_category: 'lead', method: 'quote_form' });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        bindClick('a[href^="tel:"]', 'click_phone');
-        bindClick('a[href*="line.me"]', 'click_line');
-        bindClick('a[href*="m.me"]', 'click_messenger');
-        bindClick('a[href*="facebook.com"]', 'click_facebook');
+        bindContactClicks();
 
         document.querySelectorAll('#hero-cta-line, #hero-cta-phone').forEach(function (el) {
             el.addEventListener('click', function () {

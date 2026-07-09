@@ -1,0 +1,11 @@
+Campaign,Day of week,Start hour,Start minute,End hour,End minute,Bid adjustment
+SK-BigClean-Search,Monday,8,0,18,0,
+SK-BigClean-Search,Tuesday,8,0,18,0,
+SK-BigClean-Search,Wednesday,8,0,18,0,
+SK-BigClean-Search,Thursday,8,0,18,0,
+SK-BigClean-Search,Friday,8,0,18,0,
+SK-Maid-Search,Monday,8,0,18,0,
+SK-Maid-Search,Tuesday,8,0,18,0,
+SK-Maid-Search,Wednesday,8,0,18,0,
+SK-Maid-Search,Thursday,8,0,18,0,
+SK-Maid-Search,Friday,8,0,18,0,

@@ -1,14 +1,42 @@
 """Shared site configuration."""
 
+import json
 import os
+from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+except ImportError:
+    pass
 
 SITE_URL = "https://www.sangkanclean.com"
 # Set in site_config or via env GA4_MEASUREMENT_ID (e.g. GitHub Actions secret)
 GA4_MEASUREMENT_ID = os.environ.get("GA4_MEASUREMENT_ID", "G-MJG0VZPFKS")
 ADS_CONVERSION_ID = "AW-18299765093"
-# Optional: Google Ads lead conversion label (AW-xxx/LABEL) for form success
+# Google Ads conversion labels — create in Ads → Goals → Conversions → Website
+ADS_PHONE_CONVERSION_LABEL = os.environ.get("ADS_PHONE_CONVERSION_LABEL", "")
+ADS_LINE_CONVERSION_LABEL = os.environ.get("ADS_LINE_CONVERSION_LABEL", "")
 ADS_LEAD_CONVERSION_LABEL = os.environ.get("ADS_LEAD_CONVERSION_LABEL", "")
 FORM_SUBMIT_EMAIL = "info@sangkanclean.com"
+
+
+def ads_conversion_send_to(label: str) -> str:
+    """Build gtag send_to value AW-xxx/LABEL."""
+    if not label:
+        return ""
+    return f"{ADS_CONVERSION_ID}/{label}"
+
+
+def ads_conversion_labels_js() -> str:
+    """JSON map of conversion kinds → send_to for inline gtag bootstrap."""
+    mapping = {
+        "phone": ads_conversion_send_to(ADS_PHONE_CONVERSION_LABEL),
+        "line": ads_conversion_send_to(ADS_LINE_CONVERSION_LABEL),
+        "lead": ads_conversion_send_to(ADS_LEAD_CONVERSION_LABEL),
+    }
+    return json.dumps(mapping, ensure_ascii=False)
 
 BUSINESS = {
     "phone": "+66636865134",
@@ -137,7 +165,7 @@ def analytics_script_tag(prefix=""):
     """Return standard Google gtag snippet for <head>; prefix is '' or '../'."""
     # Load gtag.js via Ads ID (always valid). GA4 G- IDs may 404 until property propagates.
     ga4_config = f"  gtag('config', '{GA4_MEASUREMENT_ID}');\n" if _has_ga4() else ""
-    ads_label = ADS_LEAD_CONVERSION_LABEL.replace("'", "")
+    labels_json = ads_conversion_labels_js()
     return f"""<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={ADS_CONVERSION_ID}"></script>
 <script>
@@ -146,5 +174,6 @@ def analytics_script_tag(prefix=""):
   window.gtag = gtag;
   gtag('js', new Date());
 {ga4_config}  gtag('config', '{ADS_CONVERSION_ID}');
-  window.adsLeadSendTo = '{ads_label}' ? '{ADS_CONVERSION_ID}/' + '{ads_label}' : '';
+  window.adsConversions = {labels_json};
+  window.adsLeadSendTo = window.adsConversions.phone || window.adsConversions.lead || window.adsConversions.line || '';
 </script>"""
