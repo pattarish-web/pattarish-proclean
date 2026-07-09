@@ -10,6 +10,6 @@
   gtag('js',new Date());
   gtag('config','G-MJG0VZPFKS');
   gtag('config',ads);
-  window.adsConversions={"phone": "", "line": "", "lead": ""};
+  window.adsConversions={"phone": "AW-18299765093/XIKsCOeMw80cEOWCgZZE", "line": "AW-18299765093/ahW4CM6qxs0cEOWCgZZE", "lead": ""};
   window.adsLeadSendTo=window.adsConversions.phone||window.adsConversions.lead||window.adsConversions.line||'';
 })();
