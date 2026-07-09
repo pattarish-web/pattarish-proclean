@@ -7,22 +7,23 @@ on:
   workflow_dispatch:
     inputs:
       batch_limit:
-        description: "Posts per run (0 = all pending offline→Gemini)"
+        description: "Posts per run (0 = all pending; throttle via sleep/key)"
         required: false
-        default: "20"
+        default: "0"
       workers:
         description: "Parallel workers (3 = one per API key in secret)"
         required: false
         default: "3"
 
 env:
-  BATCH_LIMIT: ${{ github.event.inputs.batch_limit || '20' }}
+  BATCH_LIMIT: ${{ github.event.inputs.batch_limit || '0' }}
   GEO_WORKERS: ${{ github.event.inputs.workers || '3' }}
+  GEO_SLEEP_SEC: "60"
 
 jobs:
   upgrade:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 360
     permissions:
       contents: write
 
@@ -49,7 +50,7 @@ jobs:
         echo "============================================================"
         echo "  batch_limit : $BATCH_LIMIT (0 = all pending)"
         echo "  workers     : $GEO_WORKERS"
-        echo "  sleep/key   : 45s (pause key immediately on 429)"
+        echo "  sleep/key   : ${GEO_SLEEP_SEC}s (throttle; pause key on 429)"
         echo "  save mode   : per-post (git push after each)"
         echo "  skip rule   : geo_source=gemini already done"
         echo "  retry passes: 2 (15-min cooldown between passes)"
@@ -63,10 +64,10 @@ jobs:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         GEO_BATCH_LIMIT: ${{ env.BATCH_LIMIT }}
         GEO_WORKERS: ${{ env.GEO_WORKERS }}
-        GEO_SLEEP_SEC: "45"
+        GEO_SLEEP_SEC: ${{ env.GEO_SLEEP_SEC }}
         GEO_INCREMENTAL_COMMIT: "1"
-        GEMINI_MIN_INTERVAL: "45"
-      run: python upgrade_old_posts.py --limit ${{ env.BATCH_LIMIT }} --workers ${{ env.GEO_WORKERS }} --sleep 45
+        GEMINI_MIN_INTERVAL: ${{ env.GEO_SLEEP_SEC }}
+      run: python upgrade_old_posts.py --limit ${{ env.BATCH_LIMIT }} --workers ${{ env.GEO_WORKERS }} --sleep ${{ env.GEO_SLEEP_SEC }}
 
     - name: Final commit (sitemap & site build)
       run: |
@@ -83,7 +84,7 @@ jobs:
         if git diff-index --quiet HEAD; then
           echo "::warning::No changes to commit — upgrade may have failed or nothing pending"
         else
-          git commit -m "chore: GEO upgrade batch (${{ env.BATCH_LIMIT }} posts) [skip ci]"
+          git commit -m "chore: GEO upgrade drain [skip ci]"
           echo "::notice::Committed GEO upgrade changes"
         fi
         git reset --hard

@@ -18,7 +18,7 @@ from gemini_api import (
 )
 from geo_log import banner, format_eta, key_label, log, milestone, progress
 
-DEFAULT_SLEEP = 45
+DEFAULT_SLEEP = 60
 DEFAULT_LIMIT = 0
 MAX_RETRY_PASSES = 2
 QUOTA_COOLDOWN_SEC = 900  # 15 min when all keys paused (free-tier RPD)
@@ -438,8 +438,8 @@ def main():
         help="Max posts per run (default 0=unlimited)",
     )
     parser.add_argument(
-        "--sleep", type=float, default=float(os.environ.get("GEO_SLEEP_SEC", "45")),
-        help="Min seconds between requests per API key (default 45)",
+        "--sleep", type=float, default=float(os.environ.get("GEO_SLEEP_SEC", "60")),
+        help="Min seconds between requests per API key (default 60)",
     )
     parser.add_argument(
         "--workers", type=int, default=int(os.environ.get("GEO_WORKERS", "0")),
