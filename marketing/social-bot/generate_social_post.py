@@ -65,12 +65,12 @@ def _fallback_captions(topic: dict) -> dict:
     return {
         "fb_ig": (
             f"{hl}\n\n{angle}\n\n"
-            f"Sangkan Clean — บริการทำความสะอาดออฟฟิศ เอเจนซี่ และทีมเทค\n"
+            f"Sangkan Clean — คลีนออฟฟิศให้ทีมวัยใหม่ เอเจนซี่ และเทค\n"
             f"{cta}\nโทร {PHONE}"
         ),
         "tiktok": f"{hl}\n{angle}\nLINE {LINE_OA}",
         "line": f"{hl}\n\n{angle}\n\nทักไลน์ {LINE_OA} ได้เลย",
-        "image_subline": angle[:80],
+        "image_subline": angle[:36],
         "hashtags": ["#SangkanClean", "#แม่บ้านออฟฟิศ", "#BigCleaning"],
     }
 
@@ -86,9 +86,10 @@ def _generate_captions(topic: dict) -> dict:
         print("No GEMINI_API_KEY — using fallback captions")
         return _fallback_captions(topic)
 
-    prompt = f"""คุณเป็นนักเขียนคอนเทนต์โซเชียลของแบรนด์ Sangkan Clean (สั่งการคลีน)
-โทน: มืออาชีพ แต่เข้าใจง่าย เหมาะเอเจนซี่ / ทีมเทค / ออฟฟิศ — ไม่ขายของแข็งๆ เกินไป
-ห้ามใช้ emoji เยอะ (ได้ไม่เกิน 1 ตัว) และห้ามใส่ hashtag ใน body หลัก
+    prompt = f"""คุณเขียนคอนเทนต์โซเชียลภาษาไทยให้แบรนด์ Sangkan Clean (สั่งการคลีน)
+โทน: สบายๆ มั่นใจ แม่นยำ — คุยกับทีมวัยใหม่ / เอเจนซี่ / สตาร์ทอัพ
+ห้ามสำนวนราชการ ห้ามขายแข็ง ห้ามยาวเยิ่น
+emoji ได้ไม่เกิน 1 ตัว และห้ามใส่ hashtag ในเนื้อหาหลัก
 
 หัวข้อวันนี้: {topic["label"]}
 มุม: {topic["angle"]}
@@ -98,10 +99,10 @@ CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
 
 คืน JSON เท่านั้น:
 {{
-  "fb_ig": "แคปชัน Facebook/Instagram ภาษาไทย 80-180 คำ มี CTA",
-  "tiktok": "แคปชัน TikTok สั้น 40-80 คำ",
-  "line": "ข้อความ LINE broadcast 50-120 คำ",
-  "image_subline": "ประโยครองใต้หัวข้อบนกราฟิก สั้นมาก ไม่เกิน 40 ตัวอักษร",
+  "fb_ig": "แคปชัน Facebook/Instagram ภาษาไทย 60-140 คำ มี CTA",
+  "tiktok": "แคปชัน TikTok สั้น 30-70 คำ",
+  "line": "ข้อความ LINE broadcast 40-100 คำ",
+  "image_subline": "ประโยครองใต้หัวข้อบนกราฟิก ภาษาไทย สั้นมาก ไม่เกิน 36 ตัวอักษร",
   "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
 }}
 """
@@ -114,6 +115,8 @@ CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
     for key in ("fb_ig", "tiktok", "line", "image_subline", "hashtags"):
         if key in data and data[key]:
             base[key] = data[key]
+    if isinstance(base.get("image_subline"), str):
+        base["image_subline"] = base["image_subline"][:36]
     return base
 
 
@@ -121,47 +124,47 @@ def _stamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%d")
 
 
-# Photorealistic scene hints — layout style matches genz ads; images are new each run.
+# Scene one-liners only — shared Instagram lifestyle brief is in _background_prompt.
 SCENE_BY_TOPIC: dict[str, str] = {
     "office_ondemand": (
-        "bright modern Bangkok coworking office, young professionals at desks, "
-        "floor-to-ceiling windows, plants, clean workspace atmosphere"
+        "open Bangkok coworking floor, young professionals working casually at desks, "
+        "floor-to-ceiling windows, indoor plants"
     ),
     "agency_focus": (
-        "creative agency studio with moodboards, Macs on desks, natural light, "
-        "tidy open plan, design team vibe without faces centered on camera"
+        "creative agency studio with soft moodboard wall, tidy open plan, "
+        "casual-smart team collaborating in soft focus"
     ),
     "tech_team": (
-        "startup tech office with dual monitors, standing desks, "
-        "minimal cable clutter, clean glass meeting room in soft focus"
+        "bright startup office with clean desks and monitors, "
+        "energetic but uncluttered, glass meeting room soft background"
     ),
     "big_cleaning": (
-        "professional deep cleaning of a large empty office after hours, "
-        "mops and equipment tastefully placed, polished floors, warm evening light"
+        "freshly deep-cleaned modern office after hours, polished floors catching daylight, "
+        "subtle cleaning tools softly blurred in background"
     ),
     "maid_backup": (
-        "uniformed cleaning staff preparing supplies in a bright utility room, "
-        "organized cart, professional B2B cleaning service mood"
+        "bright clean office interior with a discreet professional cleaning cart "
+        "softly out of focus — not a stiff utility room"
     ),
     "service_area": (
-        "Bangkok skyline soft background with a clean modern office interior "
-        "in the foreground, airy and professional"
+        "airy Bangkok office interior with soft city light through windows, "
+        "clean desks and plants in foreground"
     ),
     "price_pack": (
-        "small tidy home office / boutique agency desk flatlay, "
-        "notebook, plant, soft morning light, premium lifestyle photo"
+        "premium small home-office / boutique agency desk lifestyle shot, "
+        "notebook plant morning light, left third kept simple"
     ),
     "affiliate": (
-        "two colleagues chatting casually in a clean café-style office lounge, "
-        "friendly referral vibe, soft daylight"
+        "two young colleagues chatting casually in a café-style office lounge, "
+        "friendly daylight, clean modern space"
     ),
     "after_construction": (
-        "newly finished commercial space being detailed after construction, "
-        "dust removal in progress, bright unfinished-to-clean transition"
+        "newly finished bright commercial space being detailed, "
+        "dust cleanup nearly done, airy unfinished-to-clean transition"
     ),
     "soft_cleaning": (
-        "gentle daily cleaning of a condo living room / soft surfaces, "
-        "microfiber cloths, calm natural light, premium soft aesthetic"
+        "gentle daily tidy of a modern condo living area / soft surfaces, "
+        "microfiber cloths subtle, calm natural light"
     ),
 }
 
@@ -169,16 +172,21 @@ SCENE_BY_TOPIC: dict[str, str] = {
 def _background_prompt(topic: dict) -> str:
     scene = SCENE_BY_TOPIC.get(
         topic["id"],
-        "professional commercial cleaning service, realistic photo, modern Thailand office",
+        "modern Bangkok coworking office, young professionals, bright airy lifestyle photo",
     )
     return (
-        "Photorealistic lifestyle photograph for a Thai B2B cleaning-service social post. "
-        f"Topic: {topic.get('label', topic['id'])}. "
-        f"Scene: {scene}. "
-        "Natural lighting, high quality, shallow depth of field where appropriate. "
-        "No text, no logos, no watermarks, no UI overlays, no brand names, "
-        "no phone screens with readable UI. Square-friendly 1:1 composition, "
-        "leave lower third slightly darker / less busy for text overlay."
+        "Commercial lifestyle photography for Instagram ads, 1080x1080 square. "
+        "Gen-Z / young startup agency vibe — bright, airy, energetic, not corporate stiff. "
+        "Color palette cues in set dressing only: teal (#0d9488), coral/pink accents, "
+        "soft yellow accents, clean whites. "
+        "Leave clear negative space on the LEFT third for Thai text overlay "
+        "(no text, letters, logos, watermarks, or UI in the image). "
+        "Photorealistic, shallow depth of field, natural daylight, "
+        "modern Bangkok office / cowork aesthetic. "
+        "Young East/Southeast Asian professionals, casual-smart attire. "
+        "Indoor plants, clean desks, no cluttered UI mockups. "
+        f"Topic mood: {topic.get('label', topic['id'])}. "
+        f"Scene: {scene}."
     )
 
 
@@ -196,9 +204,16 @@ def _generate_background(topic: dict, out_dir: Path) -> Path | None:
         return None
 
     prompt = _background_prompt(topic)
-    raw = call_gemini_image(keys[0], prompt, key_label="social-bot-bg")
+    raw = None
+    for i, key in enumerate(keys):
+        label = f"social-bot-bg-{i + 1}"
+        raw = call_gemini_image(key, prompt, key_label=label)
+        if raw:
+            break
+        print(f"Gemini image failed on key {i + 1}/{len(keys)}")
+
     if not raw:
-        print("Gemini image failed — gradient fallback for background")
+        print("Gemini image failed on all keys — gradient fallback for background")
         return None
 
     ext = "png" if raw[:8].startswith(b"\x89PNG") else "jpg"
@@ -215,7 +230,7 @@ def build_assets(topic: dict, captions: dict) -> dict[str, str]:
     out.mkdir(parents=True, exist_ok=True)
 
     headline = topic["headline"]
-    sub = str(captions.get("image_subline") or topic["angle"])[:60]
+    sub = str(captions.get("image_subline") or topic["angle"])[:36]
 
     bg_path = _generate_background(topic, out)
 

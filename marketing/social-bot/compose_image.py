@@ -148,24 +148,24 @@ def ink(draw, xy, text, fnt, fill=WHITE, shadow: bool = True):
 
 
 def chip(draw, x, y, text, bg=CORAL, fg=DARK) -> int:
-    fnt = font(24, "semibold")
+    fnt = font(28, "semibold")
     w, h = text_wh(draw, text, fnt)
-    draw.rounded_rectangle([x, y, x + w + 36, y + h + 20], radius=22, fill=bg)
-    draw.text((x + 18, y + 8), text, font=fnt, fill=fg)
-    return y + h + 20
+    draw.rounded_rectangle([x, y, x + w + 40, y + h + 24], radius=24, fill=bg)
+    draw.text((x + 20, y + 10), text, font=fnt, fill=fg)
+    return y + h + 24
 
 
 def cta(draw, x, y, text, bg=TEAL) -> int:
-    fnt = font(28, "bold")
+    fnt = font(34, "bold")
     w, h = text_wh(draw, text, fnt)
-    draw.rounded_rectangle([x, y, x + w + 48, y + h + 28], radius=30, fill=bg)
-    draw.text((x + 24, y + 12), text, font=fnt, fill=WHITE)
-    return y + h + 28
+    draw.rounded_rectangle([x, y, x + w + 56, y + h + 32], radius=32, fill=bg)
+    draw.text((x + 28, y + 14), text, font=fnt, fill=WHITE)
+    return y + h + 32
 
 
-def brand(draw, x: int = 40, y: int = 32, name: str = "Sangkan Clean"):
-    ink(draw, (x, y), name, font(28, "semibold"), TEAL)
-    draw.rounded_rectangle([x, y + 36, x + 72, y + 42], radius=3, fill=CORAL)
+def brand(draw, x: int = 40, y: int = 28, name: str = "Sangkan Clean"):
+    ink(draw, (x, y), name, font(32, "semibold"), TEAL)
+    draw.rounded_rectangle([x, y + 40, x + 80, y + 48], radius=3, fill=CORAL)
 
 
 def _base_photo(
@@ -205,7 +205,7 @@ def compose(
     brand(draw, name=brand_name)
 
     chip_text, chip_bg = CHIP_BY_TOPIC.get(topic_id, ("Sangkan Clean", CORAL))
-    chip(draw, 40, 100, chip_text, chip_bg, DARK)
+    chip(draw, 40, 96, chip_text, chip_bg, DARK)
 
     if use_panel:
         panel = Image.new("RGBA", (w, h), (0, 0, 0, 0))
@@ -217,32 +217,33 @@ def compose(
         )
         img = Image.alpha_composite(img.convert("RGBA"), panel).convert("RGB")
         draw = ImageDraw.Draw(img)
-        x, y = 48, 180
-        head_f = font(40, "bold")
+        x, y = 48, 176
+        head_f = font(52, "bold")
         for line in wrap_lines(draw, headline, head_f, int(w * 0.55))[:3]:
             ink(draw, (x, y), line, head_f, INK, shadow=False)
-            y += 48
+            y += 62
         if subline:
-            y += 8
-            sub_f = font(22, "medium")
-            for line in wrap_lines(draw, subline, sub_f, int(w * 0.55))[:3]:
+            y += 10
+            sub_f = font(30, "medium")
+            for line in wrap_lines(draw, subline, sub_f, int(w * 0.55))[:2]:
                 ink(draw, (x, y), line, sub_f, MUTED, shadow=False)
-                y += 32
-        cta(draw, x, min(y + 28, h - 120), "ทัก LINE @sangkanclean", TEAL)
+                y += 40
+        cta(draw, x, min(y + 28, h - 130), "ทัก LINE @sangkanclean", TEAL)
     else:
-        max_w = int(w * (0.88 if is_stories else 0.78))
-        y = int(h * (0.46 if is_stories else 0.42))
-        head_f = font(64 if is_stories else 56, "bold")
+        # Left-biased wrap so text sits in the clear left third–half
+        max_w = int(w * (0.86 if is_stories else 0.72))
+        y = int(h * (0.44 if is_stories else 0.40))
+        head_f = font(80 if is_stories else 72, "bold")
         for line in wrap_lines(draw, headline, head_f, max_w)[:3]:
             ink(draw, (40, y), line, head_f, WHITE)
-            y += 70 if is_stories else 64
+            y += 88 if is_stories else 84
         if subline:
-            y += 8
-            sub_f = font(26 if is_stories else 24, "medium")
+            y += 10
+            sub_f = font(34 if is_stories else 32, "medium")
             for line in wrap_lines(draw, subline, sub_f, max_w)[:2]:
                 ink(draw, (40, y), line, sub_f, SOFT)
-                y += 36
-        cta(draw, 40, min(y + 24, h - 120), "ทัก LINE @sangkanclean")
+                y += 44
+        cta(draw, 40, min(y + 28, h - 130), "ทัก LINE @sangkanclean")
 
     return ImageEnhance.Color(img).enhance(1.08)
 
