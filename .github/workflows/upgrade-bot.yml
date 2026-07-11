@@ -18,7 +18,10 @@ on:
 env:
   BATCH_LIMIT: ${{ github.event.inputs.batch_limit || '0' }}
   GEO_WORKERS: ${{ github.event.inputs.workers || '3' }}
-  GEO_SLEEP_SEC: "120"
+  # 30s/key × 3 keys ≈ ~6 posts/min (was 120s — too slow). Still under free-tier RPM.
+  GEO_SLEEP_SEC: "30"
+  # Push every N successes instead of every post (cuts git overhead ~5×).
+  GEO_COMMIT_EVERY: "5"
 
 jobs:
   upgrade:
@@ -46,14 +49,14 @@ jobs:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
         echo "============================================================"
-        echo " GEO Upgrade — slow drain (offline → Gemini)"
+        echo " GEO Upgrade — faster drain (offline → Gemini)"
         echo "============================================================"
         echo "  batch_limit : $BATCH_LIMIT (0 = all pending)"
         echo "  workers     : $GEO_WORKERS"
         echo "  sleep/key   : ${GEO_SLEEP_SEC}s (throttle; pause key on 429)"
-        echo "  save mode   : per-post (git push after each)"
+        echo "  commit every: ${GEO_COMMIT_EVERY} ok posts"
         echo "  skip rule   : geo_source=gemini already done"
-        echo "  retry passes: 2 (15-min cooldown between passes)"
+        echo "  retry passes: 2 (5-min cooldown between passes)"
         KEY_COUNT=$(echo "$GEMINI_API_KEY" | tr ',' '\n' | sed '/^$/d' | wc -l)
         echo "  API keys    : $KEY_COUNT detected"
         echo "============================================================"
@@ -65,6 +68,7 @@ jobs:
         GEO_BATCH_LIMIT: ${{ env.BATCH_LIMIT }}
         GEO_WORKERS: ${{ env.GEO_WORKERS }}
         GEO_SLEEP_SEC: ${{ env.GEO_SLEEP_SEC }}
+        GEO_COMMIT_EVERY: ${{ env.GEO_COMMIT_EVERY }}
         GEO_INCREMENTAL_COMMIT: "1"
         GEMINI_MIN_INTERVAL: ${{ env.GEO_SLEEP_SEC }}
       run: python upgrade_old_posts.py --limit ${{ env.BATCH_LIMIT }} --workers ${{ env.GEO_WORKERS }} --sleep ${{ env.GEO_SLEEP_SEC }}
@@ -87,8 +91,6 @@ jobs:
           git commit -m "chore: GEO upgrade drain [skip ci]"
           echo "::notice::Committed GEO upgrade changes"
         fi
-        git reset --hard
-        git clean -fd
-        git pull --rebase origin main
+        git pull --rebase origin main || true
         git push origin HEAD:main
         echo "::notice::Pushed to main successfully"

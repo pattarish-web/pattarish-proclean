@@ -18,15 +18,19 @@ from gemini_api import (
 )
 from geo_log import banner, format_eta, key_label, log, milestone, progress, success
 
-DEFAULT_SLEEP = 120
+DEFAULT_SLEEP = 30
 DEFAULT_LIMIT = 0
 MAX_RETRY_PASSES = 2
-QUOTA_COOLDOWN_SEC = 900  # 15 min when all keys paused (free-tier RPD)
+QUOTA_COOLDOWN_SEC = 300  # 5 min when all keys paused (was 15 — too slow)
 PROGRESS_EVERY = 5
+# Commit+push every N successes in Actions (1 = every post, slow).
+DEFAULT_COMMIT_EVERY = 5
 
 _save_lock = threading.Lock()
 _quota_wait_lock = threading.Lock()
 _git_configured = False
+_pending_git_paths: set[str] = set()
+_successes_since_push = 0
 
 
 def get_api_keys():
@@ -88,64 +92,88 @@ def generate_geo_content(api_keys, api_key, title, description):
     return None
 
 
-def _incremental_git_push(slug: str, title: str) -> bool:
-    """Push each upgraded post immediately so cancel does not lose progress."""
+def _commit_every() -> int:
+    try:
+        return max(1, int(os.environ.get("GEO_COMMIT_EVERY", str(DEFAULT_COMMIT_EVERY))))
+    except ValueError:
+        return DEFAULT_COMMIT_EVERY
+
+
+def _ensure_git_identity() -> None:
     global _git_configured
+    if _git_configured:
+        return
+    subprocess.run(["git", "config", "user.name", "Sangkan Clean Upgrade Bot"], check=True)
+    subprocess.run(["git", "config", "user.email", "bot@sangkanclean.com"], check=True)
+    _git_configured = True
+
+
+def _flush_git_push(note: str = "") -> bool:
+    """Commit staged GEO files and push once (batched). Call under _save_lock."""
+    global _pending_git_paths, _successes_since_push
     if os.environ.get("GITHUB_ACTIONS") != "true":
         return False
     if os.environ.get("GEO_INCREMENTAL_COMMIT", "1") != "1":
         return False
-
-    if not _git_configured:
-        subprocess.run(["git", "config", "user.name", "Sangkan Clean Upgrade Bot"], check=True)
-        subprocess.run(["git", "config", "user.email", "bot@sangkanclean.com"], check=True)
-        _git_configured = True
-
-    subprocess.run(["git", "add", "posts.json", f"blog/{slug}.html"], check=True)
-    if subprocess.run(["git", "diff", "--cached", "--quiet"]).returncode == 0:
+    if not _pending_git_paths:
         return False
 
-    safe_title = title.replace('"', "'")[:55]
-    commit = subprocess.run(
-        ["git", "commit", "-m", f"chore: GEO +1 {safe_title} [skip ci]"],
-        capture_output=True,
-        text=True,
-    )
+    _ensure_git_identity()
+    paths = sorted(_pending_git_paths)
+    subprocess.run(["git", "add", *paths], check=True)
+    if subprocess.run(["git", "diff", "--cached", "--quiet"]).returncode == 0:
+        _pending_git_paths.clear()
+        _successes_since_push = 0
+        return False
+
+    n = max(_successes_since_push, 1)
+    msg = f"chore: GEO +{n} posts [skip ci]"
+    if note:
+        msg = f"chore: GEO +{n} {note[:40]} [skip ci]"
+    commit = subprocess.run(["git", "commit", "-m", msg], capture_output=True, text=True)
     if commit.returncode != 0:
         log(f"git commit skipped: {commit.stderr.strip()}", level="WARN")
         return False
 
-    # GitHub Actions runner can have additional unstaged changes after content generation
-    # (e.g., other generated artifacts). `git pull --rebase` refuses to run in that case.
-    # We only care about pushing the committed checkpoint, so force a clean tree first.
-    try:
-        subprocess.run(["git", "reset", "--hard"], check=True, capture_output=True, text=True)
-        subprocess.run(["git", "clean", "-fd"], check=True, capture_output=True, text=True)
-    except Exception as exc:
-        log(f"git clean/reset failed: {exc}", level="WARN")
-
-    pull = subprocess.run(
-        ["git", "pull", "--rebase", "origin", "main"],
-        capture_output=True,
-        text=True,
-    )
-    if pull.returncode != 0:
-        log(f"git pull failed: {pull.stderr.strip()}", level="WARN")
-        return False
-
+    # Prefer fast push; rebase only if rejected (avoids reset --hard every post).
     push = subprocess.run(
         ["git", "push", "origin", "HEAD:main"],
         capture_output=True,
         text=True,
     )
-    if push.returncode == 0:
-        return True
-    log(f"git push failed: {push.stderr.strip()}", level="WARN")
-    return False
+    if push.returncode != 0:
+        log("git push rejected — pull --rebase then retry", level="WARN")
+        try:
+            subprocess.run(["git", "reset", "--hard"], check=True, capture_output=True, text=True)
+            subprocess.run(["git", "clean", "-fd"], check=True, capture_output=True, text=True)
+        except Exception as exc:
+            log(f"git clean/reset failed: {exc}", level="WARN")
+        pull = subprocess.run(
+            ["git", "pull", "--rebase", "origin", "main"],
+            capture_output=True,
+            text=True,
+        )
+        if pull.returncode != 0:
+            log(f"git pull failed: {pull.stderr.strip()}", level="WARN")
+            return False
+        push = subprocess.run(
+            ["git", "push", "origin", "HEAD:main"],
+            capture_output=True,
+            text=True,
+        )
+        if push.returncode != 0:
+            log(f"git push failed: {push.stderr.strip()}", level="WARN")
+            return False
+
+    _pending_git_paths.clear()
+    _successes_since_push = 0
+    log(f"git push OK ({msg})")
+    return True
 
 
-def checkpoint_post(posts, idx: int) -> None:
-    """Save posts.json + one blog HTML; push to GitHub if running in Actions."""
+def checkpoint_post(posts, idx: int, *, force_push: bool = False) -> None:
+    """Save posts.json + one blog HTML; batch-push to GitHub in Actions."""
+    global _successes_since_push
     post = posts[idx]
     title = post.get("title", "")
     short = title[:55]
@@ -154,16 +182,34 @@ def checkpoint_post(posts, idx: int) -> None:
         with open("posts.json", "w", encoding="utf-8") as f:
             json.dump(posts, f, ensure_ascii=False, indent=2)
         slug = build_single_blog(posts, idx)
-        pushed = _incremental_git_push(slug, title)
+        _pending_git_paths.add(f"blog/{slug}.html")
+        _pending_git_paths.add("posts.json")
+        _successes_since_push += 1
+        every = _commit_every()
+        should_push = force_push or _successes_since_push >= every
+        pushed = _flush_git_push(short) if should_push else False
+        pending_batch = _successes_since_push
 
     gemini_total = sum(1 for p in posts if p.get("geo_source") == "gemini")
     total_posts = len(posts)
     pending = total_posts - gemini_total
-    deploy = "LIVE on main" if pushed else "saved (local checkpoint)"
+    if pushed:
+        deploy = "LIVE on main (batched)"
+    elif should_push:
+        deploy = "checkpoint (push pending/failed)"
+    else:
+        deploy = f"saved ({pending_batch}/{every} until push)"
     success(
         f"{short} | {deploy} | blog/{slug}.html | "
         f"{gemini_total}/{total_posts} gemini done ({pending} pending)"
     )
+
+
+def flush_pending_git() -> None:
+    """Push any leftover batched commits (call at end of run)."""
+    with _save_lock:
+        if _flush_git_push("flush"):
+            log("Flushed remaining GEO commits to main")
 
 
 def _upgrade_one(posts, api_keys, api_key, idx):
@@ -274,7 +320,7 @@ def _run_parallel(posts, pending_indices, api_keys, workers, t0):
 
     def worker(worker_id):
         label = ""
-        stagger = worker_id * 4
+        stagger = worker_id * 1
         if stagger:
             log(f"Worker {worker_id + 1} stagger start +{stagger}s")
             time.sleep(stagger)
@@ -369,7 +415,9 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
 
     banner("GEO UPGRADE START (Gemini drain)")
     log(f"API keys: {len(api_keys)} | workers: {workers} | interval: {sleep_sec}s/key")
-    log(f"Save mode: per-post checkpoint" + (" + git push" if os.environ.get("GITHUB_ACTIONS") == "true" else ""))
+    log(f"Save mode: per-post checkpoint + git every {_commit_every()} ok" + (
+        " (Actions)" if os.environ.get("GITHUB_ACTIONS") == "true" else ""
+    ))
     log(f"Models: {os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash → 3.1-flash-lite → 3.5-flash')}")
     log(
         f"Posts total: {len(posts)} | gemini: {already_gemini} | offline: {already_offline} | "
@@ -434,6 +482,7 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
             log(f"  ✗ {posts[idx]['title'][:60]}", level="WARN")
 
     if upgraded_count > 0:
+        flush_pending_git()
         log("Rebuilding site…")
         try:
             import build_site
@@ -441,6 +490,8 @@ def upgrade_posts(limit=DEFAULT_LIMIT, sleep_sec=DEFAULT_SLEEP, workers=0):
             log("Site rebuilt successfully")
         except Exception as e:
             log(f"Rebuild error: {e}", level="ERROR")
+    else:
+        flush_pending_git()
 
     return upgraded_count
 
@@ -452,8 +503,8 @@ def main():
         help="Max posts per run (default 0=unlimited)",
     )
     parser.add_argument(
-        "--sleep", type=float, default=float(os.environ.get("GEO_SLEEP_SEC", "120")),
-        help="Min seconds between requests per API key (default 120)",
+        "--sleep", type=float, default=float(os.environ.get("GEO_SLEEP_SEC", "30")),
+        help="Min seconds between requests per API key (default 30)",
     )
     parser.add_argument(
         "--workers", type=int, default=int(os.environ.get("GEO_WORKERS", "0")),
