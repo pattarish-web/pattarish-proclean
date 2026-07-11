@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       posts_per_category:
-        description: "Posts per category (เคล็ดลับ/ธุรกิจ/คู่มือ)"
+        description: "Posts per category (เคล็ดลับ/ธุรกิจ/คู่มือ — ไม่รวมบริการ)"
         required: false
-        default: "2"
+        default: "1"
 
 jobs:
   build:
@@ -35,13 +35,14 @@ jobs:
     - name: Run AI Blog Generator
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        POSTS_PER_CATEGORY: ${{ github.event.inputs.posts_per_category || '2' }}
+        POSTS_PER_CATEGORY: ${{ github.event.inputs.posts_per_category || '1' }}
         GEMINI_MIN_INTERVAL: "20"
         BLOG_POST_GAP_SEC: "5"
         PYTHONUNBUFFERED: "1"
       run: |
         echo "POSTS_PER_CATEGORY=$POSTS_PER_CATEGORY"
         python generate_blog.py
+        # generate_blog.py exits 1 on under-delivery / rebuild failure
 
     - name: Commit and Push changes
       run: |

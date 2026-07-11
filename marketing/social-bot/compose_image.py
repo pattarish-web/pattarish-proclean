@@ -11,6 +11,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont
 
+from creative_standard import TYPE
+
 ROOT = Path(__file__).resolve().parent
 ADS = ROOT.parent / "ads-office-ondemand"
 FONTS_DIR = ADS / "fonts"
@@ -211,27 +213,28 @@ def compose(
         panel = Image.new("RGBA", (w, h), (0, 0, 0, 0))
         pd = ImageDraw.Draw(panel)
         pd.rounded_rectangle(
-            [24, 150, int(w * 0.68), h - 28],
+            [24, 150, int(w * 0.62), h - 28],
             radius=28,
             fill=(255, 255, 255, 240),
         )
         img = Image.alpha_composite(img.convert("RGBA"), panel).convert("RGB")
         draw = ImageDraw.Draw(img)
         x, y = 48, 176
-        head_f = font(52, "bold")
-        for line in wrap_lines(draw, headline, head_f, int(w * 0.55))[:3]:
+        # Match default Gen-Z type scale; keep text in left ~55% of frame
+        head_f = font(72, "bold")
+        for line in wrap_lines(draw, headline, head_f, int(w * 0.52))[:3]:
             ink(draw, (x, y), line, head_f, INK, shadow=False)
-            y += 62
+            y += 84
         if subline:
             y += 10
-            sub_f = font(30, "medium")
-            for line in wrap_lines(draw, subline, sub_f, int(w * 0.55))[:2]:
+            sub_f = font(32, "medium")
+            for line in wrap_lines(draw, subline, sub_f, int(w * 0.52))[:2]:
                 ink(draw, (x, y), line, sub_f, MUTED, shadow=False)
-                y += 40
+                y += 44
         cta(draw, x, min(y + 28, h - 130), "ทัก LINE @sangkanclean", TEAL)
     else:
-        # Left-biased wrap so text sits in the clear left third–half
-        max_w = int(w * (0.86 if is_stories else 0.72))
+        # Keep overlay in left ~55% so it sits in the clear left third of the photo
+        max_w = int(w * (0.72 if is_stories else 0.55))
         y = int(h * (0.44 if is_stories else 0.40))
         head_f = font(80 if is_stories else 72, "bold")
         for line in wrap_lines(draw, headline, head_f, max_w)[:3]:

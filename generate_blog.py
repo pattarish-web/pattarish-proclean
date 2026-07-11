@@ -5,14 +5,16 @@ from __future__ import annotations
 import json
 import os
 import random
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
 
 from build_blogs import slugify
+from creative_standard import THAI_TONE_RULES, build_background_prompt
 from gemini_api import (
-    call_gemini_image,
-    call_gemini_json,
+    call_gemini_image_rotate,
+    call_gemini_json_rotate,
     get_api_keys,
     is_key_exhausted,
 )
@@ -21,10 +23,12 @@ from site_config import SITE_URL
 ROOT = Path(__file__).resolve().parent
 JSON_PATH = ROOT / "posts.json"
 IMAGES_DIR = ROOT / "blog" / "images"
+STOCK_DIR = ROOT / "images" / "blog"
 
-POSTS_PER_CATEGORY = max(1, int(os.environ.get("POSTS_PER_CATEGORY", "2")))
+POSTS_PER_CATEGORY = max(1, int(os.environ.get("POSTS_PER_CATEGORY", "1")))
 # Soft pause between posts (per-key throttle also applies in gemini_api).
 POST_GAP_SEC = float(os.environ.get("BLOG_POST_GAP_SEC", "5"))
+EXPECTED_DAILY = POSTS_PER_CATEGORY * 3  # เคล็ดลับ / ธุรกิจ / คู่มือ — ไม่รวมบริการ
 
 TOPICS = [
     {
@@ -45,6 +49,11 @@ TOPICS = [
             "ขจัดคราบน้ำมันกระทะ",
             "จัดเก็บของให้บ้านดูโปร่ง",
             "ทำความสะอาดระเบียงคอนโด",
+            "เคล็ดลับถูพื้นไม้มะเดื่อไม่เป็นคราบ",
+            "วิธีซักม่านคอนโดเองอย่างปลอดภัย",
+            "กำจัดเชื้อราในห้องน้ำแบบยั่งยืน",
+            "จัดห้องทำงานที่บ้านให้น้อยฝุ่น",
+            "ดูแลกระเบื้องยาแนวไม่ให้ดำ",
         ],
     },
     {
@@ -65,6 +74,11 @@ TOPICS = [
             "ลดต้นทุนทำความสะอาดออฟฟิศ",
             "ทีมสำรองแม่บ้านสำคัญอย่างไร",
             "บริการทำความสะอาด B2B",
+            "KPI ทีมแม่บ้านออฟฟิศที่วัดได้",
+            "แม่บ้าน coworking สำหรับสตาร์ทอัพ",
+            "เปรียบเทียบแพ็คแม่บ้านรายเดือน",
+            "outsourcing คลีนโรงงาน vs in-house",
+            "รายงานก่อน–หลังงานคลีนสำหรับผู้บริหาร",
         ],
     },
     {
@@ -85,9 +99,37 @@ TOPICS = [
             "วิธีประเมินราคาทำความสะอาดเบื้องต้น",
             "ดูแลพื้นผิวหินอ่อนหลังขัด",
             "คู่มืออบโอโซนก่อนเข้าอยู่",
+            "เช็คลิสต์ตรวจพื้นที่ก่อนเปิดออฟฟิศใหม่",
+            "ขั้นตอนรับมอบงานหลัง Big Cleaning",
+            "คู่มือเตรียมห้องประชุมก่อนอีเวนต์",
+            "ตรวจรับงานคลีนคลินิกอย่างปลอดภัย",
+            "แผนคลีนรายเดือนสำหรับโฮมออฟฟิศ",
         ],
     },
 ]
+
+# Keyword fragment → stock cover under images/blog/
+# Office/B2B before home so "แม่บ้านออฟฟิศ" does not match "บ้าน" inside "แม่บ้าน".
+_STOCK_RULES: list[tuple[tuple[str, ...], str]] = [
+    (("โรงงาน",), "blog-factory.jpg"),
+    (("โกดัง",), "blog-warehouse.jpg"),
+    (("โรงแรม", "รีสอร์ท"), "blog-hotel.jpg"),
+    (("โรงพยาบาล", "คลินิก"), "blog-hospital.jpg"),
+    (("โรงเรียน", "มหาวิทยาลัย"), "blog-school.jpg"),
+    (("ห้าง", "ศูนย์การค้า"), "blog-mall.jpg"),
+    (("ร้านอาหาร", "คาเฟ่", "ครัว"), "blog-restaurant.jpg"),
+    (("โชว์รูม",), "blog-showroom.jpg"),
+    (("ตึกสูง", "กระจก"), "blog-highrise.jpg"),
+    (("ฟิตเนส",), "blog-gym.jpg"),
+    (("ออฟฟิศ", "สำนักงาน", "อาคาร", "cowork", "b2b"), "blog-office.jpg"),
+    (("คอนโด", "โซฟา", "พรม", "ระเบียง", "ม่าน", "ในบ้าน", "ที่บ้าน"), "blog-home.jpg"),
+]
+
+_CATEGORY_STOCK = {
+    "เคล็ดลับ": "blog-home.jpg",
+    "ธุรกิจ": "blog-office.jpg",
+    "คู่มือ": "blog-office.jpg",
+}
 
 
 def _key_label(api_keys: list[str], key: str) -> str:
@@ -113,6 +155,8 @@ def _geo_prompt(keyword: str, category: str) -> str:
 หมวด: {category}
 แบรนด์อ้างอิงได้: Sangkan Clean (ไม่ต้องใส่ชื่อแบรนด์ใน title)
 
+{THAI_TONE_RULES}
+
 ข้อกำหนด (สำคัญมากสำหรับการทำ GEO เพื่อให้ AI นำไปอ้างอิง):
 1. title: น่าสนใจ ดึงดูดคลิก มีคำค้นหาหลัก ความยาวไม่เกิน 100 ตัวอักษร — ห้ามต่อท้ายด้วย "– Sangkan Clean"
 2. description: สรุปสั้นๆ 100-160 ตัวอักษร
@@ -128,34 +172,61 @@ def _geo_prompt(keyword: str, category: str) -> str:
 
 def _image_prompt(title: str, keyword: str, category: str) -> str:
     scene_hints = {
-        "เคล็ดลับ": "home cleaning tips, tidy living space, realistic photo",
-        "ธุรกิจ": "professional office or commercial cleaning team, B2B setting, realistic photo",
-        "คู่มือ": "checklist planning cleaning service, professional tools, realistic photo",
+        "เคล็ดลับ": (
+            "bright Bangkok condo living room after tidy-up, young SEA professional "
+            "in casual-smart clothes near indoor plants, airy lifestyle mood"
+        ),
+        "ธุรกิจ": (
+            "modern Bangkok coworking office, young East/SEA creative team, "
+            "clean desks, teal and coral accent props, energetic Gen-Z agency vibe"
+        ),
+        "คู่มือ": (
+            "young SEA professional reviewing a cleaning checklist on a tablet "
+            "in a bright Bangkok home-office, shallow depth of field"
+        ),
     }
-    hint = scene_hints.get(category, "professional cleaning service, realistic photo")
-    return (
-        f"Photorealistic cover photo for a Thai cleaning-service blog article. "
-        f"Topic: {keyword}. Title context: {title}. Category: {category}. "
-        f"Scene: {hint}. Natural lighting, high quality, no text, no logos, no watermarks, "
-        f"no UI overlays, suitable as a website blog hero image, 16:9 composition."
+    scene = scene_hints.get(category, "")
+    return build_background_prompt(
+        scene,
+        topic_mood=category,
+        extra=f"Keyword: {keyword}. Title context: {title}.",
     )
 
 
-def _fallback_image_url() -> str:
+def _stock_cover_filename(keyword: str, category: str) -> str:
+    # Neutralize "แม่บ้าน" so fragment "บ้าน" / home cues do not false-match.
+    hay = f"{keyword} {category}".replace("แม่บ้าน", "MAID").lower()
+    for fragments, filename in _STOCK_RULES:
+        if any(frag.lower() in hay for frag in fragments):
+            return filename
+    return _CATEGORY_STOCK.get(category, "blog-office.jpg")
+
+
+def _fallback_image_url(keyword: str, category: str) -> str:
+    filename = _stock_cover_filename(keyword, category)
+    path = STOCK_DIR / filename
+    if path.exists():
+        return f"{SITE_URL}/images/blog/{filename}"
     return f"{SITE_URL}/og-image.png"
 
 
-def _save_cover(api_key: str, api_keys: list[str], slug: str, title: str, keyword: str, category: str) -> str:
-    """Generate and save cover; return absolute site URL (or brand fallback)."""
-    label = _key_label(api_keys, api_key)
+def _save_cover(
+    api_keys: list[str],
+    slug: str,
+    title: str,
+    keyword: str,
+    category: str,
+) -> str:
+    """Generate cover; rotate Gemini keys on 429 before stock fallback."""
     prompt = _image_prompt(title, keyword, category)
-    raw = call_gemini_image(api_key, prompt, key_label=label)
+    print(f"  cover: rotating across {len(api_keys)} Gemini API key(s)")
+    raw = call_gemini_image_rotate(api_keys, prompt, key_label_prefix="blog-cover")
     if not raw:
-        print(f"  cover fallback → og-image.png ({slug})")
-        return _fallback_image_url()
+        url = _fallback_image_url(keyword, category)
+        print(f"  cover fallback → {url.split('/')[-1]} ({slug})")
+        return url
 
     IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-    # Detect PNG vs JPEG from magic bytes
     ext = "png" if raw[:8].startswith(b"\x89PNG") else "jpg"
     filename = f"{slug}.{ext}"
     path = IMAGES_DIR / filename
@@ -165,18 +236,33 @@ def _save_cover(api_key: str, api_keys: list[str], slug: str, title: str, keywor
     return url
 
 
-def generate_one_post(api_keys: list[str], category: str, keyword: str, key_offset: int, existing_titles: set[str]):
-    key = _pick_key(api_keys, key_offset)
-    if not key:
+def generate_one_post(
+    api_keys: list[str],
+    category: str,
+    keyword: str,
+    key_offset: int,
+    existing_titles: set[str],
+    existing_slugs: set[str],
+):
+    if not api_keys or all(is_key_exhausted(k) for k in api_keys):
         print("All API keys exhausted — stop generating.")
         return None, "quota"
 
-    label = _key_label(api_keys, key)
-    print(f"[{category}] {keyword} via {label}")
+    start = _pick_key(api_keys, key_offset)
+    ordered = api_keys
+    if start and start in api_keys:
+        i = api_keys.index(start)
+        ordered = api_keys[i:] + api_keys[:i]
 
-    result = call_gemini_json(key, _geo_prompt(keyword, category), key_label=label, timeout=90)
+    print(f"[{category}] {keyword} via {len(ordered)} key(s)")
+    result = call_gemini_json_rotate(
+        ordered,
+        _geo_prompt(keyword, category),
+        key_label_prefix="blog",
+        timeout=90,
+    )
     if not result:
-        if is_key_exhausted(key) or all(is_key_exhausted(k) for k in api_keys):
+        if all(is_key_exhausted(k) for k in api_keys):
             return None, "quota"
         return None, "fail"
 
@@ -195,9 +281,11 @@ def generate_one_post(api_keys: list[str], category: str, keyword: str, key_offs
         return None, "dup"
 
     slug = slugify(title) or f"post-{int(time.time())}"
-    # Avoid colliding filenames
-    image_key = _pick_key(api_keys, key_offset) or key
-    image_url = _save_cover(image_key, api_keys, slug, title, keyword, category)
+    if slug in existing_slugs:
+        print(f"  duplicate slug — skip: {slug[:60]}")
+        return None, "dup"
+
+    image_url = _save_cover(ordered, slug, title, keyword, category)
 
     today = datetime.today().strftime("%Y-%m-%d")
     post = {
@@ -228,13 +316,14 @@ def run_daily_batch() -> int:
         posts = []
 
     existing_titles = {p.get("title") for p in posts if p.get("title")}
+    existing_slugs = {p.get("slug") for p in posts if p.get("slug")}
     used_keywords: set[str] = set()
     added = 0
     key_offset = 0
 
     print(
         f"Daily GEO blogs: {POSTS_PER_CATEGORY}/category × {len(TOPICS)} categories "
-        f"| keys={len(api_keys)}"
+        f"(expected={EXPECTED_DAILY}, exclude บริการ) | keys={len(api_keys)}"
     )
 
     for topic in TOPICS:
@@ -250,7 +339,12 @@ def run_daily_batch() -> int:
             used_keywords.add(keyword)
 
             post, status = generate_one_post(
-                api_keys, category, keyword, key_offset, existing_titles
+                api_keys,
+                category,
+                keyword,
+                key_offset,
+                existing_titles,
+                existing_slugs,
             )
             key_offset += 1
 
@@ -259,10 +353,12 @@ def run_daily_batch() -> int:
                 _write_posts(posts)
                 return added
             if status != "ok" or not post:
+                # Retry next keyword in this category until quota filled.
                 continue
 
             posts.append(post)
             existing_titles.add(post["title"])
+            existing_slugs.add(post["slug"])
             added += 1
             made += 1
             if POST_GAP_SEC > 0:
@@ -271,7 +367,7 @@ def run_daily_batch() -> int:
         print(f"Category {category}: +{made}/{POSTS_PER_CATEGORY}")
 
     _write_posts(posts)
-    print(f"Added {added} posts total.")
+    print(f"Added {added} posts total (target {EXPECTED_DAILY}).")
     return added
 
 
@@ -280,21 +376,37 @@ def _write_posts(posts: list) -> None:
         json.dump(posts, f, ensure_ascii=False, indent=2)
 
 
-def main() -> None:
+def _rebuild_site() -> None:
+    import build_blogs
+    import build_listings
+    import update_sitemap
+
+    build_blogs.build_blogs()
+    build_listings.build_listings()
+    update_sitemap.update_sitemap()
+    print("Rebuild blogs + listings + sitemap done.")
+
+
+def main() -> int:
     added = run_daily_batch()
     if added <= 0:
         print("No new posts — skip rebuild.")
-        return
-    try:
-        import build_blogs
-        import update_sitemap
+        print(f"FAIL: expected {EXPECTED_DAILY} new posts, got 0")
+        return 1
 
-        build_blogs.build_blogs()
-        update_sitemap.update_sitemap()
-        print("Rebuild + sitemap done.")
+    try:
+        _rebuild_site()
     except Exception as exc:
-        print(f"Error building static blogs or sitemap: {exc}")
+        print(f"Error building static blogs/listings/sitemap: {exc}")
+        return 1
+
+    if added < EXPECTED_DAILY:
+        print(f"FAIL: under-delivery — got {added}/{EXPECTED_DAILY}")
+        return 1
+
+    print(f"OK: daily target met ({added}/{EXPECTED_DAILY})")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
