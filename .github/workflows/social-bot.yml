@@ -15,6 +15,10 @@ on:
         required: false
         default: "facebook,instagram,tiktok,line"
 
+concurrency:
+  group: sangkan-site-content
+  cancel-in-progress: false
+
 jobs:
   post:
     runs-on: ubuntu-latest

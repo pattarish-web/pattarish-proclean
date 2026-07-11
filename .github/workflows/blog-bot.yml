@@ -11,6 +11,10 @@ on:
         required: false
         default: "1"
 
+concurrency:
+  group: sangkan-site-content
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,29 +46,53 @@ jobs:
       run: |
         echo "POSTS_PER_CATEGORY=$POSTS_PER_CATEGORY"
         python generate_blog.py
-        # generate_blog.py exits 1 on under-delivery / rebuild failure
 
     - name: Commit and Push changes
       run: |
+        set -e
         git config --global user.name "Sangkan Clean Blog Bot"
         git config --global user.email "bot@sangkanclean.com"
         git add posts.json posts-index.json blog/ blog.html index.html sitemap.xml sitemap-pages.xml sitemap-blog.xml robots.txt
         if git diff-index --quiet HEAD; then
           echo "No changes to commit"
-        else
-          COUNT=$(python -c "import json; print(len(json.load(open('posts.json',encoding='utf-8'))))")
-          git commit -m "chore: daily blogs with covers [skip ci] (posts=$COUNT)"
-          git fetch origin
-          git pull --rebase origin main
-          for i in 1 2 3; do
-            if git push origin HEAD:main; then
-              echo "Push OK"
-              exit 0
-            fi
-            echo "Push attempt $i failed — rebase and retry"
-            git pull --rebase origin main || true
-            sleep 5
-          done
-          echo "Push failed after retries"
-          exit 1
+          exit 0
         fi
+
+        COUNT=$(python -c "import json; print(len(json.load(open('posts.json',encoding='utf-8'))))")
+        git commit -m "chore: daily blogs with covers [skip ci] (posts=$COUNT)"
+        OUR=$(git rev-parse HEAD)
+        echo "$OUR" > /tmp/our_commit
+        git fetch origin
+
+        if git rebase origin/main; then
+          echo "Rebase OK"
+        else
+          echo "Rebase conflict — merge new posts onto origin/main and rebuild"
+          git rebase --abort
+          git show "$OUR:posts.json" > /tmp/ours_posts.json
+          git reset --hard origin/main
+          python merge_daily_blog_push.py
+          git add posts.json posts-index.json blog/ blog.html index.html sitemap.xml sitemap-pages.xml sitemap-blog.xml robots.txt
+          COUNT=$(python -c "import json; print(len(json.load(open('posts.json',encoding='utf-8'))))")
+          if git diff-index --quiet HEAD; then
+            echo "Nothing to commit after merge rebuild"
+          else
+            git commit -m "chore: daily blogs with covers [skip ci] (posts=$COUNT)"
+          fi
+        fi
+
+        for i in 1 2 3; do
+          if git push origin HEAD:main; then
+            echo "Push OK"
+            exit 0
+          fi
+          echo "Push attempt $i failed — fetch and retry"
+          git fetch origin
+          if ! git pull --rebase origin main; then
+            echo "retry rebase failed"
+            git rebase --abort || true
+          fi
+          sleep 5
+        done
+        echo "Push failed after retries"
+        exit 1
