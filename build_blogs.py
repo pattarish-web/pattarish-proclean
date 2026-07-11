@@ -180,6 +180,24 @@ def render_blog_html(posts, idx, template):
                    <p>บทความนี้กำลังอยู่ในระหว่างการจัดทำเนื้อหาเพิ่มเติม โปรดติดตามอัปเดตจากเราได้เร็วๆ นี้ครับ</p>
                    <p>สนใจสอบถามบริการทำความสะอาดเพิ่มเติม ติดต่อทีมงาน Sangkan Clean ได้เลยครับ</p>"""
 
+    # Ensure CTA signals exist in body for GEO/AIO (phone / quote)
+    if "063-686" not in content and "ใบเสนอราคา" not in content:
+        content += (
+            '<section class="inline-cta"><h3>สนใจบริการทำความสะอาดครบวงจร?</h3>'
+            "<p>ทีมงาน Sangkan Clean พร้อมประเมินราคาฟรี "
+            'โทร <a href="tel:0636865134">063-686-5134</a> '
+            'หรือ LINE <a href="https://line.me/ti/p/@sangkanclean">@sangkanclean</a> '
+            "หรือขอใบเสนอราคาได้ทันที</p></section>"
+        )
+        post["content"] = content
+
+    title = re.sub(r"\s*[–—\-]\s*Sangkan Clean\s*$", "", post["title"], flags=re.I).strip()
+    post["title"] = title
+    if "unsplash.com" in (post.get("image") or ""):
+        post["image"] = f"{SITE_URL}/og-image.png"
+
+    page_title = title if re.search(r"sangkan\s*clean", title, re.I) else f"{title} | Sangkan Clean"
+
     related = build_related_posts_html(posts, idx)
     canonical = f"{SITE_URL}/blog/{slug}.html"
     date_modified = post.get("dateModified", post.get("date", ""))
@@ -188,7 +206,8 @@ def render_blog_html(posts, idx, template):
 
     html = template
     replacements = {
-        "{{title}}": post["title"],
+        "{{title}}": title,
+        "{{page_title}}": page_title,
         "{{description}}": post["description"],
         "{{image}}": post["image"],
         "{{category}}": post.get("category", "บทความ"),

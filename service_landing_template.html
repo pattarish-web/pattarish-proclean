@@ -12,6 +12,56 @@
     <meta property="og:url" content="{{canonical}}">
     <meta property="og:image" content="{{site_url}}/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Service",
+          "name": "{{title}}",
+          "description": "{{description}}",
+          "provider": {
+            "@type": "LocalBusiness",
+            "name": "Sangkan Clean",
+            "url": "{{site_url}}/",
+            "telephone": "+66636865134",
+            "image": "{{site_url}}/logo.png"
+          },
+          "areaServed": "TH",
+          "url": "{{canonical}}"
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "{{title}} ราคาเท่าไหร่?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{price}} ประเมินหน้างานฟรี โทร 063-686-5134 หรือ LINE @sangkanclean"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "รับบริการพื้นที่ไหนบ้าง?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "ให้บริการกรุงเทพ ปริมณฑล และโปรเจกต์ขนาดใหญ่ทั่วประเทศ โดยทีมงาน Sangkan Clean"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "ต้องเตรียมอุปกรณ์เองหรือไม่?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "ไม่ต้องครับ ทีมงานเตรียมอุปกรณ์และน้ำยามาตรฐานมาให้ครบ รวมประกันความเสียหายจากการปฏิบัติงาน"
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
