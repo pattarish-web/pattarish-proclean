@@ -263,8 +263,8 @@ def call_gemini_image(
         if response.status_code == 429 or (
             response.status_code == 400 and "RESOURCE_EXHAUSTED" in response.text
         ):
-            bump_key_cooldown(api_key, tag)
-            log(f"{tag} image RATE LIMIT (429) — pausing key", level="WARN")
+            # Do NOT pause the shared text key — covers fall back to og-image.png.
+            log(f"{tag} image RATE LIMIT (429) — cover fallback (key stays for text)", level="WARN")
             return None
 
         if response.status_code != 200:
