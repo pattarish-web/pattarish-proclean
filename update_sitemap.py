@@ -64,6 +64,7 @@ def update_sitemap():
         ("privacy.html", "0.3", "yearly"),
         ("landing-bigcleaning.html", "0.8", "monthly"),
         ("landing-maid.html", "0.8", "monthly"),
+        ("landing-sangkan-office.html", "0.8", "monthly"),
     ]
 
     for svc in SERVICE_LANDINGS:

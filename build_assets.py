@@ -62,6 +62,7 @@ def patch_root_html_files():
         "privacy.html",
         "landing-bigcleaning.html",
         "landing-maid.html",
+        "landing-sangkan-office.html",
         "landing-softcleaning.html",
         "landing-glass.html",
         "landing-carpet.html",
