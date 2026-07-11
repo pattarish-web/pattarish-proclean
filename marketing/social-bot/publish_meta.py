@@ -23,6 +23,52 @@ def _ig_id() -> str:
     return os.environ.get("INSTAGRAM_BUSINESS_ACCOUNT_ID", "").strip()
 
 
+def _graph_error(resp: requests.Response) -> str:
+    try:
+        payload = resp.json()
+        err = payload.get("error") or payload
+        if isinstance(err, dict):
+            code = err.get("code")
+            sub = err.get("error_subcode")
+            msg = err.get("message") or resp.text[:300]
+            return f"HTTP {resp.status_code} code={code} sub={sub} msg={msg}"
+        return f"HTTP {resp.status_code}: {resp.text[:400]}"
+    except Exception:
+        return f"HTTP {resp.status_code}: {resp.text[:400]}"
+
+
+def _post_photo(page_id: str, token: str, caption: str, image_path: Path) -> dict:
+    with image_path.open("rb") as fh:
+        r = requests.post(
+            f"{GRAPH}/{page_id}/photos",
+            data={"caption": caption, "access_token": token, "published": "true"},
+            files={"source": ("feed.png", fh, "image/png")},
+            timeout=120,
+        )
+    if r.status_code >= 400:
+        return {"ok": False, "mode": "photo", "error": _graph_error(r)}
+    data = r.json()
+    return {"ok": True, "mode": "photo", "id": data.get("id") or data.get("post_id")}
+
+
+def _post_video(page_id: str, token: str, caption: str, video_path: Path) -> dict:
+    with video_path.open("rb") as fh:
+        r = requests.post(
+            f"{GRAPH}/{page_id}/videos",
+            data={
+                "description": caption,
+                "access_token": token,
+                "published": "true",
+            },
+            files={"source": ("feed.mp4", fh, "video/mp4")},
+            timeout=180,
+        )
+    if r.status_code >= 400:
+        return {"ok": False, "mode": "video", "error": _graph_error(r)}
+    data = r.json()
+    return {"ok": True, "mode": "video", "id": data.get("id")}
+
+
 def publish_facebook(
     *,
     caption: str,
@@ -43,34 +89,40 @@ def publish_facebook(
     if not page_id or not token:
         return {"ok": False, "skipped": True, "reason": "missing FACEBOOK_PAGE_ID or token"}
 
+    # Quick auth probe (no secret printed)
     try:
-        if video_path and video_path.exists():
-            with video_path.open("rb") as fh:
-                r = requests.post(
-                    f"{GRAPH}/{page_id}/videos",
-                    data={"description": caption, "access_token": token},
-                    files={"source": fh},
-                    timeout=180,
-                )
-            r.raise_for_status()
-            data = r.json()
-            return {"ok": True, "mode": "video", "id": data.get("id")}
-
-        if not image_path or not image_path.exists():
-            return {"ok": False, "reason": "missing feed image"}
-
-        with image_path.open("rb") as fh:
-            r = requests.post(
-                f"{GRAPH}/{page_id}/photos",
-                data={"caption": caption, "access_token": token},
-                files={"source": fh},
-                timeout=120,
-            )
-        r.raise_for_status()
-        data = r.json()
-        return {"ok": True, "mode": "photo", "id": data.get("id") or data.get("post_id")}
+        who = requests.get(
+            f"{GRAPH}/me",
+            params={"fields": "id,name", "access_token": token},
+            timeout=30,
+        )
+        if who.status_code >= 400:
+            return {"ok": False, "error": f"token invalid: {_graph_error(who)}"}
+        print(f"Facebook token ok as: {who.json()}")
     except Exception as exc:
-        return {"ok": False, "error": str(exc)}
+        return {"ok": False, "error": f"token probe failed: {exc}"}
+
+    # Prefer video when provided; fall back to photo so the day still posts.
+    if video_path and video_path.exists():
+        video_result = _post_video(page_id, token, caption, video_path)
+        if video_result.get("ok"):
+            return video_result
+        print(f"Facebook video failed → {video_result.get('error')}; trying photo")
+        if image_path and image_path.exists():
+            photo_result = _post_photo(page_id, token, caption, image_path)
+            if photo_result.get("ok"):
+                photo_result["video_error"] = video_result.get("error")
+                return photo_result
+            return {
+                "ok": False,
+                "error": photo_result.get("error"),
+                "video_error": video_result.get("error"),
+            }
+        return video_result
+
+    if not image_path or not image_path.exists():
+        return {"ok": False, "reason": "missing feed image"}
+    return _post_photo(page_id, token, caption, image_path)
 
 
 def _ig_publish_container(ig_user_id: str, token: str, creation_id: str) -> dict:

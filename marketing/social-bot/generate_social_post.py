@@ -269,6 +269,7 @@ def main() -> int:
         )
         print(f"Wrote {cap_path}")
 
+    print("Results:", json.dumps(results, ensure_ascii=False))
     failed = [
         name
         for name, res in results.items()
@@ -276,6 +277,8 @@ def main() -> int:
     ]
     if failed:
         print("Publish failures:", failed)
+        for name in failed:
+            print(f"  {name}: {json.dumps(results.get(name), ensure_ascii=False)}")
         return 1
     print("Done.")
     return 0

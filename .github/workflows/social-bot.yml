@@ -57,6 +57,7 @@ jobs:
         run: python generate_social_post.py
 
       - name: Commit log and assets
+        if: always()
         run: |
           git config --global user.name "Sangkan Clean Social Bot"
           git config --global user.email "bot@sangkanclean.com"
