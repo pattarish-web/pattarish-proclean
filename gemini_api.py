@@ -213,6 +213,7 @@ def get_api_keys() -> list[str]:
 DEFAULT_IMAGE_MODELS = [
     os.environ.get("GEMINI_IMAGE_MODEL", "").strip() or "gemini-2.5-flash-image",
     "gemini-3.1-flash-image",
+    "gemini-3.1-flash-lite-image",
 ]
 
 
@@ -223,7 +224,11 @@ def call_gemini_image(
     key_label: str = "",
     timeout: int = 120,
 ) -> bytes | None:
-    """Generate one image via Gemini image models; returns raw image bytes or None."""
+    """Generate one image via Gemini image models; returns raw image bytes or None.
+
+    On 429, tries the next image model on this key. Caller should rotate to the
+    next API key when this returns None.
+    """
     import base64
 
     tag = key_label or f"{api_key[:8]}…"
@@ -240,9 +245,11 @@ def call_gemini_image(
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "responseModalities": ["TEXT", "IMAGE"],
+            "imageConfig": {"aspectRatio": "1:1"},
         },
     }
     headers = {"Content-Type": "application/json"}
+    hit_429 = False
 
     for model in models:
         url = build_generate_content_url(model, api_key)
@@ -263,9 +270,16 @@ def call_gemini_image(
         if response.status_code == 429 or (
             response.status_code == 400 and "RESOURCE_EXHAUSTED" in response.text
         ):
-            # Do NOT pause the shared text key — covers fall back to og-image.png.
-            log(f"{tag} image RATE LIMIT (429) — cover fallback (key stays for text)", level="WARN")
-            return None
+            # Keep text key usable; try next image model, then caller rotates key.
+            hit_429 = True
+            retry_after = _retry_wait(response, 0, 8)
+            log(
+                f"{tag} image RATE LIMIT (429) on {model} — next model/key "
+                f"(wait {retry_after:.0f}s)",
+                level="WARN",
+            )
+            time.sleep(min(retry_after, 20))
+            continue
 
         if response.status_code != 200:
             log(
@@ -294,5 +308,56 @@ def call_gemini_image(
 
         log(f"{tag} image model '{model}' returned no image parts", level="WARN")
 
-    log(f"{tag} all image models failed", level="ERROR")
+    if hit_429:
+        log(f"{tag} image 429 on all models — rotate to next API key", level="WARN")
+    else:
+        log(f"{tag} all image models failed", level="ERROR")
+    return None
+
+
+def call_gemini_json_rotate(
+    api_keys: list[str],
+    prompt: str,
+    *,
+    key_label_prefix: str = "gemini",
+    **kwargs,
+) -> dict | None:
+    """Try each API key until JSON succeeds; skip keys paused after 429."""
+    if not api_keys:
+        return None
+    for i, key in enumerate(api_keys):
+        label = f"{key_label_prefix}-{i + 1}"
+        if is_key_exhausted(key):
+            log(f"{label} paused (quota) — try next key", level="WARN")
+            continue
+        data = call_gemini_json(key, prompt, key_label=label, **kwargs)
+        if data and isinstance(data, dict):
+            return data
+        log(f"{label} JSON failed — try next key", level="WARN")
+    return None
+
+
+def call_gemini_image_rotate(
+    api_keys: list[str],
+    prompt: str,
+    *,
+    key_label_prefix: str = "gemini-img",
+    **kwargs,
+) -> bytes | None:
+    """Try each API key until an image is returned."""
+    if not api_keys:
+        return None
+    for i, key in enumerate(api_keys):
+        label = f"{key_label_prefix}-{i + 1}"
+        if is_key_exhausted(key):
+            log(f"{label} paused (quota) — skip image key", level="WARN")
+            continue
+        if i > 0:
+            # Stagger keys so we don't hammer shared project limits in the same second.
+            time.sleep(3)
+        log(f"{label} trying image ({i + 1}/{len(api_keys)})")
+        raw = call_gemini_image(key, prompt, key_label=label, **kwargs)
+        if raw:
+            return raw
+        log(f"{label} image failed — try next key", level="WARN")
     return None

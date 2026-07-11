@@ -77,7 +77,7 @@ def _fallback_captions(topic: dict) -> dict:
 
 def _generate_captions(topic: dict) -> dict:
     try:
-        from gemini_api import call_gemini_json, get_api_keys
+        from gemini_api import call_gemini_json_rotate, get_api_keys
     except ImportError:
         return _fallback_captions(topic)
 
@@ -86,6 +86,7 @@ def _generate_captions(topic: dict) -> dict:
         print("No GEMINI_API_KEY — using fallback captions")
         return _fallback_captions(topic)
 
+    print(f"Captions: rotating across {len(keys)} Gemini API key(s)")
     prompt = f"""คุณเขียนคอนเทนต์โซเชียลภาษาไทยให้แบรนด์ Sangkan Clean (สั่งการคลีน)
 โทน: สบายๆ มั่นใจ แม่นยำ — คุยกับทีมวัยใหม่ / เอเจนซี่ / สตาร์ทอัพ
 ห้ามสำนวนราชการ ห้ามขายแข็ง ห้ามยาวเยิ่น
@@ -106,9 +107,9 @@ CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
   "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
 }}
 """
-    data = call_gemini_json(keys[0], prompt, key_label="social-bot")
+    data = call_gemini_json_rotate(keys, prompt, key_label_prefix="social-bot")
     if not data or not isinstance(data, dict):
-        print("Gemini failed — using fallback captions")
+        print("Gemini failed on all keys — using fallback captions")
         return _fallback_captions(topic)
 
     base = _fallback_captions(topic)
@@ -193,7 +194,7 @@ def _background_prompt(topic: dict) -> str:
 def _generate_background(topic: dict, out_dir: Path) -> Path | None:
     """Generate a fresh bg via Gemini; return path or None on failure."""
     try:
-        from gemini_api import call_gemini_image, get_api_keys
+        from gemini_api import call_gemini_image_rotate, get_api_keys
     except ImportError:
         print("gemini_api unavailable — gradient fallback for background")
         return None
@@ -203,14 +204,9 @@ def _generate_background(topic: dict, out_dir: Path) -> Path | None:
         print("No GEMINI_API_KEY — gradient fallback for background")
         return None
 
+    print(f"Background: rotating across {len(keys)} Gemini API key(s)")
     prompt = _background_prompt(topic)
-    raw = None
-    for i, key in enumerate(keys):
-        label = f"social-bot-bg-{i + 1}"
-        raw = call_gemini_image(key, prompt, key_label=label)
-        if raw:
-            break
-        print(f"Gemini image failed on key {i + 1}/{len(keys)}")
+    raw = call_gemini_image_rotate(keys, prompt, key_label_prefix="social-bot-bg")
 
     if not raw:
         print("Gemini image failed on all keys — gradient fallback for background")
