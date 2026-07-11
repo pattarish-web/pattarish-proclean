@@ -1,5 +1,5 @@
 {
-  "last_topic": "office_ondemand",
+  "last_topic": "agency_focus",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -41,6 +41,30 @@
           "dry_run": true,
           "has_image_url": false,
           "preview": "ออฟฟิศสะอาด โดยไม่จ้างประจำ\n\nไม่ต้องจ้างประจำ เรียกใช้ตามต้องการ โซนอุดมสุข–บางน"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-11T16:28:27.529384+00:00",
+      "topic_id": "agency_focus",
+      "format": "video",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260711/feed.png",
+        "stories_png": "out/20260711/stories.png",
+        "stories_mp4": "out/20260711/stories.mp4",
+        "feed_mp4": "out/20260711/feed.mp4"
+      },
+      "captions": {
+        "fb_ig": "ในโลกที่ความคิดสร้างสรรค์และไอเดียใหม่ ๆ สำคัญที่สุด ทีมเอเจนซี่และครีเอทีฟต่างต้องการสมาธิอย่างเต็มที่กับการสร้างสรรค์ผลงานชั้นเยี่ยม Sangkan Clean เข้าใจดีว่าเวลาอันมีค่าของทีมคุณควรถูกใช้ไปกับการขั",
+        "tiktok": "ทีมเอเจนซี่/ครีเอทีฟต้องโฟกัสงาน! 🤯 Sangkan Clean ช่วยให้คุณหมดกังวลเรื่องความสะอาดในออฟฟิศ ไม่ต้องจัดเวรแม่บ้านเอง มี Q",
+        "line": "ถึงทีมเอเจนซี่และครีเอทีฟทุกท่าน 💡\nให้ Sangkan Clean ดูแลความสะอาดออฟฟิศของคุณ เพื่อให้ทีมงานโฟกัสกับการสร้างสรรค์ผลงานไ"
+      },
+      "results": {
+        "facebook": {
+          "ok": false,
+          "error": "HTTP 403 code=200 sub=None msg=(#200) The permission(s) publish_actions are not available. It has been deprecated. If you want to provide a way for your app users to share content to Facebook, we encourage you to use our Sharing products instead.",
+          "video_error": "HTTP 400 code=100 sub=None msg=(#100) No permission to publish the video"
         }
       }
     }
