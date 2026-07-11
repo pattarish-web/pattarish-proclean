@@ -1,0 +1,40 @@
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "Sangkan Office — Staff Easy",
+  "chatBarText": "งานของฉัน",
+  "areas": [
+    {
+      "bounds": { "x": 0, "y": 0, "width": 1250, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=staff&item=today",
+        "displayText": "งานวันนี้"
+      }
+    },
+    {
+      "bounds": { "x": 1250, "y": 0, "width": 1250, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=staff&item=checkin",
+        "displayText": "ถึงที่แล้ว"
+      }
+    },
+    {
+      "bounds": { "x": 0, "y": 843, "width": 1250, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=staff&item=pow",
+        "displayText": "ส่งรูปงาน"
+      }
+    },
+    {
+      "bounds": { "x": 1250, "y": 843, "width": 1250, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=staff&item=issue",
+        "displayText": "มีปัญหา"
+      }
+    }
+  ]
+}

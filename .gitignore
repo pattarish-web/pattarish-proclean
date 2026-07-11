@@ -11,3 +11,9 @@ Thumbs.db
 seo/compliance_report.md
 google_ads/exports/
 google_ads/client_secret.json
+
+# Keep agent skills in git for machine migration
+!.agents/
+!.agents/**
+!.cursor/skills/
+!.cursor/skills/**

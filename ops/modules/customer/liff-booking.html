@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>จอง Early Bird — Sangkan Office</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; padding: 1.25rem; background: #f8fafc; color: #0f172a; }
+    h1 { font-size: 1.25rem; }
+    label { display: block; margin-top: 0.75rem; font-size: 0.85rem; color: #64748b; }
+    input, select { width: 100%; padding: 0.65rem; margin-top: 0.25rem; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; }
+    button { margin-top: 1.25rem; width: 100%; padding: 0.85rem; border: 0; border-radius: 10px; background: #0d9488; color: #fff; font-weight: 700; }
+    .msg { margin-top: 1rem; padding: 0.75rem; border-radius: 8px; background: #ecfdf5; display: none; }
+    .err { background: #fef2f2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <h1>จอง Early Bird</h1>
+  <p>Sangkan Office · โซนอุดมสุข</p>
+  <form id="form">
+    <label>แพ็คเกจ
+      <select name="package" id="package" required>
+        <option value="S">S Lite Office — ฿2,900</option>
+        <option value="M" selected>M Growth Office — ฿6,900</option>
+        <option value="L">L Premium Executive — ฿9,900</option>
+      </select>
+    </label>
+    <label>ชื่อบริษัท <input name="companyName" required /></label>
+    <label>ชื่อผู้ติดต่อ <input name="contactName" /></label>
+    <label>ที่อยู่ / ชั้น <input name="address" required /></label>
+    <label>ละติจูด (สำหรับ GPS) <input name="lat" type="number" step="any" placeholder="13.6797" /></label>
+    <label>ลองจิจูด <input name="lng" type="number" step="any" placeholder="100.6090" /></label>
+    <label>มัดจำ (บาท) <input name="depositThb" type="number" value="500" min="0" /></label>
+    <label>รหัส Affiliate (ถ้ามี) <input name="referredByCode" /></label>
+    <button type="submit">ยืนยันจอง</button>
+  </form>
+  <div class="msg" id="msg"></div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    if (params.get("package")) document.getElementById("package").value = params.get("package");
+
+    async function init() {
+      const liffId = window.LIFF_BOOKING_ID || "";
+      if (liffId && window.liff) {
+        await liff.init({ liffId });
+        if (!liff.isLoggedIn()) liff.login();
+      }
+    }
+    init().catch(console.error);
+
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const msg = document.getElementById("msg");
+      let lineUserId = "DEV-USER";
+      try {
+        if (window.liff && liff.isLoggedIn()) {
+          const p = await liff.getProfile();
+          lineUserId = p.userId;
+        }
+      } catch (_) {}
+      const body = {
+        lineUserId,
+        companyName: fd.get("companyName"),
+        contactName: fd.get("contactName"),
+        package: fd.get("package"),
+        address: fd.get("address"),
+        lat: fd.get("lat") || "",
+        lng: fd.get("lng") || "",
+        depositThb: Number(fd.get("depositThb") || 500),
+        referredByCode: fd.get("referredByCode") || "",
+      };
+      try {
+        const res = await fetch((window.OPS_API_BASE || "") + "/api/booking", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        msg.style.display = "block";
+        if (!data.ok) {
+          msg.className = "msg err";
+          msg.textContent = data.error || "จองไม่สำเร็จ";
+          return;
+        }
+        msg.className = "msg";
+        msg.textContent = "จองสำเร็จ รหัส " + data.id + " — กลับไปที่แชท LINE ได้เลย";
+      } catch (err) {
+        msg.style.display = "block";
+        msg.className = "msg err";
+        msg.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "Sangkan Office — Customer",
+  "chatBarText": "เมนูลูกค้า",
+  "areas": [
+    {
+      "bounds": { "x": 0, "y": 0, "width": 833, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=customer&item=packages",
+        "displayText": "แพ็คเกจ"
+      }
+    },
+    {
+      "bounds": { "x": 833, "y": 0, "width": 834, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=customer&item=book",
+        "displayText": "จอง Early Bird"
+      }
+    },
+    {
+      "bounds": { "x": 1667, "y": 0, "width": 833, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=customer&item=next_job",
+        "displayText": "คิวถัดไป"
+      }
+    },
+    {
+      "bounds": { "x": 0, "y": 843, "width": 833, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=customer&item=pow",
+        "displayText": "รายงาน PoW"
+      }
+    },
+    {
+      "bounds": { "x": 833, "y": 843, "width": 834, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=customer&item=affiliate",
+        "displayText": "ชวนเพื่อน"
+      }
+    },
+    {
+      "bounds": { "x": 1667, "y": 843, "width": 833, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=customer&item=help",
+        "displayText": "ช่วยเหลือ"
+      }
+    }
+  ]
+}

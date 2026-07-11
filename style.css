@@ -208,6 +208,40 @@ h2 {
 .hero-visual { position: relative; }
 .image-wrapper { position: relative; z-index: 2; }
 .hero-img { border-radius: 24px; box-shadow: var(--shadow-xl); object-fit: cover; height: 460px; width: 100%; }
+
+/* Article-cover slideshow (hero + about) */
+.cover-slideshow {
+    position: relative;
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    aspect-ratio: 4 / 3;
+    background: #0f172a;
+}
+.cover-slideshow--hero {
+    border-radius: 24px;
+    box-shadow: var(--shadow-xl);
+    aspect-ratio: auto;
+    height: 460px;
+}
+.cover-slideshow-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    z-index: 0;
+}
+.cover-slideshow-img.is-active {
+    opacity: 1;
+    z-index: 1;
+}
+.cover-slideshow .floating-card {
+    z-index: 10;
+}
 .floating-card {
     position: absolute;
     background: rgba(255,255,255,0.92);
@@ -491,12 +525,15 @@ h2 {
     position: fixed; bottom: 1.5rem; right: 1.5rem;
     display: flex; flex-direction: column; gap: 0.75rem;
     z-index: 999;
+    /* Keep FABs off content; safe-area for notched phones */
+    padding-bottom: env(safe-area-inset-bottom, 0);
 }
 .float-btn {
     width: 52px; height: 52px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: var(--white); font-size: 1.4rem;
     box-shadow: var(--shadow-lg); transition: var(--transition);
+    flex-shrink: 0;
 }
 .float-btn:hover { transform: scale(1.12); }
 .float-phone { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
@@ -518,6 +555,7 @@ h2 {
     .hero { padding-top: 5rem; }
     .hero-grid { grid-template-columns: 1fr; gap: 3rem; }
     .hero-img { height: 360px; }
+    .cover-slideshow--hero { height: 360px; }
     .calc-grid { grid-template-columns: 1fr; gap: 3rem; }
     .footer-grid { grid-template-columns: 1fr 1fr; }
     .location-grid { grid-template-columns: repeat(2, 1fr); }
@@ -550,4 +588,22 @@ h2 {
     .card-2 { right: -2%; }
     .location-grid { grid-template-columns: 1fr; }
     .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+
+    /* Prevent floating FABs from covering hero text / CTAs */
+    .hero .container,
+    .hero-content,
+    .post-content-section .container,
+    .section-padding .container {
+        padding-right: 4.25rem;
+    }
+    .floating-contacts {
+        bottom: 1rem;
+        right: 0.75rem;
+        gap: 0.5rem;
+    }
+    .float-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.15rem;
+    }
 }

@@ -161,7 +161,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20260712">
 
     <!-- FAQ Schema Markup (SEO) -->
     <script type="application/ld+json">
@@ -296,8 +296,8 @@
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="image-wrapper">
-                    <img src="images/hero-cleaning.jpg" alt="ทีมงาน Sangkan Clean ทำความสะอาดออฟฟิศและที่พักอย่างมืออาชีพ" class="hero-img" loading="eager" fetchpriority="high" width="800" height="600">
+                <div class="image-wrapper cover-slideshow cover-slideshow--hero" id="heroCoverSlideshow">
+                    <img src="images/hero-cleaning.jpg" alt="ทีมงาน Sangkan Clean ทำความสะอาดออฟฟิศและที่พักอย่างมืออาชีพ" class="cover-slideshow-img is-active" loading="eager" fetchpriority="high" width="800" height="600" data-fallback="1">
                     <div class="floating-card card-1">
                         <i class="fa-solid fa-circle-check text-success"></i>
                         <div>
@@ -323,7 +323,9 @@
         <div class="container">
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 3rem;">
                 <div style="flex: 1; min-width: 300px;">
-                    <img src="images/hero-cleaning.jpg" alt="ทีมงานผู้เชี่ยวชาญทำความสะอาด Sangkan Clean" style="width: 100%; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);" width="800" height="600" loading="lazy">
+                    <div class="cover-slideshow" id="aboutCoverSlideshow" aria-live="polite">
+                        <img src="images/hero-cleaning.jpg" alt="ทีมงานผู้เชี่ยวชาญทำความสะอาด Sangkan Clean" class="cover-slideshow-img is-active" width="800" height="600" loading="lazy" data-fallback="1">
+                    </div>
                 </div>
                 <div style="flex: 1; min-width: 300px;">
                     <span class="sub-title">OUR STORY & EXPERTISE</span>
@@ -605,33 +607,33 @@
             <div class="articles-grid" id="articlesGrid">
                 <!-- STATIC_ARTICLES_START --><article class="article-card">
                         <div class="article-img">
-                            <img src="https://www.sangkanclean.com/images/blog/covers/c208.jpg" alt="หินอ่อนหลังขัด: คู่มือดูแลรักษาให้เงางามเหมือนวันแรก ✨" loading="lazy" width="400" height="240">
-                            <span class="article-tag">คู่มือ</span>
+                            <img src="https://www.sangkanclean.com/images/blog/covers/c090.jpg" alt="บริการแม่บ้านโรงพยาบาล ระดับมืออาชีพ" loading="lazy" width="400" height="240">
+                            <span class="article-tag">บริการ</span>
                         </div>
                         <div class="article-body">
-                            <h3>หินอ่อนหลังขัด: คู่มือดูแลรักษาให้เงางามเหมือนวันแรก ✨</h3>
-                            <p>หลังขัดหินอ่อนมาแล้วต้องทำไงต่อ? ค้นพบคู่มือฉบับย่อจาก Sangkan Clean ที่จะช่วยให้พื้นหินอ่อนของคุณเงาวับนานเหมือนใหม่ทุกวัน</p>
-                            <a href="blog/หินอ่อนหลังขัด-คู่มือดูแลรักษาให้เงางามเหมือนวันแรก-.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
+                            <h3>บริการแม่บ้านโรงพยาบาล ระดับมืออาชีพ</h3>
+                            <p>เจาะลึกบริการแม่บ้านโรงพยาบาล ครบวงจรด้วยทีมงานมืออาชีพ มาตรฐานระดับสากล เพื่อความสะอาดและสุขอนามัยที่ดีของคุณ</p>
+                            <a href="blog/บริการแม่บ้านโรงพยาบาล-ระดับมืออาชีพ--sangkan-clean.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
                         </div>
                     </article><article class="article-card">
                         <div class="article-img">
-                            <img src="https://www.sangkanclean.com/images/blog/covers/c207.jpg" alt="Big Cleaning โรงงาน: เคลียร์พื้นที่สะอาด ดัน Productivity พุ่ง!" loading="lazy" width="400" height="240">
-                            <span class="article-tag">ธุรกิจ</span>
+                            <img src="https://www.sangkanclean.com/images/blog/covers/c124.jpg" alt="บริการแม่บ้านคลินิก ระดับมืออาชีพ" loading="lazy" width="400" height="240">
+                            <span class="article-tag">บริการ</span>
                         </div>
                         <div class="article-body">
-                            <h3>Big Cleaning โรงงาน: เคลียร์พื้นที่สะอาด ดัน Productivity พุ่ง!</h3>
-                            <p>เจาะลึก Big Cleaning โรงงาน ครบวงจร ทำไมถึงสำคัญ? เพิ่มประสิทธิภาพ ลดความเสี่ยง พร้อมเช็คลิสต์เตรียมพร้อมสำหรับโรงงานคุณ.</p>
-                            <a href="blog/big-cleaning-โรงงาน-เคลียร์พื้นที่สะอาด-ดัน-productivity-พุ่ง.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
+                            <h3>บริการแม่บ้านคลินิก ระดับมืออาชีพ</h3>
+                            <p>เจาะลึกบริการแม่บ้านคลินิก ครบวงจรด้วยทีมงานมืออาชีพ มาตรฐานระดับสากล เพื่อความสะอาดและสุขอนามัยที่ดีของคุณ</p>
+                            <a href="blog/บริการแม่บ้านคลินิก-ระดับมืออาชีพ--sangkan-clean.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
                         </div>
                     </article><article class="article-card">
                         <div class="article-img">
-                            <img src="https://www.sangkanclean.com/images/blog/covers/c206.jpg" alt="เคล็ดลับกำจัดคราบมันเยิ้มในครัว: เปลี่ยนครัวเก่าให้ใสปิ๊ง ไม่ต้องออกแรงเยอะ!" loading="lazy" width="400" height="240">
-                            <span class="article-tag">เคล็ดลับ</span>
+                            <img src="https://www.sangkanclean.com/images/blog/covers/c010.jpg" alt="บริการทำความสะอาดโชว์รูม ระดับมืออาชีพ" loading="lazy" width="400" height="240">
+                            <span class="article-tag">บริการ</span>
                         </div>
                         <div class="article-body">
-                            <h3>เคล็ดลับกำจัดคราบมันเยิ้มในครัว: เปลี่ยนครัวเก่าให้ใสปิ๊ง ไม่ต้องออกแรงเยอะ!</h3>
-                            <p>เผยเทคนิคสุดปังในการทำความสะอาดครัวมันเยิ้ม รับมือคราบเหนียวแน่นให้หายวับ ด้วยวิธีง่ายๆ สไตล์มือโปร ประหยัดเวลา แรง และได้ครัวสะอาดเอี่ยม พร้อมข้อมูลสถิติและ FAQ.</p>
-                            <a href="blog/เคล็ดลับกำจัดคราบมันเยิ้มในครัว-เปลี่ยนครัวเก่าให้ใสปิ๊ง-ไม่ต้องออกแรงเยอะ.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
+                            <h3>บริการทำความสะอาดโชว์รูม ระดับมืออาชีพ</h3>
+                            <p>เจาะลึกบริการทำความสะอาดโชว์รูม ครบวงจรด้วยทีมงานมืออาชีพ มาตรฐานระดับสากล เพื่อความสะอาดและสุขอนามัยที่ดีของคุณ</p>
+                            <a href="blog/บริการทำความสะอาดโชว์รูม-ระดับมืออาชีพ--sangkan-clean.html" class="read-more">อ่านต่อ <i class="fa-solid fa-arrow-right"></i></a>
                         </div>
                     </article><!-- STATIC_ARTICLES_END -->
             </div>

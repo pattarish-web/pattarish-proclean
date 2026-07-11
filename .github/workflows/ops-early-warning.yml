@@ -1,0 +1,32 @@
+# Early Warning — jobs past start+15m without check-in
+# Schedule: every 15 minutes (filters by Asia/Bangkok job time_slot)
+
+name: ops-early-warning
+
+on:
+  schedule:
+    # Every 15 min UTC → covers Bangkok business hours densely
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  warn:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ops/webhook
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install
+        run: npm install --omit=dev
+      - name: Run Early Warning
+        env:
+          LINE_CHANNEL_SECRET: ${{ secrets.LINE_CHANNEL_SECRET }}
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_OWNER_USER_ID: ${{ secrets.LINE_OWNER_USER_ID }}
+          GOOGLE_SHEETS_ID: ${{ secrets.GOOGLE_SHEETS_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: npm run early-warning

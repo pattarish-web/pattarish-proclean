@@ -1,0 +1,41 @@
+# Render Blueprint — set Root Directory to `ops` when connecting the repo,
+# or deploy with: render blueprint from this file after moving context.
+services:
+  - type: web
+    name: sangkan-office-ops
+    runtime: docker
+    dockerfilePath: ./webhook/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: LINE_CHANNEL_SECRET
+        sync: false
+      - key: LINE_CHANNEL_ACCESS_TOKEN
+        sync: false
+      - key: LINE_OWNER_USER_ID
+        sync: false
+      - key: GOOGLE_SHEETS_ID
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: LIFF_BOOKING_ID
+        sync: false
+      - key: LIFF_CHECKIN_ID
+        sync: false
+      - key: LIFF_POW_ID
+        sync: false
+      - key: RICH_MENU_ID_CUSTOMER
+        sync: false
+      - key: RICH_MENU_ID_STAFF
+        sync: false
+      - key: RICH_MENU_ID_ADMIN
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: GPS_RADIUS_M
+        value: "200"
+      - key: AFFILIATE_PCT
+        value: "10"

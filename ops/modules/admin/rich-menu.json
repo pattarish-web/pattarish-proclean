@@ -1,0 +1,56 @@
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "Sangkan Office — Admin",
+  "chatBarText": "การจัดการ",
+  "areas": [
+    {
+      "bounds": { "x": 0, "y": 0, "width": 833, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=admin&item=threshold",
+        "displayText": "ยอดจอง"
+      }
+    },
+    {
+      "bounds": { "x": 833, "y": 0, "width": 834, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=admin&item=today",
+        "displayText": "งานวันนี้"
+      }
+    },
+    {
+      "bounds": { "x": 1667, "y": 0, "width": 833, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=admin&item=warning",
+        "displayText": "Early Warning"
+      }
+    },
+    {
+      "bounds": { "x": 0, "y": 843, "width": 833, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=admin&item=new_customers",
+        "displayText": "ลูกค้าใหม่"
+      }
+    },
+    {
+      "bounds": { "x": 833, "y": 843, "width": 834, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=admin&item=staff",
+        "displayText": "แม่บ้าน"
+      }
+    },
+    {
+      "bounds": { "x": 1667, "y": 843, "width": 833, "height": 843 },
+      "action": {
+        "type": "postback",
+        "data": "action=menu&role=admin&item=billing",
+        "displayText": "บิลค้าง"
+      }
+    }
+  ]
+}

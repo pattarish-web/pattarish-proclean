@@ -1,0 +1,17 @@
+{
+  "project": "cleaning-seo-website",
+  "purpose": "Machine migration manifest for agent skills",
+  "customSkills": [
+    "sangkan-seo-content-safety",
+    "sangkan-line-ops",
+    "sangkan-dual-repo",
+    "sangkan-erp-spine"
+  ],
+  "externalInstall": [
+    "npx skills add https://github.com/ulpi-io/skills --skill browse-seo -a cursor -y",
+    "npx skills add AsyrafHussin/agent-skills --skill seo-best-practices -a cursor -y",
+    "npx skills add https://github.com/ulpi-io/skills --skill nodejs -a cursor -y"
+  ],
+  "restoreScript": "scripts/restore-agent-skills.ps1",
+  "siblingErp": "../sangkan-clean"
+}

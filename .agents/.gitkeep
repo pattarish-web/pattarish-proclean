@@ -1,0 +1,6 @@
+# Sangkan agent skills — keep in git for machine migration
+!.agents/
+!.agents/skills/
+!.agents/skills/**
+!.cursor/skills/
+!.cursor/skills/**

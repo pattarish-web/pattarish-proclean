@@ -1,0 +1,55 @@
+{
+  "brand": "Sangkan Office",
+  "line": "@sangkanclean",
+  "creatives": {
+    "A": {
+      "chip": "สำหรับทีมวัยใหม่",
+      "headline": ["เลิกจ้างประจำ", "ได้แล้ว"],
+      "sub": "เรียกแม่บ้านออฟฟิศเมื่อไหร่ก็ได้ · อุดมสุข",
+      "cta": "ทัก LINE @sangkanclean",
+      "art": "genz-A-cowork.png",
+      "out": "A-hook.png"
+    },
+    "B": {
+      "eyebrow": "แพ็คง่ายๆ",
+      "title": "ออฟฟิศ On-Demand",
+      "packages": [
+        { "code": "S", "price": "฿2,900", "detail": "4 ครั้ง/เดือน", "hot": false },
+        { "code": "M", "price": "฿6,900", "detail": "8 ครั้ง/เดือน", "hot": true, "badge": "ฮิต" }
+      ],
+      "affiliate": "ชวนเพื่อนในโซน ได้เครดิตคืน 10%",
+      "affiliate_terms": "สะสมถึงสิ้นปี · ใช้ได้จนกว่าจะหมด",
+      "cta": "เลือกแพ็คใน LINE",
+      "art": "genz-B-flatlay.png",
+      "out": "B-price.png"
+    },
+    "C": {
+      "chip": "โปร่งใส 100%",
+      "headline": ["เช็คอิน GPS", "+ ส่งรูปก่อน–หลัง"],
+      "sub": "ไม่ต้องมีผู้จัดการคุม · เริ่ม ฿2,900",
+      "cta": "ดูแพ็ค S / M",
+      "art": "genz-C-phone.png",
+      "out": "C-trust.png"
+    },
+    "D": {
+      "chip": "EARLY BIRD",
+      "headline": ["จองก่อน", "เริ่มเดือนหน้า"],
+      "sub": "สิทธิ์จำกัด · อุดมสุข–บางนา · S/M",
+      "cta": "ทัก LINE จองเลย",
+      "art": "genz-D-morning.png",
+      "out": "D-earlybird.png"
+    },
+    "E": {
+      "chip": "ชวนเพื่อน = ได้ตังค์คืน",
+      "kicker": "เครดิตคืน",
+      "hero": "10%",
+      "lines": [
+        "ของยอดที่เพื่อนจ่าย · สะสมถึงสิ้นปี",
+        "เครดิตไม่หมดอายุ ใช้จนกว่าจะหมด"
+      ],
+      "cta": "ขอโค้ดที่ LINE",
+      "art": "genz-E-friends.png",
+      "out": "E-affiliate.png"
+    }
+  }
+}

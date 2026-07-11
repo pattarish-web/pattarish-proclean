@@ -155,15 +155,34 @@ def extract_faq_schema(content):
     return f'<script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script>'
 
 
+def redirect_slugs():
+    """Slugs kept as HTML redirect stubs (must not be pruned)."""
+    path = os.path.join("seo", "redirects.json")
+    if not os.path.isfile(path):
+        return set()
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            rules = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return set()
+    slugs = set()
+    for rule in rules:
+        from_path = rule.get("from") or ""
+        if from_path.endswith(".html"):
+            slugs.add(os.path.splitext(os.path.basename(from_path))[0])
+    return slugs
+
+
 def prune_orphan_blogs(valid_slugs):
     if not os.path.isdir("blog"):
         return 0
+    keep = set(valid_slugs) | redirect_slugs()
     removed = 0
     for name in os.listdir("blog"):
         if not name.endswith(".html"):
             continue
         slug = name[:-5]
-        if slug not in valid_slugs:
+        if slug not in keep:
             os.remove(os.path.join("blog", name))
             removed += 1
     return removed

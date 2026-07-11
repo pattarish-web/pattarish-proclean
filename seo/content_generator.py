@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import re
 import datetime
 from pathlib import Path
 
@@ -112,11 +113,25 @@ def gen_outro(kw):
         f"<p style='margin-top: 2rem; font-weight: 600; color: #0f172a;'>จบทุกปัญหาความสะอาดด้วย <strong>{kw}</strong> จาก Sangkan Clean ติดต่อประเมินราคาฟรีได้เลยครับ!</p>"
     ])
 
+def normalize_keyword(keyword):
+    """Collapse duplicate intents before generating a post (see seo/cannibalization.py)."""
+    try:
+        from seo.cannibalization import normalize_intent, preferred_keyword, landing_target
+    except ImportError:
+        from cannibalization import normalize_intent, preferred_keyword, landing_target
+
+    intent = normalize_intent(keyword)
+    if landing_target(intent):
+        return None  # served by landing page — skip blog generation
+    return preferred_keyword(intent)
+
+
 def generate_post(keyword):
-    if keyword.startswith("บริการ"):
-        title = f"{keyword} ระดับมืออาชีพ – Sangkan Clean"
-    else:
-        title = f"บริการ {keyword} ระดับมืออาชีพ – Sangkan Clean"
+    keyword = normalize_keyword(keyword)
+    if keyword is None:
+        return None, None
+    # Always use "บริการ {kw}" form so slug/title twins (บริการX vs บริการ-X) cannot reappear
+    title = f"บริการ {keyword} ระดับมืออาชีพ – Sangkan Clean"
     
     # Randomly select a structure (mix of 3-5 modules)
     modules = [
@@ -168,17 +183,26 @@ def main():
     posts_dir = Path("posts")
     posts_dir.mkdir(exist_ok=True)
     
+    seen_intents = set()
     for entry in keywords:
-        kw = entry.get("keyword")
-        title, body = generate_post(kw)
-        
+        raw_kw = entry.get("keyword")
+        title, body = generate_post(raw_kw)
+        if not title or not body:
+            continue
+
+        # After normalize_keyword, title is always "บริการ {kw} …"
+        kw = re.sub(r"^บริการ\s*", "", re.sub(r"\s*ระดับมืออาชีพ.*$", "", title)).strip()
+        if kw in seen_intents:
+            continue
+        seen_intents.add(kw)
+
         slug = kw.replace(" ", "_").replace("/", "_")
         file_path = posts_dir / f"{slug}.md"
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(f"# {title}\n\n{body}\n")
-            
+
         img_url = get_unique_image()
-        
+
         new_post = {
             "title": title,
             "description": f"เจาะลึกบริการ {kw} ครบวงจรด้วยทีมงานมืออาชีพ มาตรฐานระดับสากล เพื่อความสะอาดและสุขอนามัยที่ดีของคุณ",

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "browse-seo": {
+      "source": "ulpi-io/skills",
+      "sourceType": "github",
+      "skillPath": "browse-seo/SKILL.md",
+      "computedHash": "bba33566d5cc16727cb9e7123492a9c2aa20e956ba3ada4d59ae07c205e21648"
+    },
+    "nodejs": {
+      "source": "ulpi-io/skills",
+      "sourceType": "github",
+      "skillPath": "nodejs/SKILL.md",
+      "computedHash": "79455c9bafdef411351b73548d50f642e0b6ad877900e5049b908a418367549d"
+    },
+    "seo-best-practices": {
+      "source": "AsyrafHussin/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/seo-best-practices/SKILL.md",
+      "computedHash": "695a5a77956ee3eaa182c320820deb0ab3be0640641e8bdf44046f357c4dc902"
+    }
+  }
+}

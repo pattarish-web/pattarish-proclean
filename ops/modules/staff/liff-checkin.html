@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>ถึงที่แล้ว</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      font-family: "Leelawadee UI", "Tahoma", sans-serif;
+      margin: 0; padding: 1.5rem;
+      background: #0f172a; color: #f8fafc;
+      font-size: 1.25rem; line-height: 1.5;
+    }
+    h1 { font-size: 1.75rem; margin: 0 0 0.5rem; }
+    .card {
+      background: #1e293b; border-radius: 16px;
+      padding: 1.25rem; margin: 1rem 0;
+    }
+    .big {
+      display: block; width: 100%; margin-top: 1.5rem;
+      padding: 1.35rem 1rem; border: 0; border-radius: 16px;
+      background: #0d9488; color: #fff;
+      font-size: 1.5rem; font-weight: 800;
+    }
+    .big:disabled { opacity: 0.5; }
+    .msg { margin-top: 1.25rem; font-size: 1.15rem; }
+    .ok { color: #6ee7b7; }
+    .err { color: #fca5a5; }
+    select {
+      width: 100%; padding: 1rem; font-size: 1.2rem;
+      border-radius: 12px; border: 0; margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>ถึงที่ทำงานแล้ว</h1>
+  <p>กดปุ่มใหญ่ด้านล่างครั้งเดียว<br/>ระบบจะเช็คตำแหน่งให้อัตโนมัติ</p>
+  <div class="card" id="jobBox">กำลังโหลดงานวันนี้…</div>
+  <div id="multi" style="display:none">
+    <label>เลือกงาน</label>
+    <select id="jobSelect"></select>
+  </div>
+  <button class="big" id="btn" disabled>ถึงที่แล้ว — กดที่นี่</button>
+  <div class="msg" id="msg"></div>
+  <script>
+    let jobs = [];
+    let lineUserId = "";
+
+    async function init() {
+      const msg = document.getElementById("msg");
+      try {
+        const liffId = window.LIFF_CHECKIN_ID || "";
+        if (liffId && window.liff) {
+          await liff.init({ liffId });
+          if (!liff.isLoggedIn()) liff.login();
+          lineUserId = (await liff.getProfile()).userId;
+        }
+      } catch (e) {
+        msg.textContent = "เปิดใน LINE เท่านั้น";
+        msg.className = "msg err";
+        return;
+      }
+      try {
+        const res = await fetch(
+          (window.OPS_API_BASE || "") +
+            "/api/staff/today-jobs?lineUserId=" +
+            encodeURIComponent(lineUserId)
+        );
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || "โหลดงานไม่สำเร็จ");
+        jobs = data.jobs || [];
+        const box = document.getElementById("jobBox");
+        if (!jobs.length) {
+          box.textContent = "วันนี้ยังไม่มีงานที่ได้รับมอบหมาย";
+          return;
+        }
+        if (jobs.length === 1) {
+          box.innerHTML =
+            "<strong>" +
+            (jobs[0].label || jobs[0].id) +
+            "</strong><br/>เวลา " +
+            (jobs[0].time_slot || "-");
+        } else {
+          box.textContent = "วันนี้มีหลายงาน — เลือกด้านล่าง";
+          const sel = document.getElementById("jobSelect");
+          document.getElementById("multi").style.display = "block";
+          sel.innerHTML = jobs
+            .map(
+              (j) =>
+                '<option value="' +
+                j.id +
+                '">' +
+                (j.label || j.id) +
+                " · " +
+                (j.time_slot || "") +
+                "</option>"
+            )
+            .join("");
+        }
+        document.getElementById("btn").disabled = false;
+      } catch (e) {
+        document.getElementById("jobBox").textContent = e.message;
+        msg.textContent = e.message;
+        msg.className = "msg err";
+      }
+    }
+
+    document.getElementById("btn").onclick = () => {
+      const msg = document.getElementById("msg");
+      const jobId =
+        jobs.length === 1
+          ? jobs[0].id
+          : document.getElementById("jobSelect").value;
+      if (!jobId) {
+        msg.textContent = "ยังไม่มีงาน";
+        msg.className = "msg err";
+        return;
+      }
+      msg.textContent = "กำลังเช็คตำแหน่ง… รอสักครู่";
+      msg.className = "msg";
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const res = await fetch((window.OPS_API_BASE || "") + "/api/checkin", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                jobId,
+                staffLineUserId: lineUserId,
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude,
+              }),
+            });
+            const data = await res.json();
+            if (!data.ok) {
+              msg.textContent = data.error || "ไม่สำเร็จ";
+              msg.className = "msg err";
+              return;
+            }
+            if (data.valid === "Y") {
+              msg.textContent =
+                "สำเร็จ! บันทึกว่าถึงที่แล้วแล้ว (ห่าง " +
+                data.distance_m +
+                " เมตร)";
+              msg.className = "msg ok";
+            } else {
+              msg.textContent =
+                "ยังไกลจากที่ทำงาน ห่าง " +
+                data.distance_m +
+                " เมตร (ต้องไม่เกิน " +
+                data.radius_m +
+                " เมตร) เดินเข้าใกล้แล้วกดอีกครั้ง";
+              msg.className = "msg err";
+            }
+          } catch (e) {
+            msg.textContent = e.message;
+            msg.className = "msg err";
+          }
+        },
+        (err) => {
+          msg.textContent =
+            "เปิดตำแหน่ง (GPS) ในมือถือก่อนนะคะ — " + (err.message || "");
+          msg.className = "msg err";
+        },
+        { enableHighAccuracy: true, timeout: 20000 }
+      );
+    };
+
+    init();
+  </script>
+</body>
+</html>
