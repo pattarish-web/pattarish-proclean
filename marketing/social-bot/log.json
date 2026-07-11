@@ -1,5 +1,5 @@
 {
-  "last_topic": "agency_focus",
+  "last_topic": "tech_team",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -65,6 +65,30 @@
           "ok": false,
           "error": "HTTP 403 code=200 sub=None msg=(#200) The permission(s) publish_actions are not available. It has been deprecated. If you want to provide a way for your app users to share content to Facebook, we encourage you to use our Sharing products instead.",
           "video_error": "HTTP 400 code=100 sub=None msg=(#100) No permission to publish the video"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-11T16:39:11.445778+00:00",
+      "topic_id": "tech_team",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260711/feed.png",
+        "stories_png": "out/20260711/stories.png",
+        "stories_mp4": "out/20260711/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "สำหรับทีม Tech และ Startup ที่ต้องการความคล่องตัว การมีสภาพแวดล้อมการทำงานที่สะอาดและพร้อมใช้งานอยู่เสมอคือกุญแจสำคัญสู่ประสิทธิภาพ สั่งการคลีนเข้าใจดีว่าเวลาของทีมคุณมีค่า เราจึงนำเสนอบริการทำความสะอ",
+        "tiktok": "ทีม Tech อยากได้ออฟฟิศที่สะอาด พร้อมทำงานเสมอใช่ไหม? สั่งการคลีน จัดการให้! ด้วยระบบ GPS check-in และรายงานรูปก่อน-หลัง ",
+        "line": "ออฟฟิศ Tech / Startup ที่ต้องการความพร้อมตลอดเวลา สั่งการคลีนเข้าใจดี! เราให้บริการทำความสะอาดสำนักงานด้วยระบบที่โปร่งใส"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "photo",
+          "id": "122094357609401302",
+          "page_id": "1158266640711425"
         }
       }
     }
