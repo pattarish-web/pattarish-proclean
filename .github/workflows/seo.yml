@@ -54,7 +54,7 @@ jobs:
         run: |
           git config user.name "Sangkan Clean SEO Bot"
           git config user.email "bot@sangkanclean.com"
-          git add posts/ seo/compliance_report.md posts.json posts-index.json blog/ blog.html index.html robots.txt areas/ sitemap.xml analytics.js landing-*.html privacy.html || true
+          git add posts/ seo/compliance_report.md posts.json posts-index.json blog/ blog.html index.html robots.txt areas/ sitemap.xml sitemap-pages.xml sitemap-blog.xml analytics.js landing-*.html privacy.html || true
           git commit -m "[auto] SEO update $(date +'%Y-%m-%d %H:%M')" || true
           git push origin main
       - name: Notify on Failure

@@ -47,7 +47,7 @@ jobs:
       run: |
         git config --global user.name "Sangkan Clean Blog Bot"
         git config --global user.email "bot@sangkanclean.com"
-        git add posts.json posts-index.json blog/ blog.html index.html sitemap.xml robots.txt
+        git add posts.json posts-index.json blog/ blog.html index.html sitemap.xml sitemap-pages.xml sitemap-blog.xml robots.txt
         if git diff-index --quiet HEAD; then
           echo "No changes to commit"
         else

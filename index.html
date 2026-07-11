@@ -41,12 +41,15 @@
       "@graph": [
         {
           "@type": "LocalBusiness",
+          "@id": "https://www.sangkanclean.com/#business",
           "name": "Sangkan Clean สั่งการคลีน บริการทำความสะอาด สั่งได้ดั่งใจ",
+          "alternateName": "สั่งการคลีน",
           "description": "สั่งการคลีน บริการทำความสะอาด สั่งได้ดั่งใจ Big Cleaning แม่บ้านประจำ ทำความสะอาดบ้าน คอนโด ออฟฟิศ โรงงาน",
           "url": "https://www.sangkanclean.com/",
           "telephone": "+66636865134",
           "email": "info@sangkanclean.com",
           "image": "https://www.sangkanclean.com/logo.png",
+          "logo": "https://www.sangkanclean.com/logo.png",
           "priceRange": "฿฿",
           "foundingDate": "1993",
           "address": {
@@ -63,10 +66,14 @@
             "opens": "08:00",
             "closes": "18:00"
           },
-          "serviceArea": {
-            "@type": "Place",
-            "name": "กรุงเทพมหานคร และปริมณฑล"
-          },
+          "areaServed": [
+            { "@type": "City", "name": "กรุงเทพมหานคร" },
+            { "@type": "AdministrativeArea", "name": "นนทบุรี" },
+            { "@type": "AdministrativeArea", "name": "สมุทรปราการ" },
+            { "@type": "AdministrativeArea", "name": "ปทุมธานี" },
+            { "@type": "AdministrativeArea", "name": "ชลบุรี" },
+            { "@type": "AdministrativeArea", "name": "ระยอง" }
+          ],
           "geo": {
             "@type": "GeoCoordinates",
             "latitude": 13.7563,
@@ -75,13 +82,71 @@
           "hasMap": "https://maps.google.com/?q=13.7563,100.5018",
           "sameAs": [
             "https://www.facebook.com/100067763717435",
-            "https://line.me/ti/p/@sangkanclean"
+            "https://line.me/ti/p/@sangkanclean",
+            "https://m.me/100067763717435"
+          ],
+          "makesOffer": [
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Big Cleaning",
+                "description": "ทำความสะอาดครั้งใหญ่ ขจัดคราบฝังลึก เหมาะสำหรับโรงงาน อาคาร สำนักงาน",
+                "url": "https://www.sangkanclean.com/landing-bigcleaning.html"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "แม่บ้านประจำ",
+                "description": "จัดหาแม่บ้านประจำสำนักงาน คอนโด อาคาร ดูแลรายวัน/รายเดือน",
+                "url": "https://www.sangkanclean.com/landing-maid.html"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "Soft Cleaning",
+                "description": "ทำความสะอาดเฉพาะพื้นที่ ดูแลรักษาความสะอาดประจำ อ่อนโยนกับพื้นผิว",
+                "url": "https://www.sangkanclean.com/landing-softcleaning.html"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "เช็ดกระจกอาคารสูง",
+                "description": "บริการโรยตัวเช็ดกระจกอาคารสูง ด้วยอุปกรณ์มาตรฐานความปลอดภัย",
+                "url": "https://www.sangkanclean.com/landing-glass.html"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "ซักพรม โซฟา ผ้าม่าน",
+                "description": "ซักแห้งพรม โซฟา เก้าอี้ ผ้าม่าน ขจัดคราบ กลิ่นอับ ไรฝุ่น",
+                "url": "https://www.sangkanclean.com/landing-carpet.html"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "อบโอโซน",
+                "description": "ฆ่าเชื้อโรค แบคทีเรีย ไวรัส กำจัดกลิ่นอับ ด้วยระบบโอโซนมาตรฐาน",
+                "url": "https://www.sangkanclean.com/landing-ozone.html"
+              }
+            }
           ]
         },
         {
           "@type": "WebSite",
           "name": "Sangkan Clean",
-          "url": "https://www.sangkanclean.com/"
+          "url": "https://www.sangkanclean.com/",
+          "publisher": { "@id": "https://www.sangkanclean.com/#business" }
         }
       ]
     }
