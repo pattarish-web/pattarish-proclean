@@ -1,14 +1,7 @@
 import json
 import os
 
-from site_config import (
-    LOCAL_AREAS,
-    ORGANIZATION_ID,
-    SITE_URL,
-    analytics_script_tag,
-    area_served_schema,
-    organization_schema,
-)
+from site_config import LOCAL_AREAS, SITE_URL, analytics_script_tag
 
 
 def _faq_html(faq_items):
@@ -29,20 +22,6 @@ def _faq_schema_json(faq_items):
     ]
     return json.dumps(
         {"@type": "FAQPage", "mainEntity": entities},
-        ensure_ascii=False,
-    )
-
-
-def _breadcrumb_schema_json(title, canonical):
-    return json.dumps(
-        {
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "หน้าแรก", "item": f"{SITE_URL}/"},
-                {"@type": "ListItem", "position": 2, "name": "พื้นที่ให้บริการ", "item": f"{SITE_URL}/#areas"},
-                {"@type": "ListItem", "position": 3, "name": title, "item": canonical},
-            ],
-        },
         ensure_ascii=False,
     )
 
@@ -85,7 +64,6 @@ def build_local_pages():
         faq_html = _faq_html(faq_items)
         faq_schema = _faq_schema_json(faq_items) if faq_items else '{"@type":"WebPage"}'
         related = _related_posts_html(posts, area["slug"])
-        canonical = f"{SITE_URL}/areas/{area['file']}.html"
 
         html = template
         for key, value in area.items():
@@ -93,13 +71,9 @@ def build_local_pages():
                 continue
             html = html.replace("{{" + key + "}}", value)
         html = html.replace("{{site_url}}", SITE_URL)
-        html = html.replace("{{canonical}}", canonical)
+        html = html.replace("{{canonical}}", f"{SITE_URL}/areas/{area['file']}.html")
         html = html.replace("{{faq_html}}", faq_html)
         html = html.replace("{{faq_schema}}", faq_schema)
-        html = html.replace("{{organization_schema}}", json.dumps(organization_schema(), ensure_ascii=False))
-        html = html.replace("{{organization_id}}", ORGANIZATION_ID)
-        html = html.replace("{{area_served_schema}}", json.dumps(area_served_schema([area["slug"]]), ensure_ascii=False))
-        html = html.replace("{{breadcrumb_schema}}", _breadcrumb_schema_json(area["title"], canonical))
         html = html.replace("{{related_posts}}", related)
         html = html.replace("{{analytics_script}}", analytics_script_tag("../"))
 

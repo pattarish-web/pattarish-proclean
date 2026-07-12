@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { visibleText } from './seo_quality_utils.mjs';
 
 const ROOT = process.cwd();
 const SITE_URL = 'https://www.sangkanclean.com';
@@ -85,7 +84,6 @@ function checkSitemaps(errors, indexable) {
 
 function checkPage(file, html, errors) {
   const rel = relative(file);
-  const text = visibleText(html);
   for (const [name, pattern] of REQUIRED_META) {
     if (!pattern.test(html)) errors.push(`${rel}: missing ${name}`);
   }
@@ -100,7 +98,7 @@ function checkPage(file, html, errors) {
   }
 
   for (const marker of UNSUPPORTED_CLAIMS) {
-    if (text.includes(marker)) errors.push(`${rel}: contains unsupported claim “${marker}”`);
+    if (html.includes(marker)) errors.push(`${rel}: contains unsupported claim “${marker}”`);
   }
 
   for (const tag of html.matchAll(/<img\b[^>]*>/gi)) {
