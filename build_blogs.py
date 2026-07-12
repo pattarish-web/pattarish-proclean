@@ -4,7 +4,40 @@ import os
 import re
 
 from build_assets import write_analytics_js
-from site_config import SITE_URL, analytics_script_tag
+from site_config import ORGANIZATION_ID, SITE_URL, analytics_script_tag, organization_schema
+
+
+def _with_dimensions(match):
+    image = match.group(0)
+    if re.search(r'\b(?:role=["\']presentation["\']|alt=["\']["\'])', image, flags=re.I):
+        return image
+    if not re.search(r'\bwidth=["\'][^"\']+["\']', image, flags=re.I):
+        image = image.replace("<img", '<img width="1200"', 1)
+    if not re.search(r'\bheight=["\'][^"\']+["\']', image, flags=re.I):
+        image = image.replace("<img", '<img height="675"', 1)
+    return image
+
+
+def normalize_public_content(content):
+    """Make rendered article content safer without changing posts.json."""
+    content = re.sub(r'[^<]*99\.9%[^<]*', 'ดูแลความสะอาดตามขอบเขตงาน', content)
+    content = re.sub(r'<h1\b', '<h2', content, flags=re.I)
+    content = re.sub(r'</h1\s*>', '</h2>', content, flags=re.I)
+    return re.sub(r'<img\b[^>]*>', _with_dimensions, content, flags=re.I)
+
+
+def _breadcrumb_schema_json(title, canonical):
+    return json.dumps(
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "หน้าแรก", "item": f"{SITE_URL}/"},
+                {"@type": "ListItem", "position": 2, "name": "บทความ", "item": f"{SITE_URL}/blog.html"},
+                {"@type": "ListItem", "position": 3, "name": title, "item": canonical},
+            ],
+        },
+        ensure_ascii=False,
+    )
 
 
 def slugify(text):
@@ -65,7 +98,7 @@ def _strip_tags(text):
 def extract_faq_schema(content):
     """Build FAQPage schema from common GEO/Gemini/offline FAQ HTML shapes."""
     if "คำถามที่พบบ่อย" not in content and "FAQ" not in content:
-        return ""
+        return json.dumps({"@type": "WebPage"}, ensure_ascii=False)
 
     pairs = []
 
@@ -150,9 +183,9 @@ def extract_faq_schema(content):
             break
 
     if not entities:
-        return ""
-    schema = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": entities}
-    return f'<script type="application/ld+json">{json.dumps(schema, ensure_ascii=False)}</script>'
+        return json.dumps({"@type": "WebPage"}, ensure_ascii=False)
+    schema = {"@type": "FAQPage", "mainEntity": entities}
+    return json.dumps(schema, ensure_ascii=False)
 
 
 def redirect_slugs():
@@ -210,6 +243,8 @@ def render_blog_html(posts, idx, template):
         )
         post["content"] = content
 
+    content = normalize_public_content(content)
+
     title = re.sub(r"\s*[–—\-]\s*Sangkan Clean\s*$", "", post["title"], flags=re.I).strip()
     post["title"] = title
     if "unsplash.com" in (post.get("image") or ""):
@@ -236,6 +271,9 @@ def render_blog_html(posts, idx, template):
         "{{slug}}": slug,
         "{{content}}": content,
         "{{canonical}}": canonical,
+        "{{organization_schema}}": json.dumps(organization_schema(), ensure_ascii=False),
+        "{{organization_id}}": ORGANIZATION_ID,
+        "{{breadcrumb_schema}}": _breadcrumb_schema_json(title, canonical),
         "{{related_posts}}": related,
         "{{faq_schema}}": faq_schema,
         "{{analytics_script}}": analytics_script_tag("../"),

@@ -24,6 +24,8 @@ ADS_LINE_CONVERSION_LABEL = os.environ.get(
 )
 ADS_LEAD_CONVERSION_LABEL = os.environ.get("ADS_LEAD_CONVERSION_LABEL", "")
 FORM_SUBMIT_EMAIL = "info@sangkanclean.com"
+ORGANIZATION_ID = f"{SITE_URL}/#organization"
+SERVICE_AREAS = ["กรุงเทพมหานคร", "ปริมณฑล", "ประเทศไทย"]
 
 
 def ads_conversion_send_to(label: str) -> str:
@@ -49,10 +51,46 @@ BUSINESS = {
     "facebook": "https://www.facebook.com/100067763717435",
     "messenger": "https://m.me/100067763717435",
     "email": FORM_SUBMIT_EMAIL,
-    "latitude": 13.7563,
-    "longitude": 100.5018,
-    "maps_url": "https://maps.google.com/?q=13.7563,100.5018",
 }
+
+
+def organization_schema():
+    """Return only business identity that is verified in this repository."""
+    return {
+        "@type": "Organization",
+        "@id": ORGANIZATION_ID,
+        "name": "Sangkan Clean",
+        "url": f"{SITE_URL}/",
+        "logo": f"{SITE_URL}/logo.png",
+        "telephone": BUSINESS["phone"],
+        "email": BUSINESS["email"],
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": BUSINESS["phone"],
+            "contactType": "customer service",
+            "availableLanguage": ["th"],
+        },
+        "sameAs": [
+            BUSINESS["facebook"],
+            BUSINESS["line"],
+            BUSINESS["messenger"],
+        ],
+    }
+
+
+def area_served_schema(names):
+    """Describe coverage without claiming a branch, address, or map pin."""
+    areas = []
+    for name in names:
+        for item in str(name).split("-"):
+            item = item.strip()
+            if not item:
+                continue
+            if item in {"ประเทศไทย", "ทั่วประเทศ"}:
+                areas.append({"@type": "Country", "name": "ประเทศไทย"})
+            else:
+                areas.append({"@type": "AdministrativeArea", "name": item})
+    return areas
 
 SERVICE_LANDINGS = [
     {

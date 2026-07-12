@@ -8,27 +8,31 @@
     <meta name="description" content="{{description}}">
     <link rel="canonical" href="{{canonical}}">
     <link rel="alternate" hreflang="th" href="{{canonical}}">
-    <meta property="og:title" content="{{title}}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{title}} | Sangkan Clean">
     <meta property="og:description" content="{{description}}">
     <meta property="og:url" content="{{canonical}}">
     <meta property="og:image" content="{{site_url}}/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{title}} | Sangkan Clean">
+    <meta name="twitter:description" content="{{description}}">
+    <meta name="twitter:image" content="{{site_url}}/og-image.png">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@graph": [
+        {{organization_schema}},
         {
-          "@type": "LocalBusiness",
-          "name": "Sangkan Clean - {{slug}}",
+          "@type": "Service",
+          "@id": "{{canonical}}#service",
+          "name": "{{title}}",
           "description": "{{description}}",
           "url": "{{canonical}}",
-          "telephone": "+66636865134",
-          "email": "info@sangkanclean.com",
-          "areaServed": "{{slug}}",
-          "geo": { "@type": "GeoCoordinates", "latitude": 13.7563, "longitude": 100.5018 },
-          "hasMap": "https://maps.google.com/?q=13.7563,100.5018",
-          "address": { "@type": "PostalAddress", "addressLocality": "{{slug}}", "addressCountry": "TH" }
+          "provider": { "@id": "{{organization_id}}" },
+          "areaServed": {{area_served_schema}},
+          "mainEntityOfPage": { "@type": "WebPage", "@id": "{{canonical}}" }
         },
+        {{breadcrumb_schema}},
         {{faq_schema}}
       ]
     }
@@ -50,18 +54,11 @@
         .related-blog a { display: block; color: #0d9488; margin: 0.5rem 0; text-decoration: none; font-weight: 600; }
     </style>
     {{analytics_script}}
-
-    <!-- Geo SEO / Local SEO -->
-    <meta name="geo.region" content="TH-10">
-    <meta name="geo.placename" content="Bangkok">
-    <meta name="geo.position" content="13.7563;100.5018">
-    <meta name="ICBM" content="13.7563, 100.5018">
-
 </head>
 <body>
     <header class="navbar">
         <div class="container">
-            <a href="../index.html" class="logo"><img src="../logo.png" alt="Sangkan Clean" style="height:45px;margin-right:8px;"><span>Sangkan<span> Clean</span></span></a>
+            <a href="../index.html" class="logo"><img src="../logo.png" alt="Sangkan Clean" width="180" height="80" style="height:45px;margin-right:8px;"><span>Sangkan<span> Clean</span></span></a>
             <nav class="nav-menu" id="navMenu">
                 <a href="../index.html#services" class="nav-link">บริการ</a>
                 <a href="../blog.html" class="nav-link">บทความ</a>
@@ -74,23 +71,23 @@
     <section class="local-hero">
         <div class="container">
             <h1>{{title}}</h1>
-            <p>สั่งการคลีน บริการทำความสะอาด มืออาชีพ ประเมินราคาฟรี</p>
+            <p>บริการทำความสะอาดแบบประเมินตามหน้างาน ติดต่อทีมงานเพื่อสอบถามรายละเอียดได้โดยตรง</p>
         </div>
     </section>
 
     <main class="container local-content">
         <p>{{description}}</p>
-        <p>ทีมงาน Sangkan Clean มีประสบการณ์กว่า 30 ปี ให้บริการทำความสะอาดครบวงจรใน{{slug}} ไม่ว่าจะเป็น Big Cleaning โรงงาน ออฟฟิศ คอนโด หรือจัดหาแม่บ้านประจำ เราพร้อมประเมินราคาฟรีและจัดทีมเข้างานตามกำหนด</p>
+        <p>Sangkan Clean ให้ข้อมูลขอบเขตงานและแนวทางประเมินราคาตามประเภทพื้นที่ เพื่อช่วยให้คุณเลือกบริการที่เหมาะกับหน้างานได้ชัดเจนขึ้น</p>
         <div class="district-list">
             <h2><i class="fa-solid fa-map-pin"></i> พื้นที่ให้บริการ</h2>
             <p>{{districts}}</p>
         </div>
         <h2>บริการของเราใน{{slug}}</h2>
         <ul>
-            <li>Big Cleaning ทำความสะอาดเชิงลึก โรงงาน อาคาร ออฟฟิศ</li>
-            <li>จัดหาแม่บ้านประจำสำนักงานและคอนโด</li>
-            <li>ทำความสะอาดหลังก่อสร้าง</li>
-            <li>ซักพรม ล้างแอร์ กำจัดไรฝุ่น อบโอโซน</li>
+            <li>Big Cleaning สำหรับโรงงาน อาคาร และสำนักงาน</li>
+            <li>บริการแม่บ้านประจำสำนักงานและคอนโด</li>
+            <li>ทำความสะอาดหลังการก่อสร้าง</li>
+            <li>ซักพรม ล้างแอร์ และบริการดูแลพื้นที่ตามขอบเขตงาน</li>
         </ul>
         <div class="local-faq">
             <h2>คำถามที่พบบ่อย</h2>
@@ -101,20 +98,21 @@
             {{related_posts}}
         </div>
         <div class="local-cta">
-            <a href="../index.html#calculator" class="btn btn-primary btn-lg"><i class="fa-solid fa-calculator"></i> คำนวณราคา</a>
+            <a href="../index.html#calculator" class="btn btn-primary btn-lg"><i class="fa-solid fa-calculator"></i> คำนวณราคาเบื้องต้น</a>
             <a href="https://line.me/ti/p/@sangkanclean" target="_blank" rel="noopener" class="btn btn-secondary btn-lg"><i class="fa-brands fa-line"></i> แอดไลน์</a>
-            <a href="tel:0636865134" class="btn btn-secondary btn-lg"><i class="fa-solid fa-phone"></i> โทรเลย</a>
+            <a href="tel:0636865134" class="btn btn-secondary btn-lg"><i class="fa-solid fa-phone"></i> โทร 063-686-5134</a>
         </div>
-        <p style="margin-top:2rem;"><a href="../blog.html">อ่านบทความความรู้เรื่องการทำความสะอาด</a> | <a href="../index.html">กลับหน้าแรก</a> | <a href="../privacy.html">นโยบายความเป็นส่วนตัว</a></p>
+        <p style="margin-top:2rem;"><a href="../blog.html">อ่านบทความเกี่ยวกับการทำความสะอาด</a> | <a href="../index.html">กลับหน้าแรก</a> | <a href="../privacy.html">นโยบายความเป็นส่วนตัว</a></p>
     </main>
 
+    <footer class="footer" style="background: #0f172a; padding: 3rem 0; color: #cbd5e1; text-align: center;">
+        <p>&copy; 2026 Sangkan Clean | <a href="../index.html" style="color:#0d9488;">บริการทำความสะอาด</a></p>
+    </footer>
     <script src="../tracking.js"></script>
     <script>
         const menuToggle = document.getElementById('menuToggle');
         const navMenu = document.getElementById('navMenu');
-        if (menuToggle && navMenu) {
-            menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
-        }
+        if (menuToggle && navMenu) menuToggle.addEventListener('click', () => navMenu.classList.toggle('active'));
     </script>
 </body>
 </html>
