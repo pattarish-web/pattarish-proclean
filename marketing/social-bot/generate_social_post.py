@@ -70,6 +70,18 @@ def _save_log(data: dict) -> None:
 def _fallback_captions(topic: dict) -> dict:
     hl = topic["headline"]
     angle = topic["angle"]
+    is_edu = topic.get("type") == "edu"
+
+    if is_edu:
+        sign_off = "— เกร็ดความรู้จาก Sangkan Clean"
+        return {
+            "fb_ig": f"{hl}\n\n{angle}\n\n{sign_off}",
+            "tiktok": f"{hl}\n{angle}\n{sign_off}",
+            "line": f"{hl}\n\n{angle}\n\n{sign_off}",
+            "image_subline": clip_subline(angle),
+            "hashtags": ["#SangkanClean", "#ความรู้ทำความสะอาด", "#OfficeCleanTips"],
+        }
+
     cta = f"ทัก LINE {LINE_OA} หรือดูรายละเอียดที่ {SITE}"
     return {
         "fb_ig": (
@@ -84,13 +96,37 @@ def _fallback_captions(topic: dict) -> dict:
     }
 
 
-def _generate_captions(topic: dict) -> dict:
-    try:
-        from gemini_api import call_gemini_json_rotate, get_api_keys, call_openai_json
-    except ImportError:
-        return _fallback_captions(topic)
+def _build_prompt(topic: dict) -> str:
+    """Build the AI prompt — different for edu vs promo content."""
+    is_edu = topic.get("type") == "edu"
 
-    prompt = f"""คุณเขียนคอนเทนต์โซเชียลภาษาไทยให้แบรนด์ Sangkan Clean เท่านั้น
+    if is_edu:
+        return f"""คุณเขียนคอนเทนต์ให้ความรู้บนโซเชียลภาษาไทยให้แบรนด์ Sangkan Clean
+{THAI_TONE_RULES}
+
+หัวข้อวันนี้: {topic["label"]}
+มุม: {topic["angle"]}
+หัวข้อกราฟิก: {topic["headline"]}
+
+** สำคัญมาก: โพสต์นี้เป็น "คอนเทนต์ให้ความรู้" (Educational Content) **
+- เน้นให้ข้อมูลที่มีประโยชน์ น่าสนใจ อ่านสนุก
+- ห้ามขายตรง ห้ามใส่ CTA บอกให้ทักไลน์หรือโทร
+- ห้ามพูดถึงราคาหรือแพ็คบริการ
+- ลงชื่อแบรนด์ท้ายโพสต์เบาๆ เช่น "เกร็ดความรู้จาก Sangkan Clean" หรือ "Sangkan Clean ใส่ใจเรื่องสะอาด"
+- โทนคุยเพื่อนทำงาน ไม่เป็นทางการ ให้ข้อมูลเชิง fact
+
+คืน JSON เท่านั้น:
+{{
+  "fb_ig": "แคปชัน Facebook/Instagram ภาษาไทย 60-140 คำ ให้ความรู้ ไม่ขาย",
+  "tiktok": "แคปชัน TikTok สั้น 30-70 คำ ให้ความรู้ ไม่ขาย",
+  "line": "ข้อความ LINE broadcast 40-100 คำ ให้ความรู้ ไม่ขาย ห้ามขึ้นต้นด้วย เรียน",
+  "image_subline": "ประโยครองใต้หัวข้อบนกราฟิก ภาษาไทย สั้นมาก ไม่เกิน {SUBLINE_MAX} ตัวอักษร",
+  "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
+}}
+"""
+
+    # Promo prompt (original)
+    return f"""คุณเขียนคอนเทนต์โซเชียลภาษาไทยให้แบรนด์ Sangkan Clean เท่านั้น
 {THAI_TONE_RULES}
 
 หัวข้อวันนี้: {topic["label"]}
@@ -109,13 +145,25 @@ CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
 }}
 """
 
+
+def _generate_captions(topic: dict) -> tuple[dict, str]:
+    """Generate captions. Returns (captions_dict, source_name)."""
+    try:
+        from gemini_api import call_gemini_json_rotate, get_api_keys, call_openai_json
+    except ImportError:
+        return _fallback_captions(topic), "fallback"
+
+    prompt = _build_prompt(topic)
     data = None
+    caption_source = "fallback"
     keys = get_api_keys()
 
     # 1. Gemini
     if keys:
         print(f"Captions: rotating across {len(keys)} Gemini API key(s)")
         data = call_gemini_json_rotate(keys, prompt, key_label_prefix="social-bot")
+        if data and isinstance(data, dict):
+            caption_source = "gemini"
 
     # 2. OpenAI
     if not data or not isinstance(data, dict):
@@ -123,12 +171,15 @@ CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
         if openai_key:
             print("Gemini key missing or failed — trying OpenAI fallback")
             data = call_openai_json(prompt)
+            if data and isinstance(data, dict):
+                caption_source = "openai"
 
     # 3. Fallback
     if not data or not isinstance(data, dict):
         print("Both Gemini and OpenAI unavailable/failed — using fallback captions")
-        return _fallback_captions(topic)
+        return _fallback_captions(topic), "fallback"
 
+    print(f"Caption source: {caption_source}")
     base = _fallback_captions(topic)
     for key in ("fb_ig", "tiktok", "line", "image_subline", "hashtags"):
         if key in data and data[key]:
@@ -142,7 +193,7 @@ CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
                 .replace("สั่งการคลีน", "Sangkan Clean")
                 .replace("สังการคลีน", "Sangkan Clean")
             )
-    return base
+    return base, caption_source
 
 
 def _stamp() -> str:
@@ -151,6 +202,7 @@ def _stamp() -> str:
 
 # Scene one-liners only — shared Instagram lifestyle brief is in creative_standard.
 SCENE_BY_TOPIC: dict[str, str] = {
+    # --- Promo topics (original) ---
     "office_ondemand": (
         "open Bangkok coworking floor, young professionals working casually at desks, "
         "floor-to-ceiling windows, indoor plants"
@@ -191,6 +243,87 @@ SCENE_BY_TOPIC: dict[str, str] = {
         "gentle daily tidy of a modern condo living area / soft surfaces, "
         "microfiber cloths subtle, calm natural light"
     ),
+    # --- Edu topics ---
+    "edu_desk_germ": (
+        "close-up of an office desk with keyboard, phone and coffee mug, "
+        "subtle microscopic bacteria overlay hint, clean modern office background"
+    ),
+    "edu_germ_lifespan": (
+        "split view of clean vs dirty office desk surface, "
+        "subtle glow highlighting germs, modern infographic style"
+    ),
+    "edu_productivity": (
+        "tidy bright office with focused team working, productivity graphs "
+        "softly overlaid, morning sunlight through windows"
+    ),
+    "edu_creative_block": (
+        "cluttered messy desk contrasted with clean creative workspace, "
+        "lightbulb moment concept, soft warm lighting"
+    ),
+    "edu_dust_it": (
+        "close-up of dusty computer fan and vents, "
+        "tech office background softly blurred, dramatic side lighting"
+    ),
+    "edu_server_room": (
+        "clean server room with blinking lights, "
+        "pristine cable management, cool blue lighting"
+    ),
+    "edu_big_clean_why": (
+        "before-after split of office deep cleaning, "
+        "one side dusty corners, other side spotless, natural daylight"
+    ),
+    "edu_hidden_dirt": (
+        "under-desk view showing hidden dust and debris, "
+        "air vent with dust buildup, revealing lighting angle"
+    ),
+    "edu_checklist": (
+        "professional cleaning checklist on clipboard in clean office, "
+        "checkmarks visible, organized cleaning supplies nearby"
+    ),
+    "edu_maid_absent": (
+        "empty reception area of small office, slightly untidy, "
+        "no cleaning staff visible, morning light"
+    ),
+    "edu_zone_problems": (
+        "Bangkok cityscape with different office zones highlighted, "
+        "aerial view showing urban dust and traffic, warm golden hour"
+    ),
+    "edu_pm25": (
+        "office window view of hazy Bangkok skyline, "
+        "air purifier in foreground, soft atmospheric lighting"
+    ),
+    "edu_outsource_vs_hire": (
+        "split comparison layout: one side shows HR paperwork pile, "
+        "other side shows professional cleaning team, balanced lighting"
+    ),
+    "edu_hidden_cost": (
+        "calculator and expense receipts on office desk, "
+        "subtle cost comparison infographic style, clean background"
+    ),
+    "edu_building_hygiene": (
+        "modern office building corridor with multiple office doors, "
+        "clean shared spaces, professional lighting"
+    ),
+    "edu_zone_clean": (
+        "open plan office floor with multiple tenant spaces, "
+        "clean common area, collaborative atmosphere"
+    ),
+    "edu_construction_dust": (
+        "recently renovated office space with visible construction dust, "
+        "warning safety context, dramatic lighting showing dust particles"
+    ),
+    "edu_move_in_clean": (
+        "empty new office space ready for move-in, "
+        "fresh paint smell concept, bright natural light flooding in"
+    ),
+    "edu_routine_clean": (
+        "calendar with cleaning schedule marked, modern office desk, "
+        "organized routine concept, soft morning light"
+    ),
+    "edu_harsh_chemical": (
+        "damaged office furniture surface from wrong cleaning product, "
+        "peeling leather or stained wood, cautionary close-up"
+    ),
 }
 
 
@@ -205,6 +338,7 @@ def _background_prompt(topic: dict) -> str:
 # Same lifestyle photo pool as blog covers (Pillow overlay) — not genz/art ads.
 STOCK_BG_DIR = REPO / "images" / "blog" / "bg"
 VENUE_BY_TOPIC: dict[str, str] = {
+    # Promo
     "office_ondemand": "office",
     "agency_focus": "office",
     "tech_team": "office",
@@ -215,6 +349,27 @@ VENUE_BY_TOPIC: dict[str, str] = {
     "affiliate": "office",
     "after_construction": "warehouse",
     "soft_cleaning": "home",
+    # Edu — inherit from their cluster's promo venue
+    "edu_desk_germ": "office",
+    "edu_germ_lifespan": "office",
+    "edu_productivity": "office",
+    "edu_creative_block": "office",
+    "edu_dust_it": "office",
+    "edu_server_room": "office",
+    "edu_big_clean_why": "office",
+    "edu_hidden_dirt": "office",
+    "edu_checklist": "office",
+    "edu_maid_absent": "office",
+    "edu_zone_problems": "office",
+    "edu_pm25": "office",
+    "edu_outsource_vs_hire": "office",
+    "edu_hidden_cost": "office",
+    "edu_building_hygiene": "office",
+    "edu_zone_clean": "office",
+    "edu_construction_dust": "warehouse",
+    "edu_move_in_clean": "warehouse",
+    "edu_routine_clean": "office",
+    "edu_harsh_chemical": "office",
 }
 
 # Keyword → venue (same idea as compose_blog_covers.venue_of). First match wins.
@@ -544,10 +699,11 @@ def main() -> int:
     log = _load_log()
     topic = pick_topic(log.get("last_topic"))
     fmt = topic.get("format", "image")
+    topic_type = topic.get("type", "promo")
 
-    print(f"Topic: {topic['id']} ({fmt}) dry_run={dry_run} channels={sorted(channels)}")
+    print(f"Topic: {topic['id']} ({fmt}) type={topic_type} dry_run={dry_run} channels={sorted(channels)}")
 
-    captions = _generate_captions(topic)
+    captions, caption_source = _generate_captions(topic)
     assets = build_assets(topic, captions)
     assets = _ensure_bg_relevance(topic, captions, assets)
     print("Assets:", json.dumps(assets, ensure_ascii=False))
@@ -562,6 +718,8 @@ def main() -> int:
         entry = {
             "ts": datetime.now(timezone.utc).isoformat(),
             "topic_id": topic["id"],
+            "type": topic_type,
+            "caption_source": caption_source,
             "format": fmt,
             "dry_run": dry_run,
             "assets": assets,
@@ -584,6 +742,8 @@ def main() -> int:
     entry = {
         "ts": datetime.now(timezone.utc).isoformat(),
         "topic_id": topic["id"],
+        "type": topic_type,
+        "caption_source": caption_source,
         "format": fmt,
         "dry_run": dry_run,
         "assets": assets,
