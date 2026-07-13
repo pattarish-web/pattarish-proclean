@@ -1,5 +1,5 @@
 {
-  "last_topic": "office_ondemand",
+  "last_topic": "agency_focus",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -294,6 +294,51 @@
           "ok": true,
           "mode": "video",
           "id": "1049449504706285",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-13T09:53:21.004245+00:00",
+      "topic_id": "agency_focus",
+      "format": "video",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260713/feed.png",
+        "stories_png": "out/20260713/stories.png",
+        "venue_need": "office",
+        "venue_got": "office",
+        "bg_source": "bg-office-09.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260713/bg.jpg",
+        "stories_mp4": "out/20260713/stories.mp4",
+        "feed_mp4": "out/20260713/feed.mp4"
+      },
+      "captions": {
+        "fb_ig": "ทีมครีเอทีฟ เอเจนซี่ หรือสตาร์ทอัพที่กำลังปั่นไอเดียเจ๋งๆ กันอยู่ งานสร้างสรรค์ก็ว่าท้าทายแล้ว จะให้มานั่งกังวลเรื่องออฟฟิศไม่สะอาดอีกเหรอ? Sangkan Clean เข้าใจดีว่าสภาพแวดล้อมที่ดีคือหัวใจสำคัญของงาน",
+        "tiktok": "ทีมครีเอทีฟสายปังฟังทางนี้! 📣 ไอเดียจะมาได้ไงถ้าออฟฟิศไม่คลีน? Sangkan Clean จัดการเรื่องทำความสะอาดให้เอง แบบมี QC เป๊ะ",
+        "line": "สวัสดีทีมครีเอทีฟและสตาร์ทอัพทุกท่าน!\n\nSangkan Clean พร้อมเป็นพาร์ทเนอร์ดูแลออฟฟิศคุณให้เนี้ยบกริบ เรามีระบบ QC ที่ได้มา"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "video",
+          "id": "2099074551020692",
           "page_id": "1158266640711425"
         },
         "instagram": {
