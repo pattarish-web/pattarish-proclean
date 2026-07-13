@@ -90,12 +90,6 @@ def _generate_captions(topic: dict) -> dict:
     except ImportError:
         return _fallback_captions(topic)
 
-    keys = get_api_keys()
-    if not keys:
-        print("No GEMINI_API_KEY — using fallback captions")
-        return _fallback_captions(topic)
-
-    print(f"Captions: rotating across {len(keys)} Gemini API key(s)")
     prompt = f"""คุณเขียนคอนเทนต์โซเชียลภาษาไทยให้แบรนด์ Sangkan Clean เท่านั้น
 {THAI_TONE_RULES}
 
@@ -114,20 +108,26 @@ CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
   "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
 }}
 """
-    data = call_gemini_json_rotate(keys, prompt, key_label_prefix="social-bot")
-    
-    # OpenAI Fallback
+
+    data = None
+    keys = get_api_keys()
+
+    # 1. Gemini
+    if keys:
+        print(f"Captions: rotating across {len(keys)} Gemini API key(s)")
+        data = call_gemini_json_rotate(keys, prompt, key_label_prefix="social-bot")
+
+    # 2. OpenAI
     if not data or not isinstance(data, dict):
         openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
         if openai_key:
-            print("Gemini failed on all keys — trying OpenAI fallback")
+            print("Gemini key missing or failed — trying OpenAI fallback")
             data = call_openai_json(prompt)
-            if not data or not isinstance(data, dict):
-                print("OpenAI fallback also failed — using fallback captions")
-                return _fallback_captions(topic)
-        else:
-            print("Gemini failed on all keys and no OpenAI key — using fallback captions")
-            return _fallback_captions(topic)
+
+    # 3. Fallback
+    if not data or not isinstance(data, dict):
+        print("Both Gemini and OpenAI unavailable/failed — using fallback captions")
+        return _fallback_captions(topic)
 
     base = _fallback_captions(topic)
     for key in ("fb_ig", "tiktok", "line", "image_subline", "hashtags"):
