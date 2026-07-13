@@ -361,3 +361,42 @@ def call_gemini_image_rotate(
             return raw
         log(f"{label} image failed — try next key", level="WARN")
     return None
+
+
+def call_openai_json(
+    prompt: str,
+    *,
+    model: str = "gpt-4o-mini",
+    timeout: int = 90,
+) -> dict | None:
+    """Call OpenAI Chat Completions API with JSON response format."""
+    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not api_key:
+        log("No OPENAI_API_KEY env var found", level="WARN")
+        return None
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": prompt}],
+        "response_format": {"type": "json_object"},
+    }
+
+    url = "https://api.openai.com/v1/chat/completions"
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=timeout)
+        if response.status_code != 200:
+            log(f"OpenAI API error {response.status_code}: {response.text[:200]}", level="WARN")
+            return None
+        
+        result_json = response.json()
+        text_response = result_json["choices"][0]["message"]["content"]
+        log(f"OpenAI model '{model}' → success")
+        return json.loads(text_response)
+    except Exception as exc:
+        log(f"OpenAI error: {exc}", level="ERROR")
+        return None
+

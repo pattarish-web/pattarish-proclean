@@ -86,7 +86,7 @@ def _fallback_captions(topic: dict) -> dict:
 
 def _generate_captions(topic: dict) -> dict:
     try:
-        from gemini_api import call_gemini_json_rotate, get_api_keys
+        from gemini_api import call_gemini_json_rotate, get_api_keys, call_openai_json
     except ImportError:
         return _fallback_captions(topic)
 
@@ -115,9 +115,19 @@ CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
 }}
 """
     data = call_gemini_json_rotate(keys, prompt, key_label_prefix="social-bot")
+    
+    # OpenAI Fallback
     if not data or not isinstance(data, dict):
-        print("Gemini failed on all keys — using fallback captions")
-        return _fallback_captions(topic)
+        openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
+        if openai_key:
+            print("Gemini failed on all keys — trying OpenAI fallback")
+            data = call_openai_json(prompt)
+            if not data or not isinstance(data, dict):
+                print("OpenAI fallback also failed — using fallback captions")
+                return _fallback_captions(topic)
+        else:
+            print("Gemini failed on all keys and no OpenAI key — using fallback captions")
+            return _fallback_captions(topic)
 
     base = _fallback_captions(topic)
     for key in ("fb_ig", "tiktok", "line", "image_subline", "hashtags"):

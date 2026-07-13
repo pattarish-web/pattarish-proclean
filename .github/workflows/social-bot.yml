@@ -2,8 +2,12 @@ name: Daily Social Content Bot
 
 on:
   schedule:
-    # 02:00 UTC ≈ 09:00 Bangkok
-    - cron: '0 2 * * *'
+    # 02:21 UTC ≈ 09:21 Bangkok
+    - cron: '21 2 * * *'
+    # 05:18 UTC ≈ 12:18 Bangkok
+    - cron: '18 5 * * *'
+    # 11:20 UTC ≈ 18:20 Bangkok
+    - cron: '20 11 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -46,6 +50,7 @@ jobs:
       - name: Generate and publish
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
           FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
           INSTAGRAM_BUSINESS_ACCOUNT_ID: ${{ secrets.INSTAGRAM_BUSINESS_ACCOUNT_ID }}
