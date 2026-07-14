@@ -1,5 +1,5 @@
 {
-  "last_topic": "edu_hidden_dirt",
+  "last_topic": "big_cleaning",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -475,6 +475,52 @@
           "ok": true,
           "mode": "photo",
           "id": "122095681233401302",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-14T11:12:27.449784+00:00",
+      "topic_id": "big_cleaning",
+      "type": "promo",
+      "caption_source": "gemini",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260714/feed.png",
+        "stories_png": "out/20260714/stories.png",
+        "venue_need": "office",
+        "venue_got": "office",
+        "bg_source": "bg-office-11.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260714/bg.jpg",
+        "stories_mp4": "out/20260714/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "งาน Big Cleaning ทีไร ปวดหัวกับคราบฝังแน่นที่ไหนไม่รู้? ไม่ต้องกังวล! Sangkan Clean พร้อมลุยงานทำความสะอาดใหญ่ให้พื้นที่ของคุณกลับมาเอี่ยมอ่องเหมือนใหม่ เรามีทีมมืออาชีพประสบการณ์กว่า 30 ปี เข้าใจทุกซ",
+        "tiktok": "Big Cleaning ทีไร ให้ Sangkan Clean จัดการ! คราบฝังลึกแค่ไหนก็ไม่หวั่น ทีมมืออาชีพประสบการณ์แน่นกว่า 30 ปี ลุยงานจริงทุก",
+        "line": "ทีมไหนกำลังแพลน Big Cleaning สู้กับคราบหนัก? Sangkan Clean ช่วยคุณได้! เรามีทีมงานมืออาชีพประสบการณ์กว่า 30 ปี เข้าใจลึก"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "photo",
+          "id": "122095729737401302",
           "page_id": "1158266640711425"
         },
         "instagram": {
