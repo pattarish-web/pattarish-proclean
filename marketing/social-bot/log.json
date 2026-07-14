@@ -1,5 +1,5 @@
 {
-  "last_topic": "edu_big_clean_why",
+  "last_topic": "edu_hidden_dirt",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -429,6 +429,52 @@
           "ok": true,
           "mode": "photo",
           "id": "122095366695401302",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-14T09:29:50.847324+00:00",
+      "topic_id": "edu_hidden_dirt",
+      "type": "edu",
+      "caption_source": "gemini",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260714/feed.png",
+        "stories_png": "out/20260714/stories.png",
+        "venue_need": "home",
+        "venue_got": "home",
+        "bg_source": "bg-home-03.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260714/bg.jpg",
+        "stories_mp4": "out/20260714/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "ทำงานกันเหนื่อยๆ แต่รู้ไหมว่าบางทีความสะอาดก็มีจุดบอดนะ! 🧐 ใต้เฟอร์นิเจอร์ รางแอร์ หรือแม้แต่ร่องกระเบื้องที่เรามองข้ามไปบ่อยๆ นี่แหละ คือแหล่งสะสมคราบฝังลึกชั้นดี เพราะเป็นจุดที่ทำความสะอาดทั่วไปเข้า",
+        "tiktok": "รู้ยัง? คราบฝังลึกชอบซ่อนตัวอยู่ตามจุดลับๆ นะ! ใต้เฟอร์นิเจอร์ รางแอร์ หรือร่องกระเบื้องนี่ตัวดีเลย เพราะเป็นที่ที่การทำ",
+        "line": "เฮ้ย! คราบสกปรกไม่ได้มีแค่ที่เราเห็นนะ! 😱 ลองก้มๆ มองๆ ใต้เฟอร์นิเจอร์ หรือแหงนหน้าดูรางแอร์ดีๆ จะเจอคราบฝังลึกที่ทำความ"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "photo",
+          "id": "122095681233401302",
           "page_id": "1158266640711425"
         },
         "instagram": {
