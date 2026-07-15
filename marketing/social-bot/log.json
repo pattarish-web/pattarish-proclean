@@ -1,5 +1,5 @@
 {
-  "last_topic": "edu_checklist",
+  "last_topic": "edu_maid_absent",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -567,6 +567,52 @@
           "ok": true,
           "mode": "photo",
           "id": "122095866981401302",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-15T09:33:21.529856+00:00",
+      "topic_id": "edu_maid_absent",
+      "type": "edu",
+      "caption_source": "gemini",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260715/feed.png",
+        "stories_png": "out/20260715/stories.png",
+        "venue_need": "home",
+        "venue_got": "home",
+        "bg_source": "bg-home-08.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260715/bg.jpg",
+        "stories_mp4": "out/20260715/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "ทีมไหนเคยเจอเหตุการณ์แม่บ้านประจำลาหยุดกะทันหันบ้าง? 🤔 ปัญหาคลาสสิกที่หลายออฟฟิศเจอคือพอไม่มีคนสำรอง ออฟฟิศที่เคยเป๊ะก็อาจจะเริ่มไม่คลีนอย่างที่ต้องการ\n\nจริงๆ แล้ว การมีแผนสำรอง หรือตัวเลือกที่ยืดหยุ่",
+        "tiktok": "แม่บ้านลาหยุดกะทันหัน ออฟฟิศเงียบกริบแต่ฝุ่นไม่เงียบนะ! 😩 ทีมไหนเจอปัญหานี้บ่อยๆ บ้าง? การมีแผนสำรองหรือหาตัวช่วยที่ยืดห",
+        "line": "เคยไหม? แม่บ้านลาหยุดกะทันหัน ทำให้ออฟฟิศต้องเจอศึกฝุ่น! 🤯 ปัญหานี้แก้ได้ด้วยการมีแผนสำรองที่ดี หรือตัวช่วยที่พร้อมเข้าม"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "photo",
+          "id": "122096290929401302",
           "page_id": "1158266640711425"
         },
         "instagram": {
