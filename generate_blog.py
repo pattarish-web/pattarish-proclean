@@ -290,17 +290,31 @@ def _call_openai_multimodal_select(
         "response_format": {"type": "json_object"},
     }
     url = "https://api.openai.com/v1/chat/completions"
-    try:
-        response = requests.post(url, headers=headers, json=payload, timeout=60)
-        if response.status_code != 200:
-            log(f"OpenAI Multimodal API error {response.status_code}: {response.text[:200]}", level="WARN")
-            return None
-        data = response.json()
-        text_response = data["choices"][0]["message"]["content"]
-        result = json.loads(text_response)
-        return result.get("best_image")
-    except Exception as exc:
-        log(f"_call_openai_multimodal_select error: {exc}", level="ERROR")
+    max_retries = 3
+    base_delay = 15
+    for attempt in range(max_retries):
+        try:
+            import time
+            response = requests.post(url, headers=headers, json=payload, timeout=60)
+            if response.status_code == 429:
+                wait_time = base_delay * (2 ** attempt)
+                log(f"OpenAI Multimodal API 429 Rate Limit. Retrying in {wait_time}s... (Attempt {attempt+1}/{max_retries})", level="WARN")
+                time.sleep(wait_time)
+                continue
+            if response.status_code != 200:
+                log(f"OpenAI Multimodal API error {response.status_code}: {response.text[:200]}", level="WARN")
+                return None
+            data = response.json()
+            text_response = data["choices"][0]["message"]["content"]
+            result = json.loads(text_response)
+            return result.get("best_image")
+        except Exception as exc:
+            log(f"_call_openai_multimodal_select error: {exc}", level="ERROR")
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(base_delay)
+            else:
+                return None
     return None
 
 
