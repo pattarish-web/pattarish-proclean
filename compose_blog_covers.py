@@ -351,7 +351,8 @@ def main():
 
     bgs = list_backgrounds()
     mapping = assign_bgs(posts, bgs)
-    today = date.today().isoformat()
+    from datetime import datetime, timezone, timedelta
+    today = datetime.now(timezone(timedelta(hours=7))).date().isoformat()
     counts: dict[str, int] = defaultdict(int)
     mismatches = 0
 

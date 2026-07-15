@@ -442,7 +442,9 @@ def generate_one_post(
 
     image_url = _save_cover(ordered, slug, title, keyword, category)
 
-    today = datetime.today().strftime("%Y-%m-%d")
+    from datetime import timezone, timedelta
+    tz_bangkok = timezone(timedelta(hours=7))
+    today = datetime.now(tz_bangkok).strftime("%Y-%m-%d")
     post = {
         "title": title,
         "description": description,

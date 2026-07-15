@@ -57,7 +57,7 @@ jobs:
         set -e
         git config --global user.name "Sangkan Clean Blog Bot"
         git config --global user.email "bot@sangkanclean.com"
-        git add posts.json posts-index.json blog/ blog.html index.html sitemap.xml sitemap-pages.xml sitemap-blog.xml robots.txt
+        git add posts.json posts-index.json blog/ blog.html index.html sitemap.xml sitemap-pages.xml sitemap-blog.xml robots.txt images/
         if git diff-index --quiet HEAD; then
           echo "No changes to commit"
           exit 0
@@ -73,11 +73,11 @@ jobs:
           echo "Rebase OK"
         else
           echo "Rebase conflict — merge new posts onto origin/main and rebuild"
-          git rebase --abort
+          git rebase --abort || true
           git show "$OUR:posts.json" > /tmp/ours_posts.json
           git reset --hard origin/main
           python merge_daily_blog_push.py
-          git add posts.json posts-index.json blog/ blog.html index.html sitemap.xml sitemap-pages.xml sitemap-blog.xml robots.txt
+          git add posts.json posts-index.json blog/ blog.html index.html sitemap.xml sitemap-pages.xml sitemap-blog.xml robots.txt images/
           COUNT=$(python -c "import json; print(len(json.load(open('posts.json',encoding='utf-8'))))")
           if git diff-index --quiet HEAD; then
             echo "Nothing to commit after merge rebuild"
