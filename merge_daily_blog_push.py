@@ -39,6 +39,9 @@ def main() -> int:
                 check=False,
             )
 
+    import assign_strictly_unique_bg
+    assign_strictly_unique_bg.main()
+
     import build_blogs
     import build_listings
     import update_sitemap
