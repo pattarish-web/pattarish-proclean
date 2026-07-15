@@ -48,11 +48,9 @@ jobs:
         echo "POSTS_PER_CATEGORY=$POSTS_PER_CATEGORY"
         python generate_blog.py
 
-    - name: Deduplicate and Assign Unique Covers
-      env:
-        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    - name: Assign Strictly Unique BG
       run: |
-        python dedupe_and_assign_unique_covers.py
+        python assign_strictly_unique_bg.py
 
     - name: Commit and Push changes
       run: |
