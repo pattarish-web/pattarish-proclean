@@ -1,5 +1,5 @@
 {
-  "last_topic": "service_area",
+  "last_topic": "edu_outsource_vs_hire",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -797,6 +797,52 @@
           "ok": true,
           "mode": "photo",
           "id": "122096915709401302",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-16T23:05:38.693889+07:00",
+      "topic_id": "edu_outsource_vs_hire",
+      "type": "edu",
+      "caption_source": "gemini",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260716/feed.png",
+        "stories_png": "out/20260716/stories.png",
+        "venue_need": "home",
+        "venue_got": "home",
+        "bg_source": "bg-home-03.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260716/bg.jpg",
+        "stories_mp4": "out/20260716/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "หลายๆ ทีมคงมีคำถามในใจว่า ‘จ้างแม่บ้านเอง’ กับ ‘Outsource’ แบบไหนตอบโจทย์กว่ากัน? วันนี้ Sangkan Clean ชวนมาดูข้อเท็จจริงแบบไม่กั๊ก ให้คุณตัดสินใจได้ง่ายขึ้น 😉\n\n✅  **ต้นทุน:** ถ้าจ้างเอง ต้องคำนวณทั้ง",
+        "tiktok": "จ้างแม่บ้านเอง vs. Outsource? เลือกแบบไหนให้คุ้มค่าสุด มาดูสั้นๆ กัน!\n\n📌 **จ้างเอง:** คุมได้เต็มที่ แต่ก็มีเรื่องต้นทุนแ",
+        "line": "ทีมไหนกำลังชั่งใจเรื่องการดูแลความสะอาดในออฟฟิศบ้าง? 🤔 Sangkan Clean ชวนมาเทียบกันชัดๆ ว่า จ้างแม่บ้านเอง vs. Outsource "
+      },
+      "results": {
+        "facebook": {
+          "ok": false,
+          "mode": "photo",
+          "error": "HTTP 500 code=1 sub=None msg=Please reduce the amount of data you're asking for, then retry your request",
           "page_id": "1158266640711425"
         },
         "instagram": {
