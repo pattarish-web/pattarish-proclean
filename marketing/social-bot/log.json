@@ -1,5 +1,5 @@
 {
-  "last_topic": "edu_pm25",
+  "last_topic": "service_area",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -751,6 +751,52 @@
           "ok": true,
           "mode": "photo",
           "id": "122096878689401302",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-16T18:22:52.280397+07:00",
+      "topic_id": "service_area",
+      "type": "promo",
+      "caption_source": "gemini",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260716/feed.png",
+        "stories_png": "out/20260716/stories.png",
+        "venue_need": "home",
+        "venue_got": "home",
+        "bg_source": "bg-home-09.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260716/bg.jpg",
+        "stories_mp4": "out/20260716/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "ทีมงาน Sangkan Clean เข้าใจเลยว่างานเยอะจนไม่มีเวลาจัดการเรื่องความสะอาดใช่ไหม? 😮 ไม่ต้องห่วงนะ เราไปถึงออฟฟิศคุณได้สบายๆ ทั่วกรุงเทพฯ นนทบุรี สมุทรปราการ ปทุมธานี ชลบุรี และระยอง ครอบคลุมโซนธุรกิจสำค",
+        "tiktok": "ทำงานหนักจนไม่มีเวลาคลีนออฟฟิศเหรอ? 😮 Sangkan Clean จัดให้! เราไปถึงที่เลย ทั้งกรุงเทพฯ นนทบุรี สมุทรปราการ ปทุมธานี ชลบ",
+        "line": "Sangkan Clean เข้าใจว่าคุณต้องการความคลีนแบบมืออาชีพ! 🚀 เราพร้อมให้บริการครอบคลุมทั่วกรุงเทพฯ นนทบุรี สมุทรปราการ ปทุมธา"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "photo",
+          "id": "122096915709401302",
           "page_id": "1158266640711425"
         },
         "instagram": {
