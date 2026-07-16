@@ -1,5 +1,5 @@
 {
-  "last_topic": "edu_zone_problems",
+  "last_topic": "edu_pm25",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -705,6 +705,52 @@
           "ok": true,
           "mode": "photo",
           "id": "122096481705401302",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-16T16:51:37.341108+07:00",
+      "topic_id": "edu_pm25",
+      "type": "edu",
+      "caption_source": "gemini",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260716/feed.png",
+        "stories_png": "out/20260716/stories.png",
+        "venue_need": "office",
+        "venue_got": "office",
+        "bg_source": "bg-office-09.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260716/bg.jpg",
+        "stories_mp4": "out/20260716/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "ออฟฟิศติดถนนใหญ่? 🌆 ระวังเรื่อง PM2.5 กันหน่อยนะ! หลายคนอาจคิดว่าอยู่ในอาคารแล้วรอด แต่จริงๆ แล้ว แค่เราเปิด-ปิดประตูออฟฟิศบ่อยๆ ฝุ่นจิ๋ว PM2.5 ก็พร้อมจะเล็ดลอดเข้ามาในพื้นที่ทำงานได้ง่ายๆ เลยนะ\n\nฝุ่น",
+        "tiktok": "ออฟฟิศริมถนนใหญ่ ระวัง PM2.5 ให้ดี! แค่เปิดปิดประตูบ่อยๆ ฝุ่นจิ๋วก็เข้ามาเพียบแบบไม่รู้ตัว 😱 มันส่งผลต่อสุขภาพทีมเรานะ ท",
+        "line": "รู้ไหม? ออฟฟิศที่อยู่ริมถนนใหญ่ เสี่ยงเรื่อง PM2.5 กว่าที่คิดนะ! ทุกครั้งที่เราเปิด-ปิดประตูเข้าออก ฝุ่นละอองเล็กๆ เหล่า"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "photo",
+          "id": "122096878689401302",
           "page_id": "1158266640711425"
         },
         "instagram": {
