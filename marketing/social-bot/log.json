@@ -1,5 +1,5 @@
 {
-  "last_topic": "price_pack",
+  "last_topic": "edu_building_hygiene",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -936,6 +936,52 @@
           "ok": true,
           "mode": "video",
           "id": "2928787784157996",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-17T23:05:05.683802+07:00",
+      "topic_id": "edu_building_hygiene",
+      "type": "edu",
+      "caption_source": "gemini",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260717/feed.png",
+        "stories_png": "out/20260717/stories.png",
+        "venue_need": "office",
+        "venue_got": "office",
+        "bg_source": "bg-office-03.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260717/bg.jpg",
+        "stories_mp4": "out/20260717/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "ออฟฟิศในตึกเดียวกัน นี่แหละเพื่อนร่วมชะตาความสะอาด! 🤝 รู้ไหมว่าถ้าออฟฟิศเราสะอาดอย่างเดียวอาจไม่พอ เพราะเชื้อโรคกับฝุ่นละอองมันเดินทางข้ามห้องได้ง่ายกว่าที่คิด ยิ่งถ้าออฟฟิศข้างๆ หรือโถงทางเดินไม่สะอา",
+        "tiktok": "ออฟฟิศในตึกเดียวกัน อย่ามองข้ามเรื่องความสะอาดนะ! ถ้าทั้งชั้นสะอาดพร้อมกัน โอกาสที่เชื้อโรคหรือฝุ่นจะปนเปื้อนข้ามห้องก็ล",
+        "line": "ชาวออฟฟิศยุคใหม่ที่อยู่ตึกเดียวกันต้องรู้! ถ้าทั้งชั้นสะอาด โอกาสปนเปื้อนข้ามห้องจะลดลงทันทีเลยนะ ไม่ว่าจะเป็นฝุ่นหรือเช"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "photo",
+          "id": "122097672555401302",
           "page_id": "1158266640711425"
         },
         "instagram": {
