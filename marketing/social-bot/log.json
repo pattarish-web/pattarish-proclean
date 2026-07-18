@@ -1,5 +1,5 @@
 {
-  "last_topic": "affiliate",
+  "last_topic": "edu_construction_dust",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -1075,6 +1075,52 @@
           "ok": true,
           "mode": "video",
           "id": "1052019890723980",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-18T21:42:40.886251+07:00",
+      "topic_id": "edu_construction_dust",
+      "type": "edu",
+      "caption_source": "gemini",
+      "format": "image",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260718/feed.png",
+        "stories_png": "out/20260718/stories.png",
+        "venue_need": "warehouse",
+        "venue_got": "warehouse",
+        "bg_source": "bg-warehouse-03.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260718/bg.jpg",
+        "stories_mp4": "out/20260718/stories.mp4"
+      },
+      "captions": {
+        "fb_ig": "รีโนเวทเสร็จแล้ว พร้อมย้ายเข้าอยู่? ช้าก่อน! อย่าเพิ่งมองข้าม ‘ฝุ่นปูน’ ที่ดูเหมือนจะแค่รำคาญตา เพราะมันอันตรายกว่าที่คิดเยอะเลยนะ โดยเฉพาะฝุ่นเล็กๆ ที่เรียกว่า 'ฝุ่นซิลิกา' นี่แหละ ตัวการสำคัญเลย\n\nฝุ",
+        "tiktok": "รีโนเวทเสร็จแล้ว พร้อมใช้เลยไหม? ช้าก่อน! ฝุ่นปูนที่เห็นอาจดูเล็กน้อย แต่อันตรายกว่าที่คิดนะ โดยเฉพาะ 'ฝุ่นซิลิกา' ที่มา",
+        "line": "รู้ไหมว่า 'ฝุ่นปูน' หลังรีโนเวท อันตรายกว่าที่คิดนะ! โดยเฉพาะฝุ่นเล็กๆ อย่าง 'ฝุ่นซิลิกา' ที่เกิดจากงานก่อสร้างเนี่ย มัน"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "photo",
+          "id": "122098441719401302",
           "page_id": "1158266640711425"
         },
         "instagram": {
