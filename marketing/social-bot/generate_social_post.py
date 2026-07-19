@@ -11,6 +11,12 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except AttributeError:
+    pass
+
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent.parent
 for p in (str(ROOT), str(REPO)):
@@ -67,6 +73,45 @@ def _save_log(data: dict) -> None:
     )
 
 
+def _load_seo_keywords() -> list[str]:
+    """Load SEO keywords from keywords.json database."""
+    path = REPO / "seo" / "keywords.json"
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return [item["keyword"] for item in data if isinstance(item, dict) and "keyword" in item]
+    except Exception as e:
+        print(f"Error loading keywords: {e}")
+        return []
+
+
+def _pick_seo_keywords(topic: dict, all_keywords: list[str], limit: int = 3) -> list[str]:
+    """Select relevant SEO keywords based on topic context."""
+    matched = []
+    topic_id = str(topic.get("id", "")).lower()
+    topic_label = str(topic.get("label", "")).lower()
+
+    for kw in all_keywords:
+        kw_lower = kw.lower()
+        if any(w in topic_id or w in topic_label for w in ["construction", "ก่อสร้าง", "รีโนเวท", "renovate"]):
+            if any(k in kw_lower for k in ["ก่อสร้าง", "รีโนเวท", "บิ๊กคลีนนิ่ง"]):
+                matched.append(kw)
+        elif any(w in topic_id or w in topic_label for w in ["office", "agency", "tech", "ออฟฟิศ"]):
+            if any(k in kw_lower for k in ["ออฟฟิศ", "สำนักงาน", "แม่บ้าน"]):
+                matched.append(kw)
+        elif any(w in topic_id or w in topic_label for w in ["home", "condo", "คอนโด", "บ้าน"]):
+            if any(k in kw_lower for k in ["บ้าน", "คอนโด", "ทำความสะอาดบ้าน"]):
+                matched.append(kw)
+        elif any(w in topic_id or w in topic_label for w in ["clean", "maid"]):
+            if any(k in kw_lower for k in ["แม่บ้าน", "ทำความสะอาด"]):
+                matched.append(kw)
+
+    if not matched:
+        matched = all_keywords[:limit]
+    return list(set(matched))[:limit]
+
+
 def _fallback_captions(topic: dict) -> dict:
     hl = topic["headline"]
     angle = topic["angle"]
@@ -79,6 +124,7 @@ def _fallback_captions(topic: dict) -> dict:
             "tiktok": f"{hl}\n{angle}\n{sign_off}",
             "line": f"{hl}\n\n{angle}\n\n{sign_off}",
             "image_subline": clip_subline(angle),
+            "voiceover_text": f"รู้ไหมคะว่า {hl}? แอดมิน มีข้อมูล ดีๆ มาฝากค่ะ. {angle}. เพื่อสุขภาพ และ ความสะอาด ของออฟฟิศ อย่าลืม ใส่ใจ เรื่องนี้ นะคะ",
             "hashtags": ["#SangkanClean", "#ความรู้ทำความสะอาด", "#OfficeCleanTips"],
         }
 
@@ -92,17 +138,29 @@ def _fallback_captions(topic: dict) -> dict:
         "tiktok": f"{hl}\n{angle}\nLINE {LINE_OA}",
         "line": f"{hl}\n\n{angle}\n\nทักไลน์ {LINE_OA} ได้เลย",
         "image_subline": clip_subline(angle),
+        "voiceover_text": f"ใครกำลัง เจอปัญหา {hl} บ้างคะ? สั่งการ คลีน ตัวจริง เรื่องความสะอาด พร้อมดูแล ออฟฟิศคุณ ให้เนี้ยบ ในทุกตารางนิ้ว. ทักไลน์ {LINE_OA} ได้เลยค่ะ",
         "hashtags": ["#SangkanClean", "#แม่บ้านออฟฟิศ", "#BigCleaning"],
     }
 
 
-def _build_prompt(topic: dict) -> str:
+def _build_prompt(topic: dict, keywords: list[str] = None) -> str:
     """Build the AI prompt — different for edu vs promo content."""
     is_edu = topic.get("type") == "edu"
+    kw_str = ", ".join(keywords) if keywords else "แม่บ้านทำความสะอาด"
+
+    seo_geo_rules = (
+        f"** กฎการเขียนตามหลัก SEO / AIO / GEO (สำคัญมาก) **\n"
+        f"1. แทรกคีย์เวิร์ดเหล่านี้อย่างเป็นธรรมชาติห้ามยัดเยียด: {kw_str}\n"
+        f"2. โครงสร้างคอนเทนต์ต้องมีความชัดเจนและน่าเชื่อถือสูง เพื่อให้ AI Search Engines นำไปประมวลผลต่อได้ง่าย\n"
+        f"3. หลีกเลี่ยงประโยคที่ซับซ้อนเกินไป เน้นข้อมูลที่เป็นประโยชน์จริง\n"
+        f"4. บทพากย์ (voiceover_text) ต้องมีความเป็นธรรมชาติสูงมาก เหมือนเพื่อนร่วมงานหรือคนจริงๆ เล่าสู่กันฟัง ชวนคุยอย่างเป็นกันเองและลื่นไหล ห้ามใช้สำนวนการพากย์โฆษณาที่แข็งทู่หรือสำนวนแปลจากต่างประเทศ ห้ามมีคำฟุ่มเฟือยของบอตเด็ดขาด\n"
+        f"5. สำคัญที่สุด: ให้ใส่เว้นวรรค (space) ระหว่างวลีสั้นๆ ในบทพากย์เป็นระยะๆ (เช่น ทุกๆ 10-15 ตัวอักษร) เพื่อเว้นจังหวะให้เสียง AI หายใจได้เป็นธรรมชาติ และช่วยให้ระบบตัดซับไตเติลภาษาไทยได้สวยงาม ไม่ขาดกลางคำ"
+    )
 
     if is_edu:
         return f"""คุณเขียนคอนเทนต์ให้ความรู้บนโซเชียลภาษาไทยให้แบรนด์ Sangkan Clean
 {THAI_TONE_RULES}
+{seo_geo_rules}
 
 หัวข้อวันนี้: {topic["label"]}
 มุม: {topic["angle"]}
@@ -114,13 +172,15 @@ def _build_prompt(topic: dict) -> str:
 - ห้ามพูดถึงราคาหรือแพ็คบริการ
 - ลงชื่อแบรนด์ท้ายโพสต์เบาๆ เช่น "เกร็ดความรู้จาก Sangkan Clean" หรือ "Sangkan Clean ใส่ใจเรื่องสะอาด"
 - โทนคุยเพื่อนทำงาน ไม่เป็นทางการ ให้ข้อมูลเชิง fact
+- สร้างบทพูดพากย์ (voiceover_text) สั้นกระชับ ความยาว 45-70 คำ เพื่อใช้อ่านออกเสียงใน Reels ขนาด 15 วินาที
 
 คืน JSON เท่านั้น:
 {{
-  "fb_ig": "แคปชัน Facebook/Instagram ภาษาไทย 60-140 คำ ให้ความรู้ ไม่ขาย",
+  "fb_ig": "แคปชัน Facebook/Instagram ภาษาไทย 60-140 คำ ให้ความรู้ ไม่ขาย แทรกคีย์เวิร์ด SEO",
   "tiktok": "แคปชัน TikTok สั้น 30-70 คำ ให้ความรู้ ไม่ขาย",
   "line": "ข้อความ LINE broadcast 40-100 คำ ให้ความรู้ ไม่ขาย ห้ามขึ้นต้นด้วย เรียน",
   "image_subline": "ประโยครองใต้หัวข้อบนกราฟิก ภาษาไทย สั้นมาก ไม่เกิน {SUBLINE_MAX} ตัวอักษร",
+  "voiceover_text": "บทพากย์วิดีโอ Reels ภาษาไทย ความยาว 45-70 คำ สำหรับพากย์ด้วย AI เสียงนุ่ม น่าเชื่อถือ ห้ามมีวงเล็บ ห้ามมีเครื่องหมายอ่านออกเสียงแปลกๆ",
   "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
 }}
 """
@@ -128,6 +188,7 @@ def _build_prompt(topic: dict) -> str:
     # Promo prompt (original)
     return f"""คุณเขียนคอนเทนต์โซเชียลภาษาไทยให้แบรนด์ Sangkan Clean เท่านั้น
 {THAI_TONE_RULES}
+{seo_geo_rules}
 
 หัวข้อวันนี้: {topic["label"]}
 มุม: {topic["angle"]}
@@ -135,12 +196,15 @@ def _build_prompt(topic: dict) -> str:
 CTA ที่ต้องมี: LINE {LINE_OA} และเว็บ {SITE}
 โทรศัพท์ (ใส่ได้ถ้าเหมาะสม): {PHONE}
 
+- สร้างบทพูดพากย์ (voiceover_text) สั้นกระชับ ความยาว 45-70 คำ เพื่อใช้อ่านออกเสียงโปรโมตใน Reels ขนาด 15 วินาที
+
 คืน JSON เท่านั้น:
 {{
-  "fb_ig": "แคปชัน Facebook/Instagram ภาษาไทย 60-140 คำ มี CTA โทนคุยเพื่อนทำงาน ไม่เป็นทางการ",
+  "fb_ig": "แคปชัน Facebook/Instagram ภาษาไทย 60-140 คำ มี CTA โทนคุยเพื่อนทำงาน แทรกคีย์เวิร์ด SEO",
   "tiktok": "แคปชัน TikTok สั้น 30-70 คำ โทนเดียวกัน",
   "line": "ข้อความ LINE broadcast 40-100 คำ โทนเดียวกัน ห้ามขึ้นต้นด้วย เรียน",
   "image_subline": "ประโยครองใต้หัวข้อบนกราฟิก ภาษาไทย สั้นมาก ไม่เกิน {SUBLINE_MAX} ตัวอักษร",
+  "voiceover_text": "บทพากย์โปรโมตวิดีโอ Reels ภาษาไทย ความยาว 45-70 คำ สำหรับพากย์ด้วย AI เสียงเป็นมิตรและกระตุ้นการตัดสินใจ ห้ามมีวงเล็บ ห้ามมีเครื่องหมายอ่านออกเสียงแปลกๆ",
   "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"]
 }}
 """
@@ -153,7 +217,10 @@ def _generate_captions(topic: dict) -> tuple[dict, str]:
     except ImportError:
         return _fallback_captions(topic), "fallback"
 
-    prompt = _build_prompt(topic)
+    all_kws = _load_seo_keywords()
+    kws = _pick_seo_keywords(topic, all_kws)
+    print(f"SEO/AIO/GEO selected keywords: {kws}")
+    prompt = _build_prompt(topic, keywords=kws)
     data = None
     caption_source = "fallback"
     keys = get_api_keys()
@@ -181,7 +248,7 @@ def _generate_captions(topic: dict) -> tuple[dict, str]:
 
     print(f"Caption source: {caption_source}")
     base = _fallback_captions(topic)
-    for key in ("fb_ig", "tiktok", "line", "image_subline", "hashtags"):
+    for key in ("fb_ig", "tiktok", "line", "image_subline", "voiceover_text", "hashtags"):
         if key in data and data[key]:
             base[key] = data[key]
     if isinstance(base.get("image_subline"), str):
@@ -238,8 +305,8 @@ SCENE_BY_TOPIC: dict[str, str] = {
         "friendly daylight, clean modern space"
     ),
     "after_construction": (
-        "newly finished bright commercial space being detailed, "
-        "dust cleanup nearly done, airy unfinished-to-clean transition"
+        "professional Thai cleaning team in uniforms cleaning paint spots, "
+        "dust, and window frames in a newly built modern house in Thailand"
     ),
     "soft_cleaning": (
         "gentle daily tidy of a modern condo living area / soft surfaces, "
@@ -311,12 +378,14 @@ SCENE_BY_TOPIC: dict[str, str] = {
         "clean common area, collaborative atmosphere"
     ),
     "edu_construction_dust": (
-        "recently renovated office space with visible construction dust, "
-        "warning safety context, dramatic lighting showing dust particles"
+        "interior of a modern office space in Bangkok post-renovation, "
+        "thin layer of concrete dust on a desk, a hand wipe revealing clean wood beneath, "
+        "safety warning mood"
     ),
     "edu_move_in_clean": (
-        "empty new office space ready for move-in, "
-        "fresh paint smell concept, bright natural light flooding in"
+        "newly renovated empty office floor in a Bangkok building, "
+        "window glass sparkling clean, Thai cleaners vacuuming and detailing final spots "
+        "before tenant move-in"
     ),
     "edu_routine_clean": (
         "calendar with cleaning schedule marked, modern office desk, "
@@ -516,7 +585,10 @@ def _resolve_background(
         "relevance_ok": False,
     }
 
-    if _env_bool("SOCIAL_GEMINI_BG", default=False) and not force_venue:
+    topic_type = topic.get("type", "promo")
+    use_gemini_bg = _env_bool("SOCIAL_GEMINI_BG", default=False) or (topic_type == "edu")
+
+    if use_gemini_bg and not force_venue:
         gem = _gemini_background(topic, out_dir)
         if gem:
             # Gemini has no venue tag — treat as ok but mark source
@@ -589,7 +661,8 @@ def build_assets(
     if bg_path and bg_path.exists():
         assets["bg"] = str(bg_path.relative_to(ROOT)).replace("\\", "/")
 
-    fmt = topic.get("format", "image")
+    topic_type = topic.get("type", "promo")
+    fmt = "video" if topic_type == "edu" else topic.get("format", "image")
     need_stories_video = True  # TikTok always
     need_feed_video = fmt == "video"
 
@@ -597,14 +670,58 @@ def build_assets(
         print("WARNING: ffmpeg not found — skipping video render")
         return assets
 
+    # Synthesize TTS voiceover & SRT if voiceover script is generated
+    audio_path = out / "voiceover.mp3"
+    srt_path = out / "stories.srt"
+    has_tts = False
+    duration = 10.0
+
+    if "voiceover_text" in captions and captions["voiceover_text"]:
+        from tts_generator import generate_tts_and_srt, get_srt_duration
+        has_tts = generate_tts_and_srt(captions["voiceover_text"], audio_path, srt_path)
+        if has_tts:
+            duration = get_srt_duration(srt_path, default=10.0)
+            assets["voiceover_mp3"] = str(audio_path.relative_to(ROOT)).replace("\\", "/")
+            assets["stories_srt"] = str(srt_path.relative_to(ROOT)).replace("\\", "/")
+
     if need_stories_video:
         stories_mp4 = out / "stories.mp4"
-        render_stories_clip(stories_png, stories_mp4, duration=10.0)
+        if has_tts:
+            from render_video import render_reels_video_with_audio_and_subs
+            render_reels_video_with_audio_and_subs(
+                png_path=stories_png,
+                audio_path=audio_path,
+                srt_path=srt_path,
+                mp4_path=stories_mp4,
+                duration=duration,
+            )
+        else:
+            render_stories_clip(stories_png, stories_mp4, duration=10.0)
         assets["stories_mp4"] = str(stories_mp4.relative_to(ROOT)).replace("\\", "/")
 
     if need_feed_video:
         feed_mp4 = out / "feed.mp4"
-        render_feed_clip(feed_png, feed_mp4, duration=10.0)
+        if has_tts:
+            # Render square video with audio track
+            temp_feed_mp4 = out / "feed_silent.mp4"
+            render_feed_clip(feed_png, temp_feed_mp4, duration=duration)
+            import subprocess
+            from render_video import ffmpeg_bin
+            cmd = [
+                ffmpeg_bin(),
+                "-y",
+                "-i", str(temp_feed_mp4),
+                "-i", str(audio_path),
+                "-c:v", "copy",
+                "-c:a", "aac",
+                "-shortest",
+                str(feed_mp4),
+            ]
+            subprocess.run(cmd, check=True, capture_output=True)
+            if temp_feed_mp4.exists():
+                temp_feed_mp4.unlink()
+        else:
+            render_feed_clip(feed_png, feed_mp4, duration=10.0)
         assets["feed_mp4"] = str(feed_mp4.relative_to(ROOT)).replace("\\", "/")
 
     return assets
@@ -639,7 +756,7 @@ def publish_all(
     dry_run: bool,
 ) -> dict[str, dict]:
     results: dict[str, dict] = {}
-    fmt = topic.get("format", "image")
+    fmt = "video" if topic.get("type", "promo") == "edu" else topic.get("format", "image")
     tags = captions.get("hashtags") or []
     tag_str = " ".join(tags) if isinstance(tags, list) else str(tags)
 
@@ -658,7 +775,8 @@ def publish_all(
         results["facebook"] = publish_facebook(
             caption=fb_caption,
             image_path=abs_asset("feed_png"),
-            video_path=abs_asset("feed_mp4") if fmt == "video" else None,
+            video_path=abs_asset("stories_mp4") if fmt == "video" else None,
+            use_reels=fmt == "video",
             dry_run=dry_run,
         )
 
@@ -700,8 +818,9 @@ def main() -> int:
     channels = _channels()
     log = _load_log()
     topic = pick_topic(log.get("last_topic"))
-    fmt = topic.get("format", "image")
     topic_type = topic.get("type", "promo")
+    # Force video format for educational topics to generate Reels
+    fmt = "video" if topic_type == "edu" else topic.get("format", "image")
 
     print(f"Topic: {topic['id']} ({fmt}) type={topic_type} dry_run={dry_run} channels={sorted(channels)}")
 

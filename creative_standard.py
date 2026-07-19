@@ -16,9 +16,9 @@ _GENZ_LOOK = (
     "Leave clear negative space on the LEFT third for Thai text overlay "
     "(no text, letters, logos, watermarks, or UI in the image). "
     "Photorealistic, shallow depth of field, natural daylight, "
-    "modern Bangkok office / home / cowork aesthetic. "
-    "Young East/Southeast Asian professionals, casual-smart attire. "
-    "Indoor plants, clean desks, no cluttered UI mockups."
+    "realistic modern Thailand locations, Bangkok context. "
+    "Real Thai professionals and Thai cleaning staff in neat professional uniforms, casual-smart or work attire. "
+    "Realistic, high-quality, representing services like home cleaning, office renovation cleanup, and factory spaces."
 )
 
 BACKGROUND_BRIEF = (

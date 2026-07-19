@@ -128,17 +128,71 @@ def _post_video(page_id: str, token: str, caption: str, video_path: Path) -> dic
     return {"ok": True, "mode": "video", "id": data.get("id")}
 
 
+def _post_reel(page_id: str, token: str, caption: str, video_path: Path) -> dict:
+    try:
+        # Step 1: Start
+        r = requests.post(
+            f"{GRAPH}/{page_id}/video_reels",
+            data={
+                "upload_phase": "start",
+                "access_token": token,
+            },
+            timeout=30,
+        )
+        if r.status_code >= 400:
+            return {"ok": False, "mode": "reel", "error": f"Start phase failed: {_graph_error(r)}"}
+
+        init_data = r.json()
+        video_id = init_data.get("video_id")
+        upload_url = init_data.get("upload_url")
+        if not video_id or not upload_url:
+            return {"ok": False, "mode": "reel", "error": f"Invalid start response: {init_data}"}
+
+        # Step 2: Upload file
+        file_size = video_path.stat().st_size
+        with video_path.open("rb") as fh:
+            headers = {
+                "Authorization": f"OAuth {token}",
+                "offset": "0",
+                "file_size": str(file_size),
+            }
+            up = requests.post(upload_url, data=fh, headers=headers, timeout=180)
+
+        if up.status_code >= 400:
+            return {"ok": False, "mode": "reel", "error": f"Upload phase failed: {_graph_error(up)}"}
+
+        # Step 3: Finish / Publish
+        pub = requests.post(
+            f"{GRAPH}/{page_id}/video_reels",
+            data={
+                "upload_phase": "finish",
+                "video_id": video_id,
+                "video_state": "PUBLISHED",
+                "description": caption,
+                "access_token": token,
+            },
+            timeout=60,
+        )
+        if pub.status_code >= 400:
+            return {"ok": False, "mode": "reel", "error": f"Finish phase failed: {_graph_error(pub)}"}
+
+        return {"ok": True, "mode": "reel", "id": video_id}
+    except Exception as e:
+        return {"ok": False, "mode": "reel", "error": str(e)}
+
+
 def publish_facebook(
     *,
     caption: str,
     image_path: Path | None,
     video_path: Path | None = None,
+    use_reels: bool = False,
     dry_run: bool = False,
 ) -> dict:
     page_id = _page_id()
     token = _token()
     if dry_run:
-        mode = "video" if video_path and video_path.exists() else "photo"
+        mode = "reel" if use_reels and video_path else ("video" if video_path and video_path.exists() else "photo")
         return {
             "ok": True,
             "dry_run": True,
@@ -152,6 +206,14 @@ def publish_facebook(
         page_id, token, probe = _resolve_page_auth(page_id, token)
     except Exception as exc:
         return {"ok": False, "error": str(exc)}
+
+    # Prefer Reels when requested; fall back to standard video or photo.
+    if use_reels and video_path and video_path.exists():
+        reel_result = _post_reel(page_id, token, caption, video_path)
+        if reel_result.get("ok"):
+            reel_result["page_id"] = page_id
+            return reel_result
+        print(f"Facebook Reel failed → {reel_result.get('error')}; trying standard video")
 
     # Prefer video when provided; fall back to photo so the day still posts.
     if video_path and video_path.exists():
