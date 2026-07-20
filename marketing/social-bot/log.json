@@ -1,5 +1,5 @@
 {
-  "last_topic": "edu_desk_germ",
+  "last_topic": "edu_germ_lifespan",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -1396,6 +1396,55 @@
           "ok": true,
           "mode": "reel",
           "id": "1033578846073817",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-20T23:50:12.134407+07:00",
+      "topic_id": "edu_germ_lifespan",
+      "type": "edu",
+      "caption_source": "gemini",
+      "format": "video",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260720/feed.png",
+        "stories_png": "out/20260720/stories.png",
+        "venue_need": "factory",
+        "venue_got": "factory",
+        "bg_source": "bg-factory-06.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260720/bg.jpg",
+        "voiceover_mp3": "out/20260720/voiceover.mp3",
+        "stories_srt": "out/20260720/stories.srt",
+        "stories_mp4": "out/20260720/stories.mp4",
+        "feed_mp4": "out/20260720/feed.mp4"
+      },
+      "captions": {
+        "fb_ig": "ใครคิดว่าโต๊ะทำงานเราสะอาด ลองเช็กกันหน่อย! 🔍 รู้ไหมครับว่าเชื้อโรคหลายชนิดที่เรามองไม่เห็น สามารถอยู่บนพื้นผิวที่เราสัมผัสบ่อยๆ ได้นานกว่าที่คิดเยอะเลย\n\nอย่างไวรัสไข้หวัดเนี่ย อยู่บนโต๊ะทำงานเราได้นา",
+        "tiktok": "โต๊ะทำงานที่เราใช้ทุกวัน อาจเป็นแหล่งรวมเชื้อโรคชั้นดีเลยนะ! 🦠 รู้ไหมว่าไวรัสไข้หวัดอยู่บนพื้นผิวได้นานถึง 24 ชั่วโมง ส่",
+        "line": "เช็กกันหน่อย! 🔍 โต๊ะทำงานที่เราใช้กันทุกวัน สะอาดพอไหมนะ? หลายคนอาจไม่รู้ว่าไวรัสไข้หวัดสามารถอยู่บนพื้นผิวได้นานถึง 24 "
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "reel",
+          "id": "2391670344657860",
           "page_id": "1158266640711425"
         },
         "instagram": {
