@@ -1,5 +1,5 @@
 {
-  "last_topic": "office_ondemand",
+  "last_topic": "edu_productivity",
   "posts": [
     {
       "ts": "2026-07-11T13:25:45.046874+00:00",
@@ -1494,6 +1494,55 @@
           "ok": true,
           "mode": "reel",
           "id": "28850079227914374",
+          "page_id": "1158266640711425"
+        },
+        "instagram": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing INSTAGRAM_BUSINESS_ACCOUNT_ID or token"
+        },
+        "tiktok": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing TIKTOK_ACCESS_TOKEN"
+        },
+        "line": {
+          "ok": false,
+          "skipped": true,
+          "reason": "missing LINE_CHANNEL_ACCESS_TOKEN"
+        }
+      }
+    },
+    {
+      "ts": "2026-07-21T19:04:06.180424+07:00",
+      "topic_id": "edu_productivity",
+      "type": "edu",
+      "caption_source": "gemini",
+      "format": "video",
+      "dry_run": false,
+      "assets": {
+        "feed_png": "out/20260721/feed.png",
+        "stories_png": "out/20260721/stories.png",
+        "venue_need": "factory",
+        "venue_got": "factory",
+        "bg_source": "bg-factory-06.jpg",
+        "relevance_ok": "1",
+        "bg": "out/20260721/bg.jpg",
+        "voiceover_mp3": "out/20260721/voiceover.mp3",
+        "stories_srt": "out/20260721/stories.srt",
+        "stories_mp4": "out/20260721/stories.mp4",
+        "feed_mp4": "out/20260721/feed.mp4"
+      },
+      "captions": {
+        "fb_ig": "ทีมงาน Sangkan Clean มีเรื่องน่าสนใจมาแชร์! เคยสงสัยไหมว่า ออฟฟิศที่ดูสะอาดสะอ้านเนี่ย มันช่วยให้เราทำงานได้ดีขึ้นจริงหรือเปล่า? 📈\n\nมีงานวิจัยหลายชิ้นเลยนะ ที่ชี้ตรงกันว่า สภาพแวดล้อมในการทำงานที่ถูกส",
+        "tiktok": "ออฟฟิศสะอาดๆ ช่วยให้ทำงานดีขึ้นจริงเหรอ? 🧐 งานวิจัยบอกว่า สภาพแวดล้อมที่สะอาดช่วยเพิ่มสมาธิได้ถึง 15% เลยนะ! ไม่ว่าจะออฟ",
+        "line": "รู้ไหม? ออฟฟิศที่สะอาดเอี่ยมเนี่ย ไม่ใช่แค่ดูดีนะ แต่มันช่วยเพิ่ม Productivity ของทีมได้จริง! งานวิจัยชี้ว่า สภาพแวดล้อม"
+      },
+      "results": {
+        "facebook": {
+          "ok": true,
+          "mode": "reel",
+          "id": "1074480075151584",
           "page_id": "1158266640711425"
         },
         "instagram": {
