@@ -756,6 +756,7 @@ def publish_all(
     channels: set[str],
     dry_run: bool,
 ) -> dict[str, dict]:
+    results: dict[str, dict] = {}
     disable_video = _env_bool("DISABLE_VIDEO", default=True)
     fmt = "image" if disable_video else ("video" if topic.get("type", "promo") == "edu" else topic.get("format", "image"))
     tags = captions.get("hashtags") or []
